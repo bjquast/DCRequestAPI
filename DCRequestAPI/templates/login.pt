@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>DC Request API</title>
+		<link rel="stylesheet" type="text/css" href="${request.application_url}/static/css/global.css">
+	</head>
+	<body>
+		<fieldset id='pageheader'>
+			<div><h1>Login</h1></div>
+		</fieldset>
+		
+		<div tal:condition="python: message is not None and message != ''" class="message error">${message}</div>
+		<form action="${url}" method="post">
+			<input type="hidden" name="came_from" value="${came_from}"/>
+			<div class='login_form'>
+				<span class="w25" ><label for="login">Username</label></span>
+				<span class="w75"><input type="text" id="login" name="login" value="${login}"/></span>
+			</div>
+			<div class='login_form'>
+				<span class="w25"><label for="password">Password</label></span>
+				<span class="w75"><input type="password" id="password" name="password" value="${password}"/></span>
+			</div>
+			<br />
+			
+			<div class='login_form'>
+				<span class="w25"><label for="server">Server</label></span>
+				<span class="w75"><input type="text" id="server" name="server" value="${server}"/></span>
+			</div>
+			<div class='login_form'>
+				<span class="w25"><label for="port">Port</label></span>
+				<span class="w75"><input type="text" id="port" name="port" value="${port}"/></span>
+			</div>
+			<div class='login_form'>
+				<span class="w25"><label for="database">Database</label></span>
+				<span class="w75"><input type="text" id="database" name="database" value="${database}"/></span>
+			</div>
+			<br/>
+			<div tal:condition="python: len(available_dwb_cons) > 0" id="dwb_connector_form">
+				<div class='login_form'>
+					<span class="w25"><label for="dwb_con_selector" class="">Available Servers</label></span>
+					<span class="w75"><select id="dwb_con_selector" name="dwb_connector">
+						<option tal:repeat="dwb_con available_dwb_cons" tal:attributes="selected 'selected' if dwb_con == current_dwb_con else None" value="${dwb_con}">${dwb_con}</option>
+					</select></span>
+				</div>
+			</div>
+			<br />
+			
+			<div class='login_form'>
+				<span class="w25"><input type="submit" name="form.submitted" value="Log In"/></span>
+			</div>
+		</form>
+		<br/>
+	</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en"
+xmlns:tal="http://xml.zope.org/namespaces/tal"
+xmlns:metal="http://xml.zope.org/namespaces/metal">
+
+<head>
+	<title>${pagetitle}</title>
+	
+
+
+</head>
+
+<body>
+	<h1>${pagetitle}</h1>
+
+	<h3>API for requesting data from a DiversityCollection database</h3>
+	<p></p>
+
+
+</body>
+</html>
+

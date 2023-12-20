@@ -1,0 +1,135 @@
+
+body {
+	font-family: sans-serif;
+}
+
+h1 {
+	font-size: 1em;
+	line-height: 0.8em;
+}
+
+#accounts {
+	display: flex;
+	justify-content: space-between;
+	margin: 2em;
+}
+
+
+a {
+	text-decoration: none;
+	color: darkblue;
+}
+
+a:visited {
+	text-decoration: none;
+	/*color: darkgrey;*/
+}
+
+
+
+#pageheader {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 0.5em;
+	width: 95%;
+	border: none;
+}
+
+#navigation {
+	display: flex;
+	justify-content: right;
+}
+
+
+#navigation>div,
+#navigation>span {
+	margin-left: 1em;
+}
+
+
+label{
+	font-size: smaller;
+}
+
+
+.font_08em {
+	font-size: 0.8em;
+}
+
+
+input{
+	font-size: 10pt;
+}
+
+
+.message{
+	border: 2px;
+	border-style: solid;
+	padding: 0.2em;
+	margin: 1em;
+}
+
+
+
+.message.success{
+	border-color: green;
+}
+
+.message.error{
+	border-color: red;
+}
+
+.message-box-top-fixed {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 300;
+	background-color: white;
+}
+
+.login_form {
+	width: 40%; 
+	display: flex;
+	justify-content: left;
+	flex-wrap: wrap;
+}
+
+.w25 {
+	width: 10em;
+}
+
+.w75 {
+	min-width: 20em;
+}
+
+.definitions {
+	display: flex;
+	justify-content: left;
+	flex-wrap: wrap;
+}
+
+
+.hidden {
+	display: none;
+}
+
+
+.flex-start {
+	display: flex;
+	justify-content: flex-start;
+	margin-bottom: 1em;
+	margin-left: 1em;
+}
+
+.flex-start div {
+	margin-right: 1em;
+	margin-bottom: 1em;
+}
+
+
+.flex-space-between {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 1em;
+}
+
