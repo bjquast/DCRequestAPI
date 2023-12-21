@@ -15,7 +15,7 @@ def main(global_config, **settings):
 	config.set_security_policy(SecurityPolicy())
 	
 	config.include('pyramid_chameleon')
-	#config.add_renderer('jsonp', JSONP(param_name='callback'))
+	config.add_renderer('jsonp', JSONP(param_name='callback'))
 	
 	config.add_route('iupartslist', '/list')
 	config.add_route('help', '/')

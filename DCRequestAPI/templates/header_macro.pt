@@ -1,0 +1,24 @@
+
+<div id="site-header">
+    <div>
+        <a title="API to the Digital Catalogue of the Zoological Research Museum Alexander Koenig/LIB" href="${baseurl}">
+            <img width="300" height="103" src="${request.static_url('DCRequestAPI:static/images/zfmk_api_big.svg')}" alt="Logo of the LIB" >
+        </a>
+    </div>
+    <div id="site-header-images">
+        <div class="white-background">
+            <div id="header_background_image">
+                <img src="${request.static_url('DCRequestAPI:static/images/image_collage.png')}" alt="Images of collection specimens"/>
+            </div>
+        </div>
+        <div class="site-header-box">
+            <h4 class="site-header-box-title">${pagetitle}</h4>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+

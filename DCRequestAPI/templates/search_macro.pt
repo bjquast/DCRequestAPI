@@ -1,0 +1,48 @@
+	
+	
+	
+	
+	
+<div>
+	<form action="${baseurl}" method="GET" >
+		<fieldset>
+			<legend>Search</legend>
+			<div id="searchbox">
+				<!--<dfn class="tooltip">-->
+					<span tal:condition="python: searchterms_preset is None">
+						<input id="search_terms" type="text" name="searchterms"/><input type="submit" value="Search"/>
+					</span>
+					<span tal:condition="python: searchterms_preset is not None">
+						<input id="search_terms" type="text" name="searchterms" value="${searchterms_preset}"/><input type="submit" value="Search"/>
+					</span>
+					<span tal:condition="python: len(searchfields) > 0">
+						<span tal:define="preset searchfields_preset"> Search in fields: 
+							<select name="searchfields">
+								<option tal:repeat="searchfield searchfields" 
+									value="${searchfield}" tal:attributes="selected 'selected' if searchfield in preset else None">${searchfield}</option>
+							</select>
+						</span>
+					</span>
+					<span tal:define="preset truncate_preset"> Search type:
+						<select name="truncate">
+							<option value="both" tal:attributes="selected 'selected' if preset == 'both' else None">result contains term</option>
+							<option value="pre" tal:attributes="selected 'selected' if preset == 'pre' else None">wildcard before term</option>
+							<option value="post" tal:attributes="selected 'selected' if preset == 'post' else None">wildcard after term</option>
+							<option value="false" tal:attributes="selected 'selected' if preset == 'false' else None">exact match</option>
+						</select>
+					</span>
+					<span tal:condition="python: len(orderbylist) > 0">
+						<span tal:define="preset orderby_preset"> Order results by: 
+							<select name="orderby">
+								<option tal:repeat="orderby orderbylist" 
+								value="${orderby}" tal:attributes="selected 'selected' if orderby == preset else None">${orderby}</option>
+							</select>
+						</span>
+					</span>
+					<!--<span class="smallparagraph" rel="tooltip">Search terms separated by a white space will be connected by an AND operator, terms separated by a semi-colon will be connected by an or OR operator.</span>-->
+				<!--</dfn>-->
+			</div>
+		</fieldset>
+	</form>
+</div>
+	 

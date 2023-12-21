@@ -74,8 +74,8 @@ class ES_Searcher():
 
 
 	def setStartRow(self):
-		if 'current_page' in self.search_params:
-			self.start = self.pagesize * (self.search_params['current_page']-1)
+		if 'page' in self.search_params:
+			self.start = self.pagesize * (self.search_params['page']-1)
 		else:
 			self.start = 0
 		return
@@ -190,7 +190,7 @@ if __name__ == "__main__":
 	'''
 	search_params = {
 		'pagesize': 1000,
-		'current_page': 1,
+		'page': 1,
 		'sorting_col': 'AccessionDate',
 		'sorting_dir': 'DESC',
 		'term_filters': {

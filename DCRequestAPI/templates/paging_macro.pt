@@ -1,0 +1,15 @@
+
+
+<span>Pages: 
+	<span tal:condition="python: (maxpage == 1) and (currentpage == 1)"><a href="${request.path_url}?page=1&${requestparamsstring}">1</a></span>
+	<span tal:condition="python: (maxpage > 1) and (currentpage > 1)"><a href="${request.path_url}?page=1&${requestparamsstring}">1</a> .. </span>
+	<span tal:condition="python: (currentpage == 1) and (maxpage > 1)" style="font-size:larger;">${currentpage}</span>
+	<a tal:condition="python: (currentpage > 3)" href="${request.path_url}?page=${currentpage-2}&${requestparamsstring}">${currentpage -2}</a>
+	<a tal:condition="python: (currentpage > 2)" href="${request.path_url}?page=${currentpage-1}&${requestparamsstring}">${currentpage -1}</a>
+	<span tal:condition="python: (currentpage < maxpage) and (currentpage > 1)" style="font-size:larger;">${currentpage}</span>
+	<a tal:condition="python: (currentpage +1) < maxpage" href="${request.path_url}?page=${currentpage+1}&${requestparamsstring}">${currentpage +1}</a>
+	<a tal:condition="python: (currentpage +2) < maxpage" href="${request.path_url}?page=${currentpage+2}&${requestparamsstring}">${currentpage +2}</a>
+	<span tal:condition="python: (maxpage > 1) and (currentpage < maxpage)"> .. <a href="${request.path_url}?page=${maxpage}&${requestparamsstring}">${maxpage}</a></span>
+	<span tal:condition="python: (currentpage == maxpage) and (maxpage > 1)" style="font-size:larger;">${currentpage}</span>
+</span>
+
