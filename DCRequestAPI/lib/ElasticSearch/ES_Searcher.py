@@ -67,7 +67,7 @@ class ES_Searcher():
 
 	def setPageSize(self):
 		if 'pagesize' in self.search_params:
-			self.pagesize = self.search_params['pagesize']
+			self.pagesize = int(self.search_params['pagesize'])
 		else:
 			pass
 		return
@@ -75,7 +75,7 @@ class ES_Searcher():
 
 	def setStartRow(self):
 		if 'page' in self.search_params:
-			self.start = self.pagesize * (self.search_params['page']-1)
+			self.start = self.pagesize * (int(self.search_params['page'])-1)
 		else:
 			self.start = 0
 		return
@@ -143,9 +143,17 @@ class ES_Searcher():
 		self.deleteEmptySubqueries()
 
 
-	def paginatedSearch(self, source_fields=[]):
-		#pudb.set_trace()
+	def updateMaxResultWindow(self, max_result_window):
+		#adjust max number of results that can be fetched
+		logger.info(self.client.indices.get_settings(index=self.index))
 		
+		body = {'index': {'max_result_window': max_result_window}}
+		self.client.indices.put_settings(index=self.index, body=body)
+
+
+	def paginatedSearch(self, source_fields=[]):
+		
+		self.updateMaxResultWindow(max_result_window=2000000)
 		self.readIndexMapping()
 		
 		self.setPageSize()
@@ -171,11 +179,12 @@ class ES_Searcher():
 		
 		response = self.client.search(index=self.index, size=self.pagesize, sort=self.sort, query=self.query, from_=self.start, source=source_fields, track_total_hits=True, aggs=aggs)
 		self.raw_aggregations = response['aggregations']
-
+		
+		resultnum = hits=response['hits']['total']['value']
 		maxpage = self.getMaxPage(hits=response['hits']['total']['value'])
 		docs = [doc for doc in response['hits']['hits']]
 		
-		return docs, maxpage
+		return docs, maxpage, resultnum
 
 
 
@@ -185,9 +194,9 @@ class ES_Searcher():
 if __name__ == "__main__":
 	# main program for testing
 	
-	search_params = {}
+	#search_params = {}
 	
-	'''
+	
 	search_params = {
 		'pagesize': 1000,
 		'page': 1,
@@ -199,7 +208,7 @@ if __name__ == "__main__":
 		},
 		'match_query': 'Rulik',
 	}
-	'''
+	
 	
 	pudb.set_trace()
 	es_search = ES_Searcher(search_params = search_params, user_id = 'bquast', users_projects = [634, 30000])

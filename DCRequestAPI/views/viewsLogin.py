@@ -45,8 +45,6 @@ class LoginViews(object):
 		came_from = self.request.params.get('came_from', referrer)
 		self.message = None
 		
-		pudb.set_trace()
-		
 		if 'form.submitted' in self.request.params:
 			self.read_form_input()
 			

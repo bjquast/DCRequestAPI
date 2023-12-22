@@ -9,80 +9,23 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 	<link rel="stylesheet" type="text/css" href="${request.static_url('DCRequestAPI:static/css/listview.css')}">
 </head>
 <body>
-	<div metal:use-macro="load: DCRequestAPI.templates.header_macro.pt"></div>
+	<div metal:use-macro="load: DCRequestAPI:templates/header_macro.pt"></div>
 
 
 <!--<div metal:use-macro="load: ./search_macro.pt"></div>-->
 
-<div tal:condition="python: len(specimenlist) <= 0">
+<div tal:condition="python: len(iupartslist) <= 0">
 	<h3>No specimen found</h3>
 </div>
 
-<div tal:condition="python: len(specimenlist) > 0 and resultnum > 0">
+<div tal:condition="python: len(iupartslist) > 0 and resultnum > 0">
 	<p >Number of specimens: ${resultnum}</p>
 </div>
 
-<div metal:use-macro="load: DCRequestAPI.templates.paging_macro.pt"></div>
+<div metal:use-macro="load: DCRequestAPI:templates/paging_macro.pt"></div>
 
 
-<div tal:condition="python: len(iupartslist) > 0" class="listview">
-	<br/ >
-	<table>
-		<thead>
-			<th>Image</th><th>Accession number</th><th>Species</th><th>Location</th><th>Collector(s)</th>
-		</thead>
-		<tbody>
-			<tr tal:repeat="cs specimenlist">
-				<td class="imagecol">
-					<div tal:condition="python: cs.CollectionSpecimenImages is not None" tal:define="csnum repeat.cs.number">
-						<div tal:define="url cs.CollectionSpecimenImages[0]['URI']">
-							<div class="osdviewer previewimage" id="osd_${csnum}"></div>
-							<a class="dz_image_url hide_me" href="${url}">${url}</a>
-						</div>
-					</div>
-					<div tal:condition="python: 'CollectionSpecimenImages' is None">
-						<span class="noImageMessage">No image available</span>
-					</div>
-				</td>
-				<td>
-					<div tal:condition="python: 'AccessionNumber' in cs" class="accessionnumber">
-						<a href="${baseurl}/${cs['CollectionSpecimenID']}">${cs['AccessionNumber']}</a>
-					</div>
-				</td>
-				<td>
-					<div tal:condition="python: cs.IdentificationUnits is not None" class="iulist">
-						<div class="iu" tal:repeat="iu cs.IdentificationUnits">
-							<div tal:condition="python: 'Identifications' in iu">
-								<span tal:repeat="i iu['Identifications']">
-									<span>${structure: i['HTMLTaxonomicName']}</span>
-									<br />
-								</span>
-							</div>
-						</div>
-					</div>
-				</td>
-				<td>
-					<div tal:condition="cs.CollectionEvent">
-						<div tal:define="ce cs.CollectionEvent">
-							<div tal:condition="ce['LocalityDescription']">${ce['LocalityDescription']}</div>
-							<div tal:condition="python: 'Sampling plot' in ce and ce['Sampling plot'] is not None">${ce['Sampling plot']}</div>
-							<div tal:condition="ce['CountryCache']">${ce['CountryCache']}</div>
-							<div tal:condition="python: 'WGS84Coordinates' in ce and ce['WGS84Coordinates'] is not None">${ce['WGS84Coordinates'][1]}, ${ce['WGS84Coordinates'][0]}</div>
-						</div>
-					</div>
-				</td>
-				<td>
-					<div tal:condition="python: cs.Collectors is not None">
-						<div tal:repeat="ca cs.Collectors">
-							<span tal:condition="ca['CollectorsName']">${ca['CollectorsName']}</span>
-							<br />
-						</div>
-					</div>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-</div>
+
 
 
 
