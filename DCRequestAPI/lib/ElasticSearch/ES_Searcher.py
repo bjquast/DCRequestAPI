@@ -77,6 +77,8 @@ class ES_Searcher():
 
 	def setStartRow(self):
 		if 'page' in self.search_params:
+			if int(self.search_params['page']) < 1:
+				self.search_params['page'] = 1
 			self.start = self.pagesize * (int(self.search_params['page'])-1)
 		else:
 			self.start = 0
@@ -193,15 +195,16 @@ class ES_Searcher():
 		
 		response = self.client.search(index=self.index, size=self.pagesize, sort=self.sort, query=self.query, from_=self.start, source=source_fields, track_total_hits=True, aggs=aggs)
 		
-		resultnum = hits=response['hits']['total']['value']
+		resultnum = response['hits']['total']['value']
+		maxpage = self.getMaxPage(resultnum)
 		
 		if self.start > resultnum:
-			self.search_params['page'] = 1
+			self.search_params['page'] = maxpage
 			self.setStartRow()
 			response = self.client.search(index=self.index, size=self.pagesize, sort=self.sort, query=self.query, from_=self.start, source=source_fields, track_total_hits=True, aggs=aggs)
 			
 		self.raw_aggregations = response['aggregations']
-		maxpage = self.getMaxPage(hits=response['hits']['total']['value'])
+		
 		docs = [doc for doc in response['hits']['hits']]
 		
 		return docs, maxpage, resultnum

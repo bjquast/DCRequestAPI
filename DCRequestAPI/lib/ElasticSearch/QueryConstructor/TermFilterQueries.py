@@ -25,17 +25,17 @@ class TermFilterQueries():
 			try:
 				mapping = self.mapping
 				for path_element in filter_path:
-					mapping = mapping[path_element]
+					element_mapping = mapping[path_element]
 			
 			except KeyError:
 				continue
 			
 			filter_type = None
-			if mapping['type'] == 'keyword':
+			if element_mapping['type'] == 'keyword':
 				filter_type = 'term'
 				filter_name_string = "{0}"
 			
-			elif 'keyword' in mapping['fields']:
+			elif 'fields' in element_mapping and 'keyword' in element_mapping['fields']:
 				filter_type = 'term'
 				filter_name_string = "{0}.keyword"
 			

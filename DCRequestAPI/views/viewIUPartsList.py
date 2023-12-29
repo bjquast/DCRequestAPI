@@ -45,7 +45,7 @@ class IUPartsListView():
 			'pagetitle': 'API for requests on DiversityCollection database',
 			'maxpage': maxpage,
 			'resultnum': resultnum,
-			'currentpage': int(self.search_params.get('current_page', 1)),
+			'currentpage': int(self.search_params.get('page', 1)),
 			'requestparamsstring': self.requeststring,
 			'iupartslist': iupartslist,
 			'colheaders': colheaders,
@@ -57,7 +57,7 @@ class IUPartsListView():
 	@view_config(route_name='iupartslist', accept='text/html', renderer="DCRequestAPI:templates/iupartslist.pt")
 	def IUPartsList(self):
 		
-		pudb.set_trace()
+		#pudb.set_trace()
 		
 		self.set_search_params()
 		self.set_requeststring()
@@ -114,9 +114,11 @@ class IUPartsListView():
 	def set_requeststring(self):
 		self.requeststring = ''
 		paramslist = []
-		for param in self.request.params:
+		request_params = self.request.params.dict_of_lists()
+		for param in request_params:
 			if param not in ['pagesize', 'page', 'currentpage']:
-				paramslist.append('{0}={1}'.format(param, self.request.params[param]))
+				for value in request_params[param]:
+					paramslist.append('{0}={1}'.format(param, value))
 		
 		self.requeststring = '&'.join(paramslist)
 		return
