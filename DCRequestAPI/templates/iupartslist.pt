@@ -25,7 +25,19 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 <div metal:use-macro="load: DCRequestAPI:templates/paging_macro.pt"></div>
 
 
-
+<div tal:condition="python: len(iupartslist) > 0" class="listview">
+	<br/ >
+	<table>
+		<thead>
+			<th tal:repeat="colheader colheaders">${colheader}</th>
+		</thead>
+		<tbody>
+			<tr tal:repeat="iuparts iupartslist">
+				<td tal:repeat="iupfield iuparts">${iupfield}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
 
 
 

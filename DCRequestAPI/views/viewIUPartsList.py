@@ -7,6 +7,7 @@ from pyramid.view import (view_config, view_defaults)
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPSeeOther
 
 from DCRequestAPI.lib.ElasticSearch.ES_Searcher import ES_Searcher
+from DCRequestAPI.lib.SearchResults.IUPartsListTable import IUPartsListTable
 
 import pudb
 import json
@@ -30,9 +31,14 @@ class IUPartsListView():
 		json_dict = self.request.json_body
 		self.search_params = json_dict.get('search_params', {})
 		
+		iupartstable = IUPartsListTable()
+		source_fields = iupartstable.getSourceFields()
+		colheaders = iupartstable.getColHeaders()
+		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_projects = self.users_project_ids)
+		es_searcher.setSourceFields(source_fields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
-		iupartslist = [doc['_source'] for doc in docs]
+		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs], users_project_ids = self.users_project_ids)
 		
 		pagecontent = {
 			'request': self.request,
@@ -41,7 +47,8 @@ class IUPartsListView():
 			'resultnum': resultnum,
 			'currentpage': int(self.search_params.get('current_page', 1)),
 			'requestparamsstring': self.requeststring,
-			'iupartslist': iupartslist
+			'iupartslist': iupartslist,
+			'colheaders': colheaders,
 			
 		}
 		return pagecontent
@@ -50,12 +57,19 @@ class IUPartsListView():
 	@view_config(route_name='iupartslist', accept='text/html', renderer="DCRequestAPI:templates/iupartslist.pt")
 	def IUPartsList(self):
 		
+		pudb.set_trace()
+		
 		self.set_search_params()
 		self.set_requeststring()
 		
+		iupartstable = IUPartsListTable()
+		source_fields = iupartstable.getSourceFields()
+		colheaders = iupartstable.getColHeaders()
+		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_projects = self.users_project_ids)
+		es_searcher.setSourceFields(source_fields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
-		iupartslist = [doc['_source'] for doc in docs]
+		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs], users_project_ids = self.users_project_ids)
 		
 		pagecontent = {
 			'request': self.request,
@@ -64,7 +78,8 @@ class IUPartsListView():
 			'resultnum': resultnum,
 			'currentpage': int(self.search_params.get('page', 1)),
 			'requestparamsstring': self.requeststring,
-			'iupartslist': iupartslist
+			'iupartslist': iupartslist,
+			'colheaders': colheaders
 		}
 		return pagecontent
 
@@ -100,7 +115,7 @@ class IUPartsListView():
 		self.requeststring = ''
 		paramslist = []
 		for param in self.request.params:
-			if param not in ['pagesize', 'page']:
+			if param not in ['pagesize', 'page', 'currentpage']:
 				paramslist.append('{0}={1}'.format(param, self.request.params[param]))
 		
 		self.requeststring = '&'.join(paramslist)

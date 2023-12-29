@@ -6,6 +6,8 @@ logger = logging.getLogger('elastic')
 import json
 import math
 
+import pudb
+
 from DCRequestAPI.lib.ElasticSearch.ES_Connector import ES_Connector
 from DCRequestAPI.lib.ElasticSearch.ES_Mappings import MappingsDict
 
@@ -13,7 +15,6 @@ from DCRequestAPI.lib.ElasticSearch.QueryConstructor.BucketAggregations import B
 from DCRequestAPI.lib.ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
 from DCRequestAPI.lib.ElasticSearch.QueryConstructor.MatchQuery import MatchQuery
 
-import pudb
 
 class ES_Searcher():
 	def __init__(self, search_params = {}, user_id = None, users_projects = []):
@@ -25,6 +26,7 @@ class ES_Searcher():
 		self.users_projects = users_projects
 		
 		self.index = 'iuparts'
+		self.source_fields = []
 		
 		self.pagesize = 1000
 		self.start = 0
@@ -97,6 +99,16 @@ class ES_Searcher():
 		return
 
 
+	def setSourceFieldsForList(self):
+		iupartstable = IUPartsListTable()
+		self.source_fields = [colname for colname in iupartstable.colnames]
+		return
+
+
+	def setSourceFields(self, source_fields=[]):
+		self.source_fields = source_fields
+
+
 	def addUserLimitation(self):
 		#if self.user_id is not None:
 		#	projectmanager = ProjectManagement(self.uid)
@@ -145,13 +157,13 @@ class ES_Searcher():
 
 	def updateMaxResultWindow(self, max_result_window):
 		#adjust max number of results that can be fetched
-		logger.info(self.client.indices.get_settings(index=self.index))
+		logger.debug(self.client.indices.get_settings(index=self.index))
 		
 		body = {'index': {'max_result_window': max_result_window}}
 		self.client.indices.put_settings(index=self.index, body=body)
 
 
-	def paginatedSearch(self, source_fields=[]):
+	def paginatedSearch(self):
 		
 		self.updateMaxResultWindow(max_result_window=2000000)
 		self.readIndexMapping()
@@ -168,19 +180,27 @@ class ES_Searcher():
 		buckets_query = BucketAggregations(users_projects = self.users_projects)
 		aggs = buckets_query.getAggregationsQuery()
 		
-		logger.info(json.dumps(aggs))
-		logger.info(json.dumps(self.query))
-		#logger.info(json.dumps(self.sort))
+		logger.debug(json.dumps(aggs))
+		logger.debug(json.dumps(self.query))
+		#logger.debug(json.dumps(self.sort))
 		
-		if (isinstance(source_fields, list) or isinstance(source_fields, tuple)) and len(source_fields) == 0:
+		if len(self.source_fields) == 0:
 			source_fields = True
+		elif len(self.source_fields) > 0:
+			source_fields = self.source_fields
 		else:
 			pass
 		
 		response = self.client.search(index=self.index, size=self.pagesize, sort=self.sort, query=self.query, from_=self.start, source=source_fields, track_total_hits=True, aggs=aggs)
-		self.raw_aggregations = response['aggregations']
 		
 		resultnum = hits=response['hits']['total']['value']
+		
+		if self.start > resultnum:
+			self.search_params['page'] = 1
+			self.setStartRow()
+			response = self.client.search(index=self.index, size=self.pagesize, sort=self.sort, query=self.query, from_=self.start, source=source_fields, track_total_hits=True, aggs=aggs)
+			
+		self.raw_aggregations = response['aggregations']
 		maxpage = self.getMaxPage(hits=response['hits']['total']['value'])
 		docs = [doc for doc in response['hits']['hits']]
 		

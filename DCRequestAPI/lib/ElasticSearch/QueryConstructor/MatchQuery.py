@@ -84,7 +84,8 @@ class MatchQuery():
 									'fields': self.open_fields
 								}
 							},
-						]
+						],
+						"minimum_should_match": 1
 					}
 				}
 				
