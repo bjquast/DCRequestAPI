@@ -31,9 +31,6 @@ class ES_Searcher():
 		self.pagesize = 1000
 		self.start = 0
 		
-		# standard sorting
-		self.sort = {'PartAccessionNumber.keyword': {'order': 'asc'}}
-		
 		self.sorting_cols = [
 			'CollectionSpecimenID',
 			'IdentificationUnitID',
@@ -87,17 +84,22 @@ class ES_Searcher():
 
 	def setSorting(self):
 		
-		if self.search_params['sorting_col'] is not None and self.search_params['sorting_dir'] is not None:
-			# check which type is needed for sorting
-			if self.search_params['sorting_col'] in self.mapping:
-				if self.mapping[self.search_params['sorting_col']]['type'].lower() in ['long', 'integer']:
-					self.sort = {"{0}".format(self.search_params['sorting_col']): {'order': self.search_params['sorting_dir'].lower()}}
-				elif self.mapping[self.search_params['sorting_col']]['type'].lower() in ['date']:
-					self.sort = {"{0}".format(self.search_params['sorting_col']): {'order': self.search_params['sorting_dir'].lower(), 'format': 'date_optional_time'}}
-				else:
-					self.sort = {"{0}.keyword".format(self.search_params['sorting_col']): {'order': self.search_params['sorting_dir'].lower()}}
-			else:
-				pass
+		self.sort = [{"_score":{"order":"desc"}}, {"PartAccessionNumber.keyword":{"order":"asc"}}]
+		
+		if 'sorting_col' in self.search_params and 'sorting_dir' in self.search_params:
+			if self.search_params['sorting_col'] is not None and self.search_params['sorting_dir'] is not None:
+				self.sort = []
+				# check which type is needed for sorting
+				if self.search_params['sorting_col'] in self.mapping:
+					if self.mapping[self.search_params['sorting_col']]['type'].lower() in ['long', 'integer']:
+						self.sort.append({"{0}".format(self.search_params['sorting_col']): {'order': self.search_params['sorting_dir'].lower()}})
+					elif self.mapping[self.search_params['sorting_col']]['type'].lower() in ['date']:
+						self.sort.append({"{0}".format(self.search_params['sorting_col']): {'order': self.search_params['sorting_dir'].lower(), 'format': 'date_optional_time'}})
+					elif self.mapping[self.search_params['sorting_col']]['type'].lower() in ['keyword']:
+						self.sort.append({"{0}".format(self.search_params['sorting_col']): {'order': self.search_params['sorting_dir'].lower()}})
+					elif self.mapping[self.search_params['sorting_col']]['type'].lower() in ['text'] and 'fields' in self.mapping[self.search_params['sorting_col']] and 'keyword' in self.mapping[self.search_params['sorting_col']]['fields']:
+						self.sort.append({"{0}.keyword".format(self.search_params['sorting_col']): {'order': self.search_params['sorting_dir'].lower()}})
+		
 		return
 
 
@@ -172,9 +174,7 @@ class ES_Searcher():
 		
 		self.setPageSize()
 		self.setStartRow()
-		
-		if 'sorting_col' in self.search_params and 'sorting_dir' in self.search_params:
-			self.setSorting()
+		self.setSorting()
 		
 		#self.queryConstructor is set in the derived classes
 		self.setQuery()
@@ -182,6 +182,7 @@ class ES_Searcher():
 		buckets_query = BucketAggregations(users_projects = self.users_projects)
 		aggs = buckets_query.getAggregationsQuery()
 		
+		logger.debug(self.sort)
 		logger.debug(json.dumps(aggs))
 		logger.debug(json.dumps(self.query))
 		#logger.debug(json.dumps(self.sort))
