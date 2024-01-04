@@ -63,7 +63,7 @@ class ES_Searcher():
 
 	def setSorting(self):
 		
-		self.sort = [{"_score":{"order":"desc"}}, {"PartAccessionNumber.keyword":{"order":"asc"}}]
+		self.sort = [{"_score":{"order":"desc"}}, {"PartAccessionNumber.keyword_lc":{"order":"asc"}}]
 		
 		if 'sorting_col' in self.search_params and 'sorting_dir' in self.search_params:
 			if self.search_params['sorting_col'] is not None and self.search_params['sorting_dir'] is not None:
@@ -74,10 +74,10 @@ class ES_Searcher():
 						self.sort.append({"{0}".format(self.search_params['sorting_col']): {'order': self.search_params['sorting_dir'].lower()}})
 					elif self.mapping[self.search_params['sorting_col']]['type'].lower() in ['date']:
 						self.sort.append({"{0}".format(self.search_params['sorting_col']): {'order': self.search_params['sorting_dir'].lower(), 'format': 'date_optional_time'}})
-					elif self.mapping[self.search_params['sorting_col']]['type'].lower() in ['keyword']:
-						self.sort.append({"{0}".format(self.search_params['sorting_col']): {'order': self.search_params['sorting_dir'].lower()}})
-					elif self.mapping[self.search_params['sorting_col']]['type'].lower() in ['text'] and 'fields' in self.mapping[self.search_params['sorting_col']] and 'keyword' in self.mapping[self.search_params['sorting_col']]['fields']:
-						self.sort.append({"{0}.keyword".format(self.search_params['sorting_col']): {'order': self.search_params['sorting_dir'].lower()}})
+					elif self.mapping[self.search_params['sorting_col']]['type'].lower() in ['keyword'] and 'fields' in self.mapping[self.search_params['sorting_col']] and 'keyword_lc' in self.mapping[self.search_params['sorting_col']]['fields']:
+						self.sort.append({"{0}.keyword_lc".format(self.search_params['sorting_col']): {'order': self.search_params['sorting_dir'].lower()}})
+					elif self.mapping[self.search_params['sorting_col']]['type'].lower() in ['text'] and 'fields' in self.mapping[self.search_params['sorting_col']] and 'keyword_lc' in self.mapping[self.search_params['sorting_col']]['fields']:
+						self.sort.append({"{0}.keyword_lc".format(self.search_params['sorting_col']): {'order': self.search_params['sorting_dir'].lower()}})
 		
 		return
 
