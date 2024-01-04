@@ -34,6 +34,7 @@ class IUPartsListView():
 		iupartstable = IUPartsListTable()
 		source_fields = iupartstable.getSourceFields()
 		colheaders = iupartstable.getColHeaders()
+		available_sorting_cols = iupartstable.colnames
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_projects = self.users_project_ids)
 		es_searcher.setSourceFields(source_fields)
@@ -47,8 +48,10 @@ class IUPartsListView():
 			'resultnum': resultnum,
 			'page': int(self.search_params.get('page', 1)),
 			'requestparamsstring': self.requeststring,
+			'search_params': self.search_params,
 			'iupartslist': iupartslist,
 			'colheaders': colheaders,
+			'available_sorting_cols': available_sorting_cols
 			
 		}
 		return pagecontent
@@ -65,6 +68,7 @@ class IUPartsListView():
 		iupartstable = IUPartsListTable()
 		source_fields = iupartstable.getSourceFields()
 		colheaders = iupartstable.getColHeaders()
+		available_sorting_cols = iupartstable.colnames
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_projects = self.users_project_ids)
 		es_searcher.setSourceFields(source_fields)
@@ -78,8 +82,10 @@ class IUPartsListView():
 			'resultnum': resultnum,
 			'page': int(self.search_params.get('page', 1)),
 			'requestparamsstring': self.requeststring,
+			'search_params': self.search_params,
 			'iupartslist': iupartslist,
-			'colheaders': colheaders
+			'colheaders': colheaders,
+			'available_sorting_cols': available_sorting_cols
 		}
 		return pagecontent
 

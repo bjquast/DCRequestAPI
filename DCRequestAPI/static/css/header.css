@@ -1,0 +1,36 @@
+#site-header {
+	margin-top: 0.5em;
+	margin-left: 2.5%;
+	margin-right: 4%;
+	display: flex;
+	justify-content: space-between;
+	/*flex-wrap: wrap;*/
+	color: #363636;
+}
+
+#header_background_image img{
+	height: 5em;
+}
+
+#site-header-images{
+	margin-top: 0.5em;
+	overflow: hidden;
+}
+
+.site-header-box {
+	padding-left: 0.5em;
+}
+
+.site-header-box-title {
+	background-color: white;
+	display: inline;
+	line-height: 1.5em;
+}
+
+
+.white-background {
+	background-color: white;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	padding-top: 0.5em;
+}

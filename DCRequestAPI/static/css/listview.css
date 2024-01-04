@@ -1,0 +1,57 @@
+.listview table {
+	margin: 0 1em 1em 1em;
+	border-collapse: collapse;
+}
+
+.listview th {
+	padding:1em;
+	border-bottom: 1px solid #ddd;
+}
+
+.listview tr {
+	padding-bottom: 0em;
+}
+
+.listview td {
+	vertical-align: top;
+	padding-top: 0.5em;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	border-bottom: 1px solid #ddd;
+}
+
+.listview td table,td td,td th {
+	border: none;
+	padding: 0.1em;
+	vertical-align: baseline;
+}
+
+.listview tr:nth-child(even){background-color: #f2f2f2;}
+
+.listview .imagecol {
+	width: 150px;
+}
+
+.listview .imagecol img{
+	width: 150px;
+}
+
+.noImageMessage {
+	font-size: 8pt;
+	color: #aaa;
+	display: none;
+}
+
+#searchbox {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+#searchbox>span {
+	margin-left: 1em;
+	/*
+	flex: auto;
+	*/
+}
+
+

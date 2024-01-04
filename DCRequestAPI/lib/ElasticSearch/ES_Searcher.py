@@ -15,7 +15,6 @@ from DCRequestAPI.lib.ElasticSearch.QueryConstructor.BucketAggregations import B
 from DCRequestAPI.lib.ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
 from DCRequestAPI.lib.ElasticSearch.QueryConstructor.MatchQuery import MatchQuery
 
-
 class ES_Searcher():
 	def __init__(self, search_params = {}, user_id = None, users_projects = []):
 		es_connector = ES_Connector()
@@ -30,26 +29,6 @@ class ES_Searcher():
 		
 		self.pagesize = 1000
 		self.start = 0
-		
-		self.sorting_cols = [
-			'CollectionSpecimenID',
-			'IdentificationUnitID',
-			'SpecimenPartID',
-			'PartAccessionNumber.keyword',
-			'AccessionDate',
-			'PreparationMethod.keyword',
-			'MaterialCategory',
-			'CollectorsEventNumber.keyword',
-			'CountryCache.keyword',
-			'CollectingMethod.keyword',
-			'LastIdentificationCache',
-			'FamilyCache',
-			'Projects.Project',
-			'Projects.ProjectID',
-			'CollectionName',
-			'NumberOfUnits',
-		]
-		
 
 
 	def getMaxPage(self, hits):
@@ -103,12 +82,6 @@ class ES_Searcher():
 		return
 
 
-	def setSourceFieldsForList(self):
-		iupartstable = IUPartsListTable()
-		self.source_fields = [colname for colname in iupartstable.colnames]
-		return
-
-
 	def setSourceFields(self, source_fields=[]):
 		self.source_fields = source_fields
 
@@ -152,7 +125,8 @@ class ES_Searcher():
 			
 			if param == 'match_query':
 				match_query = MatchQuery(users_projects = self.users_projects).getMatchQuery(self.search_params['match_query'])
-				self.query['bool']['must'].append(match_query)
+				if match_query is not None:
+					self.query['bool']['must'].append(match_query)
 		
 		
 		self.addUserLimitation()

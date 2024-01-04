@@ -62,6 +62,7 @@ class MatchQuery():
 
 
 	def getMatchQuery(self, query_string):
+		self.match_query = None
 		
 		if query_string is not None and len(query_string) > 0:
 			

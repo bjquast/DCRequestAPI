@@ -1,46 +1,32 @@
 	
-	
-	
-	
-	
 <div>
-	<form action="${baseurl}" method="GET" >
+	<form action="${request.application_url}/list" method="GET" >
 		<fieldset>
 			<legend>Search</legend>
 			<div id="searchbox">
-				<!--<dfn class="tooltip">-->
-					<span tal:condition="python: searchterms_preset is None">
-						<input id="search_terms" type="text" name="searchterms"/><input type="submit" value="Search"/>
-					</span>
-					<span tal:condition="python: searchterms_preset is not None">
-						<input id="search_terms" type="text" name="searchterms" value="${searchterms_preset}"/><input type="submit" value="Search"/>
-					</span>
-					<span tal:condition="python: len(searchfields) > 0">
-						<span tal:define="preset searchfields_preset"> Search in fields: 
-							<select name="searchfields">
-								<option tal:repeat="searchfield searchfields" 
-									value="${searchfield}" tal:attributes="selected 'selected' if searchfield in preset else None">${searchfield}</option>
-							</select>
-						</span>
-					</span>
-					<span tal:define="preset truncate_preset"> Search type:
-						<select name="truncate">
-							<option value="both" tal:attributes="selected 'selected' if preset == 'both' else None">result contains term</option>
-							<option value="pre" tal:attributes="selected 'selected' if preset == 'pre' else None">wildcard before term</option>
-							<option value="post" tal:attributes="selected 'selected' if preset == 'post' else None">wildcard after term</option>
-							<option value="false" tal:attributes="selected 'selected' if preset == 'false' else None">exact match</option>
-						</select>
-					</span>
-					<span tal:condition="python: len(orderbylist) > 0">
-						<span tal:define="preset orderby_preset"> Order results by: 
-							<select name="orderby">
-								<option tal:repeat="orderby orderbylist" 
-								value="${orderby}" tal:attributes="selected 'selected' if orderby == preset else None">${orderby}</option>
-							</select>
-						</span>
-					</span>
-					<!--<span class="smallparagraph" rel="tooltip">Search terms separated by a white space will be connected by an AND operator, terms separated by a semi-colon will be connected by an or OR operator.</span>-->
-				<!--</dfn>-->
+				<span tal:condition="python: 'match_query' not in search_params or search_params['match_query'] is None or search_params['match_query'] == ''">
+					<input id="match_query_input" type="text" name="match_query"/><input type="submit" value="Search"/>
+				</span>
+				<span tal:condition="python: 'match_query' in search_params and search_params['match_query'] is not None and len(search_params['match_query']) > 0">
+					<input id="match_query_input" type="text" name="match_query" value="${search_params['match_query']}"/>
+					<input type="submit" value="Search"/>
+				</span>
+				
+				
+				
+				<span tal:condition="python: len(available_sorting_cols) > 0">
+					<label for="sort_col_selector">Sort results by: </label> 
+					<select id="sort_col_selector" name="sorting_col">
+						<option tal:repeat="sorting_col available_sorting_cols" 
+						value="${sorting_col}" tal:attributes="selected 'selected' if 'sorting_col' in search_params and sorting_col == search_params['sorting_col'] else None">${available_sorting_cols[sorting_col]['en']}</option>
+					</select>
+					<label for="sort_dir_selector">Sort direction: </label>
+					<select id="sort_dir_selector" name="sorting_dir">
+						<option value="asc" tal:attributes="selected 'selected' if 'sorting_dir' in search_params and search_params['sorting_dir'] == 'asc' else None">Ascending</option>
+						<option value="desc" tal:attributes="selected 'selected' if 'sorting_dir' in search_params and search_params['sorting_dir'] == 'desc' else None">Descending</option>
+					</select>
+				</span>
+				<!--<span class="smallparagraph" rel="tooltip">Search terms separated by a white space will be connected by an AND operator, terms separated by a semi-colon will be connected by an or OR operator.</span>-->
 			</div>
 		</fieldset>
 	</form>

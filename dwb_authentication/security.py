@@ -3,7 +3,6 @@ import pudb
 
 from dwb_authentication.MSSQLConnector import MSSQLConnector, MSSQLConnectionParams
 from dwb_authentication.dbsession import DBSession
-from dwb_authentication.dwb_account import DWB_Account
 
 
 class SecurityPolicy:

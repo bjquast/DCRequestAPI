@@ -7,12 +7,13 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 	<title>${pagetitle}</title>
 	<link rel="stylesheet" type="text/css" href="${request.static_url('DCRequestAPI:static/css/global.css')}">
 	<link rel="stylesheet" type="text/css" href="${request.static_url('DCRequestAPI:static/css/listview.css')}">
+	<link rel="stylesheet" type="text/css" href="${request.static_url('DCRequestAPI:static/css/header.css')}">
 </head>
 <body>
 	<div metal:use-macro="load: DCRequestAPI:templates/header_macro.pt"></div>
 
 
-<!--<div metal:use-macro="load: ./search_macro.pt"></div>-->
+<div metal:use-macro="load: ./search_macro.pt"></div>
 
 <div tal:condition="python: len(iupartslist) <= 0">
 	<h3>No specimen found</h3>

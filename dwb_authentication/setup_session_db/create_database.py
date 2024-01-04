@@ -1,7 +1,10 @@
 import pudb
 
-from dwb_authentication.mysql_connect import mysql_connect
+from configparser import ConfigParser
+config = ConfigParser(allow_no_value=True)
+config.read('./config.ini')
 
+from dwb_authentication.mysql_connect import mysql_connect
 
 class SessionDBSetup():
 	def __init__(self):
@@ -111,13 +114,13 @@ class SessionDBSetup():
 
 
 	def set_default_connectors(self):
-		valuelists = [
-			['192.168.122.99', 1433, 'DiversityCollection_ASVSamples', 1],
-		]
-		if len(valuelists) > 0:
+		
+		self.read_default_connectors()
+		
+		if len(self.default_connectors) > 0:
 			placeholders = []
 			values = []
-			for valuelist in valuelists:
+			for valuelist in self.default_connectors:
 				placeholders.append('(%s, %s, %s, %s)')
 				values.extend(valuelist)
 			placeholderstring = ', '.join(placeholders)
@@ -131,6 +134,24 @@ class SessionDBSetup():
 			
 			self.cur.execute(query, values)
 			self.con.commit()
+
+
+	def read_default_connectors(self):
+		self.default_connectors = []
+		
+		sections = config.sections()
+		for section in sections:
+			if section[:12]=='data_source_' and section!='data_source_test':
+				server = config.get(section, 'server', fallback = None)
+				port = config.get(section, 'port', fallback = None)
+				database_name = config.get(section, 'database', fallback = None)
+			
+				if server is not None and port is not None and database_name is not None:
+					self.default_connectors.append([server, port, database_name, 1])
+		
+		return
+		
+
 
 
 if __name__ == "__main__":
