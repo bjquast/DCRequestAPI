@@ -21,7 +21,9 @@ class IUPartsListTable():
 			'LifeStage': {'en': 'Life stage'},
 			'Gender': {'en': 'Sex'},
 			'NumberOfUnits': {'en': 'Number of specimens'},
-			'CollectionName': {'en': 'Collection'}
+			'CollectionName': {'en': 'Collection'},
+			'Projects.Project': {'en': 'Project'},
+			'CollectionSpecimenID': {'en': 'CollectionSpecimenID'}
 		}
 		
 		self.withholdfilters = WithholdFilters()

@@ -17,6 +17,7 @@
 				<span tal:condition="python: len(available_sorting_cols) > 0">
 					<label for="sort_col_selector">Sort results by: </label> 
 					<select id="sort_col_selector" name="sorting_col">
+						<option value="relevance">Relevance</option>
 						<option tal:repeat="sorting_col available_sorting_cols" 
 						value="${sorting_col}" tal:attributes="selected 'selected' if 'sorting_col' in search_params and sorting_col == search_params['sorting_col'] else None">${available_sorting_cols[sorting_col]['en']}</option>
 					</select>
@@ -31,4 +32,4 @@
 		</fieldset>
 	</form>
 </div>
-	 
+	
