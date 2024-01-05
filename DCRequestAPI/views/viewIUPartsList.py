@@ -33,12 +33,13 @@ class IUPartsListView():
 		
 		iupartstable = IUPartsListTable()
 		source_fields = iupartstable.getSourceFields()
-		colheaders = iupartstable.getColHeaders()
+		columns = iupartstable.columns
 		available_sorting_cols = iupartstable.colnames
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_projects = self.users_project_ids)
 		es_searcher.setSourceFields(source_fields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
+		aggregations = es_searcher.getParsedAggregations()
 		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs], users_project_ids = self.users_project_ids)
 		
 		pagecontent = {
@@ -50,7 +51,8 @@ class IUPartsListView():
 			'requestparamsstring': self.requeststring,
 			'search_params': self.search_params,
 			'iupartslist': iupartslist,
-			'colheaders': colheaders,
+			'aggregations': aggregations,
+			'columns': columns,
 			'available_sorting_cols': available_sorting_cols
 			
 		}
@@ -60,19 +62,20 @@ class IUPartsListView():
 	@view_config(route_name='iupartslist', accept='text/html', renderer="DCRequestAPI:templates/iupartslist.pt")
 	def IUPartsList(self):
 		
-		pudb.set_trace()
+		#pudb.set_trace()
 		
 		self.set_search_params()
 		self.set_requeststring()
 		
 		iupartstable = IUPartsListTable()
 		source_fields = iupartstable.getSourceFields()
-		colheaders = iupartstable.getColHeaders()
+		columns = iupartstable.colnames
 		available_sorting_cols = iupartstable.colnames
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_projects = self.users_project_ids)
 		es_searcher.setSourceFields(source_fields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
+		aggregations = es_searcher.getParsedAggregations()
 		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs], users_project_ids = self.users_project_ids)
 		
 		pagecontent = {
@@ -84,7 +87,8 @@ class IUPartsListView():
 			'requestparamsstring': self.requeststring,
 			'search_params': self.search_params,
 			'iupartslist': iupartslist,
-			'colheaders': colheaders,
+			'aggregations': aggregations,
+			'columns': columns,
 			'available_sorting_cols': available_sorting_cols
 		}
 		return pagecontent

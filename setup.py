@@ -28,8 +28,9 @@ setup(name='DCRequestAPI',
 	author_email='b.quast@leibniz-lib.de',
 	license='CC By 4.0',
 	install_requires=requires,
-	entry_points="""\
-	[paste.app_factory]
-	main = DCRequestAPI:main
-	""",
+	entry_points={
+		'paste.app_factory': [
+		'main = DCRequestAPI:main'
+		],
+	},
 )

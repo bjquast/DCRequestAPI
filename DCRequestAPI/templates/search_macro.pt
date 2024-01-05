@@ -30,6 +30,7 @@
 				<!--<span class="smallparagraph" rel="tooltip">Search terms separated by a white space will be connected by an AND operator, terms separated by a semi-colon will be connected by an or OR operator.</span>-->
 			</div>
 		</fieldset>
+		<div metal:use-macro="load: DCRequestAPI:templates/filters_macro.pt"></div>
 	</form>
 </div>
 	

@@ -29,6 +29,7 @@ class ES_Searcher():
 		
 		self.pagesize = 1000
 		self.start = 0
+		
 
 
 	def getMaxPage(self, hits):
@@ -185,7 +186,28 @@ class ES_Searcher():
 		return docs, maxpage, resultnum
 
 
+	def parseRawAggregations(self):
+		self.aggregations = {}
+		for colname in self.raw_aggregations:
+			self.parseRawAggregation(self.raw_aggregations[colname], colname)
+		return
 
+
+	def parseRawAggregation(self, raw_aggregation, colname):
+		if 'buckets' in raw_aggregation:
+			if isinstance(raw_aggregation['buckets'], list) or isinstance(raw_aggregation['buckets'], tuple):
+				if colname not in self.aggregations:
+					self.aggregations[colname] = []
+				for bucket in raw_aggregation['buckets']:
+					self.aggregations[colname].append(bucket)
+			elif isinstance(raw_aggregation['buckets'], dict) and 'buckets' in raw_aggregation['buckets']:
+				self.parseRawAggregation(raw_aggregation['buckets'], colname)
+		return
+
+
+	def getParsedAggregations(self):
+		self.parseRawAggregations()
+		return self.aggregations
 
 
 

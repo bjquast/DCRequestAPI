@@ -1,10 +1,33 @@
 
 <div id="selectable_filters">
-
-
-
-
-
-
-
+	
+	<fieldset>
+		<legend>Filters</legend>
+		
+		<div>
+			<block tal:condition="python: 'term_filters' in search_params">
+				<block tal:repeat="filter_name search_params['term_filters']">
+					<block tal:repeat="filter_value search_params['term_filters'][filter_name]">
+						<span tal:condition="python: filter_name in columns">
+							<label>${columns[filter_name]['en']}:${filter_value}</label>
+							<input type="checkbox" checked="checked" readonly="readonly" value="${filter_name}:${filter_value}" name="term_filters">
+						</span>
+					</block>
+				</block>
+			</block>
+		</div>
+		
+		<div class="flexbox_row">
+			<div tal:repeat="aggs_name columns">
+				<block tal:condition="python: aggs_name in aggregations">
+					<h3>${columns[aggs_name]['en']}</h3>
+					<ul>
+						<li tal:repeat="bucket aggregations[aggs_name]">${bucket['key']} (${bucket['doc_count']})</li>
+					</ul>
+				</block>
+			</div>
+		</div>
+	</fieldset>
+	
+	
 </div>

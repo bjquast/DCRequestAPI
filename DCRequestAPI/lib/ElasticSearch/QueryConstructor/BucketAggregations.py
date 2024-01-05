@@ -8,32 +8,29 @@ import math
 
 import pudb
 
+from DCRequestAPI.lib.ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
+
 class BucketAggregations():
 	def __init__(self, users_projects = []):
 		self.users_projects = users_projects
-		self.aggs_fields = {
-			'LastIdentificationCache':  {'field_query': 'LastIdentificationCache.keyword', 'size': 20},
-			'FamilyCache': {'field_query': 'FamilyCache.keyword', 'size': 20},
-			'OrderCache': {'field_query': 'OrderCache.keyword', 'size': 20},
-			'CollectionName': {'field_query': 'CollectionName', 'size': 20},
-			'Projects.Project': {'field_query': 'Projects.Project', 'size': 20},
-			'VernacularTerm': {'field_query': 'Identifications.VernacularTerm', 'size': 20},
-			'TypeStatus': {'field_query': 'Identifications.TypeStatus', 'size': 20},
-		}
 		
-		self.nested_restricted_aggs_fields = {
-			'CollectorsName': {'path': 'CollectionAgents', 'field_query': 'CollectionAgents.CollectorsName.keyword', 'withholdflag': 'CollectionAgents.CollectorsWithhold', 'size': 20},
-		}
+		self.aggs_fields = {}
+		self.nested_restricted_aggs_fields = {}
+		self.restricted_aggs_fields = {}
 		
-		self.restricted_aggs_fields = {
-			'CountryCache': {'field_query': 'CountryCache.keyword', 'withholdflag': 'EventWithhold', 'size': 20},
-			'CollectingMethod': {'field_query': 'CollectingMethod.keyword', 'withholdflag': 'EventWithhold', 'size': 20},
-			'HabitatDescription': {'field_query': 'HabitatDescription.keyword', 'withholdflag': 'EventWithhold', 'size': 20},
-			'LocalityDescription': {'field_query': 'LocalityDescription.keyword', 'withholdflag': 'EventWithhold', 'size': 20},
-			'LocalityVerbatim': {'field_query': 'LocalityVerbatim.keyword', 'withholdflag': 'EventWithhold', 'size': 20},
-			'NamedArea': {'field_query': 'NamedArea.keyword', 'withholdflag': 'EventWithhold', 'size': 20},
-			
-		}
+		self.read_field_definitions()
+
+
+	def read_field_definitions(self):
+		for fieldname in fieldnames:
+			if fieldname in fielddefinitions:
+				if 'buckets' in fielddefinitions[fieldname] and 'path' in fielddefinitions[fieldname]['buckets'] and 'withholdflag' in fielddefinitions[fieldname]['buckets']:
+					self.nested_restricted_aggs_fields[fieldname] = fielddefinitions[fieldname]['buckets']
+				elif 'buckets' in fielddefinitions[fieldname] and 'withholdflag' in fielddefinitions[fieldname]['buckets']:
+					self.restricted_aggs_fields[fieldname] = fielddefinitions[fieldname]['buckets']
+				elif 'buckets' in fielddefinitions[fieldname]:
+					self.aggs_fields[fieldname] = fielddefinitions[fieldname]['buckets']
+
 
 
 	def getAggregationsQuery(self):
@@ -60,7 +57,7 @@ class BucketAggregations():
 					'path': self.nested_restricted_aggs_fields[field]['path']
 				},
 				'aggs': {
-					'filtered_{0}'.format(field): {
+					'buckets': {
 						'filter': {
 							'bool': {
 								'should': [
@@ -71,7 +68,7 @@ class BucketAggregations():
 							}
 						},
 						'aggs': {
-							'open_{0}'.format(field): {
+							'buckets': {
 								'terms': {'field': self.nested_restricted_aggs_fields[field]['field_query'], 'size': self.nested_restricted_aggs_fields[field]['size']}
 							}
 						}
@@ -96,7 +93,7 @@ class BucketAggregations():
 					}
 				},
 				'aggs': {
-					'open_{0}'.format(field): {
+					'buckets': {
 						'terms': {'field': self.restricted_aggs_fields[field]['field_query'], 'size': self.restricted_aggs_fields[field]['size']}
 					}
 				}

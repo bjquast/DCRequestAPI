@@ -1,33 +1,24 @@
 import pudb
 
-
+from DCRequestAPI.lib.ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
 from DCRequestAPI.lib.SearchResults.WithholdFilters import WithholdFilters
 
 
 class IUPartsListTable():
 	def __init__(self):
-		self.colnames = {
-			'PartAccessionNumber': {'en': 'Accessionnumber'},
-			'LastIdentificationCache': {'en': 'Taxon / Species'},
-			'FamilyCache': {'en': 'Family'},
-			'MaterialCategory': {'en': 'Specimen type'},
-			'LocalityVerbatim': {'en': 'Sampling locality'},
-			'LocalityDescription': {'en': 'Locality description'},
-			'HabitatDescription': {'en': 'Habitat'},
-			'CollectingMethod': {'en': 'Collecting method'},
-			'CountryCache': {'en': 'Country'},
-			'WGS84_Coordinate': {'en': 'Coordinate'},
-			'CollectionAgents.CollectorsName': {'en': 'Collector(s)'},
-			'LifeStage': {'en': 'Life stage'},
-			'Gender': {'en': 'Sex'},
-			'NumberOfUnits': {'en': 'Number of specimens'},
-			'CollectionName': {'en': 'Collection'},
-			'Projects.Project': {'en': 'Project'},
-			'CollectionSpecimenID': {'en': 'CollectionSpecimenID'}
-		}
+		self.colnames = {}
 		
 		self.withholdfilters = WithholdFilters()
 		self.withhold_fields = self.withholdfilters.getWithholdFields()
+		
+		self.readFieldDefinitions()
+
+
+	def readFieldDefinitions(self):
+		
+		for fieldname in fieldnames:
+			if fieldname in fielddefinitions:
+				self.colnames[fieldname] = fielddefinitions[fieldname]['names']
 
 
 	def getSourceFields(self):

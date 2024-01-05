@@ -20,7 +20,7 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 </div>
 
 <div tal:condition="python: len(iupartslist) > 0 and resultnum > 0">
-	<p >Number of specimens: ${resultnum}</p>
+	<p>Number of specimens: ${resultnum}</p>
 </div>
 
 <div metal:use-macro="load: DCRequestAPI:templates/paging_macro.pt"></div>
@@ -30,7 +30,7 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 	<br/ >
 	<table>
 		<thead>
-			<th tal:repeat="colheader colheaders">${colheader}</th>
+			<th tal:repeat="columnkey columns">${columns[columnkey]['en']}</th>
 		</thead>
 		<tbody>
 			<tr tal:repeat="iuparts iupartslist">
