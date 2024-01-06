@@ -8,7 +8,7 @@ import math
 
 import pudb
 
-from DCRequestAPI.lib.ElasticSearch.ES_Mappings import MappingsDict
+from DCRequestAPI.lib.ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
 
 class TermFilterQueries():
 	def __init__(self, mapping):
@@ -16,6 +16,7 @@ class TermFilterQueries():
 
 
 	def getTermFilterQueries(self, filters):
+		pudb.set_trace()
 		filter_queries = []
 		
 		for filter_name in filters:

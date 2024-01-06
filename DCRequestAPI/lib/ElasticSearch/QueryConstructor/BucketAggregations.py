@@ -15,6 +15,7 @@ class BucketAggregations():
 		self.users_projects = users_projects
 		
 		self.aggs_fields = {}
+		self.nested_aggs_fields = {}
 		self.nested_restricted_aggs_fields = {}
 		self.restricted_aggs_fields = {}
 		
@@ -26,16 +27,20 @@ class BucketAggregations():
 			if fieldname in fielddefinitions:
 				if 'buckets' in fielddefinitions[fieldname] and 'path' in fielddefinitions[fieldname]['buckets'] and 'withholdflag' in fielddefinitions[fieldname]['buckets']:
 					self.nested_restricted_aggs_fields[fieldname] = fielddefinitions[fieldname]['buckets']
+				elif 'buckets' in fielddefinitions[fieldname] and 'path' in fielddefinitions[fieldname]['buckets'] and 'withholdflag' not in fielddefinitions[fieldname]['buckets']:
+					self.nested_aggs_fields[fieldname] = fielddefinitions[fieldname]['buckets']
 				elif 'buckets' in fielddefinitions[fieldname] and 'withholdflag' in fielddefinitions[fieldname]['buckets']:
 					self.restricted_aggs_fields[fieldname] = fielddefinitions[fieldname]['buckets']
 				elif 'buckets' in fielddefinitions[fieldname]:
 					self.aggs_fields[fieldname] = fielddefinitions[fieldname]['buckets']
+		return
 
 
 
 	def getAggregationsQuery(self):
 		self.aggs_query = {}
 		self.setAggregationsQuery()
+		self.setNestedAggregationsQuery()
 		self.setRestrictedAggregationsQuery()
 		self.setNestedRestrictedAggregationsQuery()
 		
@@ -46,6 +51,21 @@ class BucketAggregations():
 		for field in self.aggs_fields:
 			self.aggs_query[field] = {'terms': {'field': self.aggs_fields[field]['field_query'], 'size': self.aggs_fields[field]['size']}}
 		
+		return
+
+
+	def setNestedAggregationsQuery(self):
+		for field in self.nested_aggs_fields:
+			self.aggs_query[field] = {
+				'nested': {
+					'path': self.nested_aggs_fields[field]['path']
+				},
+				'aggs': {
+					'buckets': {
+						'terms': {'field': self.nested_aggs_fields[field]['field_query'], 'size': self.nested_aggs_fields[field]['size']}
+					}
+				}
+			}
 		return
 
 

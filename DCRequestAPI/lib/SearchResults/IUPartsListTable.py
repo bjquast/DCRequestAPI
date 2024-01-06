@@ -53,7 +53,7 @@ class IUPartsListTable():
 		doc_sources = self.withholdfilters.applyFiltersToSources(doc_sources, users_project_ids)
 		
 		self.rows = []
-		
+		pudb.set_trace()
 		for doc_source in doc_sources:
 			values = []
 			for colname in self.colnames:
@@ -89,6 +89,8 @@ class IUPartsListTable():
 						valuelist = self.getComplexElements(element, keys_list, valuelist)
 				elif len(keys_list) > 1:
 					valuelist = self.getComplexElements(doc_element, keys_list, valuelist)
+				elif doc_element is None:
+					pass
 				else:
 					valuelist.append(doc_element)
 			else:
