@@ -62,13 +62,15 @@ class IUPartsListTable():
 					valuelist = self.getComplexElements(doc_source, colname_keys, valuelist = [])
 					value = ',\n'.join(valuelist)
 					values.append(value)
-				else:
+				elif colname in doc_source:
 					doc_element = doc_source[colname]
 					if isinstance(doc_element, list) or isinstance(doc_element, tuple):
 						value = ',\n'.join.doc_element
 						values.append(value)
 					else:
 						values.append(doc_element)
+				else:
+					values.append(None)
 			self.rows.append(values)
 		return
 
@@ -93,5 +95,5 @@ class IUPartsListTable():
 				else:
 					valuelist.append(doc_element)
 			else:
-				pass
+				return valuelist
 		return valuelist
