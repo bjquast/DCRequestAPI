@@ -36,7 +36,6 @@ class BucketAggregations():
 		return
 
 
-
 	def getAggregationsQuery(self):
 		self.aggs_query = {}
 		self.setAggregationsQuery()
@@ -45,7 +44,8 @@ class BucketAggregations():
 		self.setNestedRestrictedAggregationsQuery()
 		
 		return self.aggs_query
-		
+
+
 	def setAggregationsQuery(self):
 		
 		for field in self.aggs_fields:

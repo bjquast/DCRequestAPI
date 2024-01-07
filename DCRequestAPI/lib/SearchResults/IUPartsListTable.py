@@ -53,7 +53,7 @@ class IUPartsListTable():
 		doc_sources = self.withholdfilters.applyFiltersToSources(doc_sources, users_project_ids)
 		
 		self.rows = []
-		pudb.set_trace()
+		
 		for doc_source in doc_sources:
 			values = []
 			for colname in self.colnames:
@@ -80,15 +80,14 @@ class IUPartsListTable():
 
 	def getComplexElements(self, doc_element, keys_list, valuelist = []):
 		#pudb.set_trace()
-		while len(keys_list) > 0:
-			key = keys_list.pop(0)
+		for key in keys_list:
 			if key in doc_element:
 				doc_element = doc_element[key]
 				if isinstance (doc_element, list) or isinstance (doc_element, tuple):
 					for element in doc_element:
-						valuelist = self.getComplexElements(element, keys_list, valuelist)
+						valuelist = self.getComplexElements(element, keys_list[1:], valuelist)
 				elif len(keys_list) > 1:
-					valuelist = self.getComplexElements(doc_element, keys_list, valuelist)
+					valuelist = self.getComplexElements(doc_element, keys_list[1:], valuelist)
 				elif doc_element is None:
 					pass
 				else:

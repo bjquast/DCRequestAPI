@@ -121,7 +121,7 @@ class ES_Searcher():
 		for param in self.search_params:
 			
 			if param == 'term_filters':
-				filter_queries = TermFilterQueries(self.mapping).getTermFilterQueries(self.search_params['term_filters'])
+				filter_queries = TermFilterQueries(users_projects = self.users_projects).getTermFilterQueries(self.search_params['term_filters'])
 				self.query['bool']["filter"].extend(filter_queries)
 			
 			if param == 'match_query':
