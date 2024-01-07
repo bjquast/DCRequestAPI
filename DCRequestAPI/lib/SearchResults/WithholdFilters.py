@@ -42,45 +42,50 @@ class WithholdFilters():
 					break
 			
 			if project_matched is False:
-			
 				for filter_name in self.filter_definitions:
 					
 					filter_keys = filter_name.split('.')
-					self.filterComplexElements(source, filter_keys, filter_name)
+					if len(filter_keys) == 1 and len(self.filter_definitions[filter_keys[0]]) > 0:
+						source = self.filterSimpleElements(source, filter_keys[0], filter_name)
+					
+					elif len(filter_keys) > 1:
+						source = self.filterComplexElements(source, filter_keys, filter_name)
 			
 			self.filtered_sources.append(source)
 			
 		return self.filtered_sources
-		
 
 
-	def filterComplexElements(self, doc_source, keys_list, filter_name):
+	def filterSimpleElements(self, doc_element, key, filter_name):
+			if key in doc_element and doc_element[key] == 'true':
+				if len(self.filter_definitions[filter_name]) > 0:
+					for field_name in self.filter_definitions[filter_name]:
+						try:
+							del doc_element[field_name]
+						except:
+							pass
+			return doc_element
+
+
+	def filterComplexElements(self, doc_element, keys_list, filter_name):
 		# keys_list[-1] must always be the name of the withhold field that decides whether to delete the data or not 
-		#pudb.set_trace()
-		while len(keys_list) > 0:
-			key = keys_list.pop(0)
-			if len(keys_list) > 0:
-				if key in doc_source:
-					if isinstance (doc_source[key], list) or isinstance (doc_source[key], tuple):
+		for key in keys_list:
+			if len(keys_list) > 1:
+				if key in doc_element:
+					if isinstance (doc_element[key], list) or isinstance (doc_element[key], tuple):
 						allowed_items = []
-						for i in range (len(doc_source[key])):
-							doc_element = self.filterComplexElements(doc_source[key][i], keys_list, filter_name)
-							if doc_element is not None:
-								allowed_items.append(doc_element)
-						doc_source[key] = allowed_items
+						for element in doc_element[key]:
+							element = self.filterComplexElements(element, keys_list[1:], filter_name)
+							if element is not None:
+								allowed_items.append(element)
+						doc_element[key] = allowed_items
 					else:
-						doc_source = self.filterComplexElements(doc_source[key], keys_list, filter_name)
+						doc_element[key] = self.filterComplexElements(doc_element[key], keys_list[1:], filter_name)
 			
-			elif len(keys_list) == 0:
-				if key in doc_source and doc_source[key] == 'true':
-					if len(self.filter_definitions[filter_name]) > 0:
-						for field_name in self.filter_definitions[filter_name]:
-							try:
-								del doc_source[field_name]
-							except:
-								pass
-						return doc_source
-					else:
+			elif len(keys_list) == 1:
+				if key in doc_element and doc_element[key] == 'true':
 						return None
-		return doc_source
+				else:
+					return doc_element
+		return doc_element
 

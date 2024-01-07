@@ -62,7 +62,7 @@ class IUPartsListView():
 	@view_config(route_name='iupartslist', accept='text/html', renderer="DCRequestAPI:templates/iupartslist.pt")
 	def IUPartsList(self):
 		
-		pudb.set_trace()
+		#pudb.set_trace()
 		
 		self.set_search_params()
 		self.set_requeststring()
