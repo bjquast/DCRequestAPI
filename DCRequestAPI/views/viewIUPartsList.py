@@ -54,6 +54,7 @@ class IUPartsListView():
 			'aggregations': aggregations,
 			'columns': columns,
 			'available_sorting_cols': available_sorting_cols
+			#'open_filter_selectors': []
 			
 		}
 		return pagecontent
@@ -89,7 +90,8 @@ class IUPartsListView():
 			'iupartslist': iupartslist,
 			'aggregations': aggregations,
 			'columns': columns,
-			'available_sorting_cols': available_sorting_cols
+			'available_sorting_cols': available_sorting_cols,
+			'open_filter_selectors': self.search_params['open_filter_selectors']
 		}
 		return pagecontent
 
@@ -100,6 +102,7 @@ class IUPartsListView():
 		
 		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'match_query']
 		complex_params = ['term_filters',]
+		list_params = ['open_filter_selectors',]
 		
 		request_params = self.request.params.dict_of_lists()
 		
@@ -117,6 +120,14 @@ class IUPartsListView():
 						if query[0] not in self.search_params[param_name]:
 							self.search_params[param_name][query[0]] = []
 						self.search_params[param_name][query[0]].append(query[1])
+			else:
+				self.search_params[param_name] = []
+		
+		for param_name in list_params:
+			if param_name in request_params:
+				self.search_params[param_name] = request_params[param_name]
+			else:
+				self.search_params[param_name] = []
 		
 		return
 

@@ -4,12 +4,13 @@
 $(document).ready( function() {
 	add_filter_events();
 	add_remove_filter_events()
+	add_collapsible_filters_event();
 	add_submit_events();
 } );
 
 
 function add_submit_events() {
-	$("#sort_col_selector").change( function() { 
+	$("#sort_col_selector").change( function() {
 		$("#search_form").submit();
 	});
 	$("#sort_dir_selector").change( function() {
@@ -32,24 +33,22 @@ function add_filter_events() {
 
 
 function add_filter(filter_id, filter_name, filter_key, filter_value) {
-	//console.log(filter_id);
 	
 	let filter_exists = false;
 	
 	$('.filter_checkbox').each( function () {
-		console.log(filter_id, $(this).data('filter-id'));
 		if (filter_id == $(this).data('filter-id')) {
 			filter_exists = true;
 		}
 	});
 	
 	if (filter_exists == false) {
-		$('#applied_filters').append('<span class="filter_checkbox new_filter"></span>');
-		$('#applied_filters>span.new_filter').attr('data-filter-id', filter_id);
-		$('#applied_filters>span.new_filter').append('<label><b>' + filter_name + ': </b>' + filter_value + '</label>');
-		$('#applied_filters>span.new_filter').append('<input type="checkbox" checked="checked" value="' + filter_key + ':' + filter_value + '" name="term_filters">');
-		$('#applied_filters>span.new_filter>input').attr('data-filter-id', filter_id);
-		$('#applied_filters>span.new_filter').removeClass('new_filter');
+		$('#applied_filters').append('<div class="filter_checkbox new_filter"></div>');
+		$('#applied_filters .new_filter').attr('data-filter-id', filter_id);
+		$('#applied_filters .new_filter').append('<label><b>' + filter_name + ': </b>' + filter_value + '</label>');
+		$('#applied_filters .new_filter').append('<input type="checkbox" form="search_form" checked="checked" value="' + filter_key + ':' + filter_value + '" name="term_filters">');
+		$('#applied_filters .new_filter>input').attr('data-filter-id', filter_id);
+		$('#applied_filters .new_filter').removeClass('new_filter');
 		
 		// only submit when the filter was not set before
 		$("#search_form").submit();
@@ -74,7 +73,19 @@ function remove_filter(filter_id) {
 		}
 	});
 	
-	
 	$("#search_form").submit();
 }
 
+
+function add_collapsible_filters_event() {
+	$('#search_form').on('submit', function () {
+		$('.filter_selectors').each( function () {
+			if ($(this).attr('open') == 'open') {
+				$(this).children('input:checkbox').prop('checked', true);
+			}
+			else {
+				$(this).children('input:checkbox').prop('checked', false);
+			}
+		});
+	});
+}

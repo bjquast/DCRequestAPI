@@ -63,7 +63,7 @@ class ES_Searcher():
 
 
 	def setSorting(self):
-		
+		#pudb.set_trace()
 		self.sort = [{"_score":{"order":"desc"}}, {"PartAccessionNumber.keyword_lc":{"order":"asc"}}]
 		
 		if 'sorting_col' in self.search_params and 'sorting_dir' in self.search_params:

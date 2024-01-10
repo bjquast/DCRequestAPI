@@ -1,0 +1,11 @@
+.filter-select-box {
+	margin-right: 1rem;
+}
+
+.filter-select-box summary {
+	font-size: small;
+}
+
+.filter-select-box details {
+	font-size: small;
+}

@@ -1,4 +1,12 @@
+.listview {
+	overflow: scroll;
+	height: 100%;
+	width: 97%;
+}
+
 .listview table {
+	width: 100%;
+	overflow: auto;
 	margin: 0 1em 1em 1em;
 	border-collapse: collapse;
 }
@@ -42,16 +50,5 @@
 	display: none;
 }
 
-#searchbox {
-	display: flex;
-	flex-wrap: wrap;
-}
-
-#searchbox>span {
-	margin-left: 1em;
-	/*
-	flex: auto;
-	*/
-}
 
 

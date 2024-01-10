@@ -9,6 +9,12 @@ h1 {
 	line-height: 0.8em;
 }
 
+
+fieldset {
+	margin-right: 1rem;
+}
+
+
 #accounts {
 	display: flex;
 	justify-content: space-between;
@@ -141,6 +147,33 @@ input{
 }
 
 
-.filter-select-box {
-	font-size: small;
+.flex-column {
+	display: flex;
+	flex-direction: column;
 }
+
+
+.flex-row {
+	display: flex;
+	flex-direction: row;
+}
+
+#filter-and-resulttable {
+	width: 100%;
+}
+
+
+#selectable_filters {
+	min-width: 20rem;
+	max-width: 25rem;
+}
+
+#results_iuparts {
+	width: 40%;
+	height: 30rem;
+	flex-grow: 8;
+}
+
+
+
+
