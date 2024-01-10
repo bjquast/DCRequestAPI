@@ -50,5 +50,19 @@
 	display: none;
 }
 
+.page_radiobutton {
+	visibility: hidden;
+	/* image replacement for screen-readers according to: https://wiki.selfhtml.org/wiki/CSS/Tutorials/Hintergrund/Image_Replacement */
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
 
+.page_radiobutton_label {
+	color: blue;
+}
 

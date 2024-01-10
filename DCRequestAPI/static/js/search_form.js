@@ -16,6 +16,14 @@ function add_submit_events() {
 	$("#sort_dir_selector").change( function() {
 		$("#search_form").submit();
 	});
+	$("#pagesize_selector").change( function() {
+		$("#search_form").submit();
+	});
+	$('.page_radiobutton').each( function () {
+		$(this).change( function () {
+			$("#search_form").submit();
+		})
+	});
 };
 
 

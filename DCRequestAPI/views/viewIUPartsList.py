@@ -48,6 +48,7 @@ class IUPartsListView():
 			'maxpage': maxpage,
 			'resultnum': resultnum,
 			'page': int(self.search_params.get('page', 1)),
+			'pagesize': int(self.search_params.get('pagesize', 1000)),
 			'requestparamsstring': self.requeststring,
 			'search_params': self.search_params,
 			'iupartslist': iupartslist,
@@ -85,6 +86,7 @@ class IUPartsListView():
 			'maxpage': maxpage,
 			'resultnum': resultnum,
 			'page': int(self.search_params.get('page', 1)),
+			'pagesize': int(self.search_params.get('pagesize', 1000)),
 			'requestparamsstring': self.requeststring,
 			'search_params': self.search_params,
 			'iupartslist': iupartslist,
@@ -137,9 +139,9 @@ class IUPartsListView():
 		paramslist = []
 		request_params = self.request.params.dict_of_lists()
 		for param in request_params:
-			if param not in ['pagesize', 'page']:
-				for value in request_params[param]:
-					paramslist.append('{0}={1}'.format(param, value))
+			# if param not in ['pagesize', 'page']:
+			for value in request_params[param]:
+				paramslist.append('{0}={1}'.format(param, value))
 		
 		self.requeststring = '&'.join(paramslist)
 		return

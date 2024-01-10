@@ -1,0 +1,29 @@
+
+
+<div class="flex-start">
+	<div class="flexitem-align-center">
+		<span tal:condition="python: len(available_sorting_cols) > 0">
+			<label for="sort_col_selector">Sort results by: </label> 
+			<select id="sort_col_selector" form="search_form" name="sorting_col">
+				<option value="relevance">Relevance</option>
+				<option tal:repeat="sorting_col available_sorting_cols" 
+				value="${sorting_col}" tal:attributes="selected 'selected' if 'sorting_col' in search_params and sorting_col == search_params['sorting_col'] else None">${available_sorting_cols[sorting_col]['en']}</option>
+			</select>
+		</span>
+	</div>
+	<div class="flexitem-align-center">
+		<span>
+			<label for="sort_dir_selector">Sort direction: </label>
+			<select id="sort_dir_selector" form="search_form" name="sorting_dir">
+				<option value="asc" tal:attributes="selected 'selected' if 'sorting_dir' in search_params and search_params['sorting_dir'] == 'asc' else None">Ascending</option>
+				<option value="desc" tal:attributes="selected 'selected' if 'sorting_dir' in search_params and search_params['sorting_dir'] == 'desc' else None">Descending</option>
+			</select>
+		</span>
+	</div>
+	<div class="flexitem-align-center">
+		<label>Pagesize: </label>
+		<select id="pagesize_selector" form="search_form" name="pagesize">
+			<option tal:repeat="available_pagesize [10,20,50,100,500,1000]" value="${available_pagesize}" tal:attributes="selected 'selected' if pagesize == available_pagesize else None">${available_pagesize}</option>
+		</select>
+	</div>
+</div>
