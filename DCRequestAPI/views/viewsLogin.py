@@ -101,11 +101,16 @@ class LoginViews(object):
 	
 	@view_config(route_name='logout')
 	def logout_view(self):
+		pudb.set_trace()
+		logout_url = self.request.route_url('logout')
+		referrer = self.request.url
+		if referrer == logout_url:
+			referrer = self.request.route_url('iupartslist') # never use login form itself as came_from
+		came_from = self.request.params.get('came_from', referrer)
 		
 		#headers = forget(self.request)
 		self.request.session['token'] = None
-		url = self.request.route_url('select_table')
-		return HTTPFound(location=url)
+		return HTTPFound(location = came_from)
 
 
 	'''

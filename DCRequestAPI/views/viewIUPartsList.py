@@ -54,8 +54,8 @@ class IUPartsListView():
 			'iupartslist': iupartslist,
 			'aggregations': aggregations,
 			'columns': columns,
-			'available_sorting_cols': available_sorting_cols
-			#'open_filter_selectors': []
+			'available_sorting_cols': available_sorting_cols,
+			'authenticated_user': self.uid
 			
 		}
 		return pagecontent
@@ -93,7 +93,8 @@ class IUPartsListView():
 			'aggregations': aggregations,
 			'columns': columns,
 			'available_sorting_cols': available_sorting_cols,
-			'open_filter_selectors': self.search_params['open_filter_selectors']
+			'open_filter_selectors': self.search_params['open_filter_selectors'],
+			'authenticated_user': self.uid
 		}
 		return pagecontent
 
