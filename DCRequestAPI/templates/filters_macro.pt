@@ -8,8 +8,8 @@
 			<block tal:condition="python: 'term_filters' in search_params">
 				<block tal:repeat="filter_key search_params['term_filters']">
 					<block tal:repeat="filter_value search_params['term_filters'][filter_key]">
-						<div tal:condition="python: filter_key in columns" data-filter-id="filter_${filter_key}_${filter_value}" class="filter_checkbox">
-							<label><b>${columns[filter_key]['en']}:</b> ${filter_value}</label>
+						<div tal:condition="python: filter_key in ordered_coldefs" data-filter-id="filter_${filter_key}_${filter_value}" class="filter_checkbox">
+							<label><b>${coldefs[filter_key]['en']}:</b> ${filter_value}</label>
 							<input type="checkbox" form="search_form" checked="checked" value="${filter_key}:${filter_value}" name="term_filters" data-filter-id="filter_${filter_key}_${filter_value}">
 						</div>
 					</block>
@@ -21,14 +21,14 @@
 		
 		<h4>Choose filter</h4>
 		<div id="available_filters">
-			<div tal:repeat="aggs_name columns" class="filter-select-box">
+			<div tal:repeat="aggs_name ordered_coldefs" class="filter-select-box">
 				<details tal:condition="python: aggs_name in aggregations" class="filter_selectors" tal:attributes="open 'open' if aggs_name in open_filter_selectors else None">
 					<input type="checkbox" form="search_form" name="open_filter_selectors" class="hidden" value="${aggs_name}" tal:attributes="checked 'checked' if aggs_name in open_filter_selectors else None">
-					<summary>${columns[aggs_name]['en']}</summary>
+					<summary>${coldefs[aggs_name]['en']}</summary>
 					<ul>
 						<li tal:repeat="bucket aggregations[aggs_name]" class="bucket_entry" 
 							data-filter-id="filter_${aggs_name}_${bucket['key']}" 
-							data-filter-name="${columns[aggs_name]['en']}"
+							data-filter-name="${coldefs[aggs_name]['en']}"
 							data-filter-key="${aggs_name}"
 							data-filter-value="${bucket['key']}">
 							${bucket['key']} (${bucket['doc_count']})

@@ -25,13 +25,15 @@ class WithholdFilters():
 		return withhold_fields
 
 
-	def applyFiltersToSources(self, iupartslist, users_projects):
+	def applyFiltersToSources(self, docs, users_projects):
 		#pudb.set_trace()
 		
-		self.filtered_sources = []
+		self.filtered_docs = []
 		
 		
-		for source in iupartslist:
+		for doc in docs:
+			
+			source = doc['_source']
 			project_ids = [project['ProjectID'] for project in source['Projects']]
 			
 			project_matched = False
@@ -51,9 +53,9 @@ class WithholdFilters():
 					elif len(filter_keys) > 1:
 						source = self.filterComplexElements(source, filter_keys, filter_name)
 			
-			self.filtered_sources.append(source)
+			self.filtered_docs.append(doc)
 			
-		return self.filtered_sources
+		return self.filtered_docs
 
 
 	def filterSimpleElements(self, doc_element, key, filter_name):

@@ -11,8 +11,8 @@ import pudb
 from DCRequestAPI.lib.ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
 
 class TermFilterQueries():
-	def __init__(self, users_projects = []):
-		self.users_projects = users_projects
+	def __init__(self, users_project_ids = []):
+		self.users_project_ids = users_project_ids
 		
 		self.nested_fields = {}
 		self.nested_restricted_fields = {}
@@ -102,7 +102,7 @@ class TermFilterQueries():
 							}
 						],
 						"should": [
-							{"terms": {"Projects.ProjectID": self.users_projects}},
+							{"terms": {"Projects.ProjectID": self.users_project_ids}},
 							{"term": {self.simple_restricted_fields[filter_key]['withholdflag']: "false"}}
 						],
 						"minimum_should_match": 1
@@ -159,7 +159,7 @@ class TermFilterQueries():
 								}
 							],
 							"should": [
-								{"terms": {"Projects.ProjectID": self.users_projects}},
+								{"terms": {"Projects.ProjectID": self.users_project_ids}},
 								{"term": {self.nested_restricted_fields[filter_key]['withholdflag']: "false"}}
 							],
 							"minimum_should_match": 1

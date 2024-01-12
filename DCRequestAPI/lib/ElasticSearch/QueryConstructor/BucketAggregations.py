@@ -11,8 +11,8 @@ import pudb
 from DCRequestAPI.lib.ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
 
 class BucketAggregations():
-	def __init__(self, users_projects = []):
-		self.users_projects = users_projects
+	def __init__(self, users_project_ids = []):
+		self.users_project_ids = users_project_ids
 		
 		self.aggs_fields = {}
 		self.nested_aggs_fields = {}
@@ -81,7 +81,7 @@ class BucketAggregations():
 						'filter': {
 							'bool': {
 								'should': [
-									{"terms": {"Projects.ProjectID": self.users_projects}},
+									{"terms": {"Projects.ProjectID": self.users_project_ids}},
 									{"term": {self.nested_restricted_aggs_fields[field]['withholdflag']: "false"}}
 								],
 								"minimum_should_match": 1
@@ -106,7 +106,7 @@ class BucketAggregations():
 				'filter': {
 					'bool': {
 						'should': [
-							{"terms": {"Projects.ProjectID": self.users_projects}},
+							{"terms": {"Projects.ProjectID": self.users_project_ids}},
 							{"term": {self.restricted_aggs_fields[field]['withholdflag']: "false"}}
 						],
 						"minimum_should_match": 1

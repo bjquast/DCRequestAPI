@@ -11,24 +11,28 @@ import pudb
 from DCRequestAPI.lib.ElasticSearch.ES_Connector import ES_Connector
 from DCRequestAPI.lib.ElasticSearch.ES_Mappings import MappingsDict
 
+from DCRequestAPI.lib.SearchResults.WithholdFilters import WithholdFilters
 from DCRequestAPI.lib.ElasticSearch.QueryConstructor.BucketAggregations import BucketAggregations
 from DCRequestAPI.lib.ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
 from DCRequestAPI.lib.ElasticSearch.QueryConstructor.MatchQuery import MatchQuery
 
 class ES_Searcher():
-	def __init__(self, search_params = {}, user_id = None, users_projects = []):
+	def __init__(self, search_params = {}, user_id = None, users_project_ids = []):
 		es_connector = ES_Connector()
 		self.client = es_connector.client
 		
 		self.search_params = search_params
 		self.user_id = user_id
-		self.users_projects = users_projects
+		self.users_project_ids = users_project_ids
 		
 		self.index = 'iuparts'
 		self.source_fields = []
 		
 		self.pagesize = 1000
 		self.start = 0
+		
+		self.withholdfilters = WithholdFilters()
+		self.withhold_fields = self.withholdfilters.getWithholdFields()
 		
 
 
@@ -66,6 +70,8 @@ class ES_Searcher():
 		#pudb.set_trace()
 		self.sort = [{"_score":{"order":"desc"}}, {"PartAccessionNumber.keyword_lc":{"order":"asc"}}]
 		
+		if 'sorting_col' in self.search_params and 'sorting_dir' not in self.search_params:
+			self.search_params['sorting_dir'] = 'asc'
 		if 'sorting_col' in self.search_params and 'sorting_dir' in self.search_params:
 			if self.search_params['sorting_col'] is not None and self.search_params['sorting_dir'] is not None:
 				self.sort = []
@@ -85,6 +91,10 @@ class ES_Searcher():
 
 	def setSourceFields(self, source_fields=[]):
 		self.source_fields = source_fields
+		
+		if 'Projects.ProjectID' not in self.source_fields:
+			source_fields.append('Projects.ProjectID')
+		source_fields.extend(self.withhold_fields)
 
 
 	def addUserLimitation(self):
@@ -95,7 +105,7 @@ class ES_Searcher():
 		
 		# prepare the query as a subquery to the must-queries, so that it is guarantied that it is AND connected. 
 		# this is in contrast to should filters where the addition of other should filters might disable the AND connection
-		self.user_limitation = {"bool": {"should": [{"terms": {"Projects.ProjectID": self.users_projects}}, {"bool": {"must": [{"term": {"IUWithhold": "false"}}, {"term": {"SpecimenWithhold": "false"}}]}}], "minimum_should_match": 1}}
+		self.user_limitation = {"bool": {"should": [{"terms": {"Projects.ProjectID": self.users_project_ids}}, {"bool": {"must": [{"term": {"IUWithhold": "false"}}, {"term": {"SpecimenWithhold": "false"}}]}}], "minimum_should_match": 1}}
 		self.query["bool"]["must"].append(self.user_limitation)
 		return
 
@@ -121,11 +131,11 @@ class ES_Searcher():
 		for param in self.search_params:
 			
 			if param == 'term_filters':
-				filter_queries = TermFilterQueries(users_projects = self.users_projects).getTermFilterQueries(self.search_params['term_filters'])
+				filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids).getTermFilterQueries(self.search_params['term_filters'])
 				self.query['bool']["filter"].extend(filter_queries)
 			
 			if param == 'match_query':
-				match_query = MatchQuery(users_projects = self.users_projects).getMatchQuery(self.search_params['match_query'])
+				match_query = MatchQuery(users_project_ids = self.users_project_ids).getMatchQuery(self.search_params['match_query'])
 				if match_query is not None:
 					self.query['bool']['must'].append(match_query)
 		
@@ -154,7 +164,7 @@ class ES_Searcher():
 		#self.queryConstructor is set in the derived classes
 		self.setQuery()
 		
-		buckets_query = BucketAggregations(users_projects = self.users_projects)
+		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids)
 		aggs = buckets_query.getAggregationsQuery()
 		
 		logger.debug(self.sort)
@@ -182,6 +192,7 @@ class ES_Searcher():
 		self.raw_aggregations = response['aggregations']
 		
 		docs = [doc for doc in response['hits']['hits']]
+		docs = self.withholdfilters.applyFiltersToSources(docs, self.users_project_ids)
 		
 		return docs, maxpage, resultnum
 
@@ -231,7 +242,7 @@ if __name__ == "__main__":
 	
 	
 	pudb.set_trace()
-	es_search = ES_Searcher(search_params = search_params, user_id = 'bquast', users_projects = [634, 30000])
+	es_search = ES_Searcher(search_params = search_params, user_id = 'bquast', users_project_ids = [634, 30000])
 	es_search.paginatedSearch()
 	facets = es_search.raw_aggregations
 	

@@ -20,7 +20,7 @@ fieldnames = [
 	'NumberOfUnits',
 	'CollectionName',
 	'Projects.Project',
-	'CollectionSpecimenID',
+	'CollectionSpecimenID'
 ]
 
 fielddefinitions = {

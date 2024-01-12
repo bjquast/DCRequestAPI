@@ -25,56 +25,85 @@ class IUPartsListView():
 		
 
 
-	@view_config(route_name='iupartslist', accept='application/json', renderer="DCRequestAPI:templates/iupartslist.pt")
-	def IUPartsList(self):
+	@view_config(route_name='iupartslist', accept='application/json', renderer="json")
+	def IUPartsListJSON(self):
 		
-		json_dict = self.request.json_body
-		self.search_params = json_dict.get('search_params', {})
+		#pudb.set_trace()
+		
+		# prepare the params as dict of lists so it can be used in self.set_search_params()
+		json_params = self.request.json_body
+		request_params = {}
+		for key in json_params:
+			request_params[key] = []
+			if isinstance(json_params[key], list) or isinstance(json_params[key], tuple):
+				request_params[key].extend(json_params[key])
+			else:
+				request_params[key].append(json_params[key])
+		
+		self.set_search_params(request_params)
 		
 		iupartstable = IUPartsListTable()
 		source_fields = iupartstable.getSourceFields()
-		columns = iupartstable.columns
-		available_sorting_cols = iupartstable.colnames
+		coldefs = iupartstable.coldefs
+		available_sorting_cols = iupartstable.coldefs
+		ordered_coldefs = iupartstable.ordered_coldefs
 		
-		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_projects = self.users_project_ids)
+		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
 		es_searcher.setSourceFields(source_fields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
 		aggregations = es_searcher.getParsedAggregations()
 		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs], users_project_ids = self.users_project_ids)
 		
+		# set the coldefs for each iupart as keys for the json dicts 
+		iuparts = []
+		for doc in docs:
+			iupartdict = {
+				'_id': doc['_id']
+			}
+			
+			for key in ['_score', '_ignored']:
+				if key in doc:
+					iupartdict[key] = doc[key]
+			
+			for colkey in ordered_coldefs:
+				if colkey in doc['_source']:
+					iupartdict[colkey] = doc['_source'][colkey]
+			
+			iuparts.append(iupartdict)
+		
 		pagecontent = {
-			'request': self.request,
-			'pagetitle': 'API for requests on DiversityCollection database',
+			'title': 'API for requests on DiversityCollection database',
 			'maxpage': maxpage,
 			'resultnum': resultnum,
 			'page': int(self.search_params.get('page', 1)),
 			'pagesize': int(self.search_params.get('pagesize', 1000)),
-			'requestparamsstring': self.requeststring,
 			'search_params': self.search_params,
-			'iupartslist': iupartslist,
+			'iuparts': iuparts,
 			'aggregations': aggregations,
-			'columns': columns,
+			#'ordered_coldefs': ordered_coldefs,
+			#'coldefs': coldefs,
 			'available_sorting_cols': available_sorting_cols,
-			'authenticated_user': self.uid
-			
 		}
+		
 		return pagecontent
 
 
 	@view_config(route_name='iupartslist', accept='text/html', renderer="DCRequestAPI:templates/iupartslist.pt")
-	def IUPartsList(self):
+	def IUPartsListHTML(self):
 		
 		#pudb.set_trace()
 		
-		self.set_search_params()
+		request_params = self.request.params.dict_of_lists()
+		self.set_search_params(request_params)
 		self.set_requeststring()
 		
 		iupartstable = IUPartsListTable()
 		source_fields = iupartstable.getSourceFields()
-		columns = iupartstable.colnames
-		available_sorting_cols = iupartstable.colnames
+		coldefs = iupartstable.coldefs
+		available_sorting_cols = iupartstable.coldefs
+		ordered_coldefs = iupartstable.ordered_coldefs
 		
-		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_projects = self.users_project_ids)
+		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
 		es_searcher.setSourceFields(source_fields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
 		aggregations = es_searcher.getParsedAggregations()
@@ -91,7 +120,8 @@ class IUPartsListView():
 			'search_params': self.search_params,
 			'iupartslist': iupartslist,
 			'aggregations': aggregations,
-			'columns': columns,
+			'ordered_coldefs': ordered_coldefs,
+			'coldefs': coldefs,
 			'available_sorting_cols': available_sorting_cols,
 			'open_filter_selectors': self.search_params['open_filter_selectors'],
 			'authenticated_user': self.uid
@@ -100,14 +130,12 @@ class IUPartsListView():
 
 
 
-	def set_search_params(self):
+	def set_search_params(self, request_params):
 		self.search_params = {}
 		
 		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'match_query']
 		complex_params = ['term_filters',]
 		list_params = ['open_filter_selectors',]
-		
-		request_params = self.request.params.dict_of_lists()
 		
 		for param_name in simple_params: 
 			if param_name in request_params and len(request_params[param_name]) > 0:

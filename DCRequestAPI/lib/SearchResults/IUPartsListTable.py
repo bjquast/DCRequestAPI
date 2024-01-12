@@ -1,69 +1,66 @@
 import pudb
 
 from DCRequestAPI.lib.ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
-from DCRequestAPI.lib.SearchResults.WithholdFilters import WithholdFilters
 
 
 class IUPartsListTable():
 	def __init__(self):
-		self.colnames = {}
-		
-		self.withholdfilters = WithholdFilters()
-		self.withhold_fields = self.withholdfilters.getWithholdFields()
+		self.coldefs = {}
 		
 		self.readFieldDefinitions()
+		self.setColDefsOrder()
+
+
+	def setColDefsOrder(self, colkeys = []):
+		self.ordered_coldefs = []
+		if len(colkeys) <= 0:
+			for fieldname in fieldnames:
+				self.ordered_coldefs.append(fieldname)
+		
+		else:
+			for colkey in colkeys:
+				if colkey in fieldnames:
+					self.ordered_coldefs.append(colkey)
+		return
 
 
 	def readFieldDefinitions(self):
 		
 		for fieldname in fieldnames:
 			if fieldname in fielddefinitions:
-				self.colnames[fieldname] = fielddefinitions[fieldname]['names']
+				self.coldefs[fieldname] = fielddefinitions[fieldname]['names']
 
 
 	def getSourceFields(self):
-		source_fields = [colname for colname in self.colnames]
-		source_fields.extend(self.withhold_fields)
+		source_fields = [colkey for colkey in self.coldefs]
 		
-		if 'Projects.ProjectID' not in self.colnames:
+		if 'Projects.ProjectID' not in self.coldefs:
 			source_fields.append('Projects.ProjectID')
 		
 		return source_fields
 
 
-	def setColHeaders(self, colnames = [], lang = 'en'):
+	def getColHeaders(self, lang = 'en'):
 		self.colheaders = []
-		
-		if len(colnames) <= 0:
-			for colname in self.colnames:
-				self.colheaders.append(self.colnames[colname][lang])
-		else:
-			for colname in colnames:
-				if colname in self.colnames:
-					self.colheaders.append(self.colnames[colname][lang])
-		return
-
-
-	def getColHeaders(self, colnames = [], lang = 'en'):
-		self.setColHeaders(colnames = colnames, lang = lang)
+		for colkey in self.ordered_coldefs:
+			self.colheaders.append(self.coldefs[colkey])
 		return self.colheaders
 
 
 	def setRowContent(self, doc_sources = [], users_project_ids = []):
-		doc_sources = self.withholdfilters.applyFiltersToSources(doc_sources, users_project_ids)
 		
 		self.rows = []
 		
 		for doc_source in doc_sources:
 			values = []
-			for colname in self.colnames:
-				colname_keys = colname.split('.')
-				if len(colname_keys) > 1:
-					valuelist = self.getComplexElements(doc_source, colname_keys, valuelist = [])
+			for colkey in self.coldefs:
+				colkey_parts = colkey.split('.')
+				if len(colkey_parts) > 1:
+					valuelist = self.getComplexElements(doc_source, colkey_parts, valuelist = [])
 					value = ',\n'.join(valuelist)
 					values.append(value)
-				elif colname in doc_source:
-					doc_element = doc_source[colname]
+				elif colkey in doc_source:
+					doc_element = doc_source[colkey]
 					if isinstance(doc_element, list) or isinstance(doc_element, tuple):
 						value = ',\n'.join.doc_element
 						values.append(value)

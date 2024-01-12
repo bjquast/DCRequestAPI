@@ -9,8 +9,8 @@ import math
 import pudb
 
 class MatchQuery():
-	def __init__(self, users_projects = []):
-		self.users_projects = users_projects
+	def __init__(self, users_project_ids = []):
+		self.users_project_ids = users_project_ids
 		
 		self.open_fields = [
 			'PartAccessionNumber',
@@ -106,7 +106,7 @@ class MatchQuery():
 								{
 									'bool': {
 										'should': [
-											{"terms": {"Projects.ProjectID": self.users_projects}},
+											{"terms": {"Projects.ProjectID": self.users_project_ids}},
 											{"term": {self.withholded_fields[w_field]['withholdflag']: "false"}}
 										],
 										"minimum_should_match": 1

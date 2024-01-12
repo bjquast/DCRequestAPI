@@ -37,7 +37,7 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 			<br/ >
 			<table>
 				<thead>
-					<th tal:repeat="columnkey columns">${columns[columnkey]['en']}</th>
+					<th tal:repeat="columnkey ordered_coldefs">${coldefs[columnkey]['en']}</th>
 				</thead>
 				<tbody>
 					<tr tal:repeat="iuparts iupartslist">
