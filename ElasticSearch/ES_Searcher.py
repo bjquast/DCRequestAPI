@@ -8,13 +8,13 @@ import math
 
 import pudb
 
-from DCRequestAPI.lib.ElasticSearch.ES_Connector import ES_Connector
-from DCRequestAPI.lib.ElasticSearch.ES_Mappings import MappingsDict
+from ElasticSearch.ES_Connector import ES_Connector
+from ElasticSearch.ES_Mappings import MappingsDict
 
-from DCRequestAPI.lib.SearchResults.WithholdFilters import WithholdFilters
-from DCRequestAPI.lib.ElasticSearch.QueryConstructor.BucketAggregations import BucketAggregations
-from DCRequestAPI.lib.ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
-from DCRequestAPI.lib.ElasticSearch.QueryConstructor.MatchQuery import MatchQuery
+from ElasticSearch.WithholdFilters import WithholdFilters
+from ElasticSearch.QueryConstructor.BucketAggregations import BucketAggregations
+from ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
+from ElasticSearch.QueryConstructor.MatchQuery import MatchQuery
 
 class ES_Searcher():
 	def __init__(self, search_params = {}, user_id = None, users_project_ids = []):

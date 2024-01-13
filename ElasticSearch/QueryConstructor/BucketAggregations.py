@@ -8,7 +8,7 @@ import math
 
 import pudb
 
-from DCRequestAPI.lib.ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
+from ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
 
 class BucketAggregations():
 	def __init__(self, users_project_ids = []):

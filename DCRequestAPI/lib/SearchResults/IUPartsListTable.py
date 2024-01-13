@@ -1,6 +1,6 @@
 import pudb
 
-from DCRequestAPI.lib.ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
+from ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
 
 
 class IUPartsListTable():

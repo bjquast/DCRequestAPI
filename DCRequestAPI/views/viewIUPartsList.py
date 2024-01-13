@@ -6,7 +6,7 @@ from pyramid.renderers import render_to_response
 from pyramid.view import (view_config, view_defaults)
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPSeeOther
 
-from DCRequestAPI.lib.ElasticSearch.ES_Searcher import ES_Searcher
+from ElasticSearch.ES_Searcher import ES_Searcher
 from DCRequestAPI.lib.SearchResults.IUPartsListTable import IUPartsListTable
 
 import pudb
