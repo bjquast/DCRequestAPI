@@ -19,6 +19,8 @@ class IUPartsListView():
 		self.request = request
 		self.uid = self.request.authenticated_userid
 		
+		
+		
 		self.roles = self.request.identity['dwb_roles']
 		self.users_projects = self.request.identity['projects']
 		self.users_project_ids = [project[0] for project in self.users_projects]
@@ -30,17 +32,7 @@ class IUPartsListView():
 		
 		#pudb.set_trace()
 		
-		# prepare the params as dict of lists so it can be used in self.set_search_params()
-		json_params = self.request.json_body
-		request_params = {}
-		for key in json_params:
-			request_params[key] = []
-			if isinstance(json_params[key], list) or isinstance(json_params[key], tuple):
-				request_params[key].extend(json_params[key])
-			else:
-				request_params[key].append(json_params[key])
-		
-		self.set_search_params(request_params)
+		self.set_search_params()
 		
 		iupartstable = IUPartsListTable()
 		source_fields = iupartstable.getSourceFields()
@@ -93,8 +85,7 @@ class IUPartsListView():
 		
 		#pudb.set_trace()
 		
-		request_params = self.request.params.dict_of_lists()
-		self.set_search_params(request_params)
+		self.set_search_params()
 		self.set_requeststring()
 		
 		iupartstable = IUPartsListTable()
@@ -130,7 +121,22 @@ class IUPartsListView():
 
 
 
-	def set_search_params(self, request_params):
+	def set_search_params(self):
+		
+		# check if there is a json body in the request
+		try:
+			json_params = self.request.json_body
+			# prepare the params as dict of lists so it can be used in self.set_search_params()
+			request_params = {}
+			for key in json_params:
+				request_params[key] = []
+				if isinstance(json_params[key], list) or isinstance(json_params[key], tuple):
+					request_params[key].extend(json_params[key])
+				else:
+					request_params[key].append(json_params[key])
+		except:
+			request_params = self.request.params.dict_of_lists()
+		
 		self.search_params = {}
 		
 		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'match_query']
