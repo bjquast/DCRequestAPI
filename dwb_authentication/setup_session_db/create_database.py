@@ -140,6 +140,7 @@ class SessionDBSetup():
 
 
 	def read_default_connectors(self):
+		# read the default connection parameters without any credentials!
 		self.default_connectors = []
 		
 		sections = config.sections()
@@ -148,11 +149,11 @@ class SessionDBSetup():
 				accronym = config.get(section, 'accronym', fallback = section[12:])
 				server = config.get(section, 'server', fallback = None)
 				port = config.get(section, 'port', fallback = None)
-				database_name = config.get(section, 'database', fallback = None)
+				database = config.get(section, 'database', fallback = None)
 				driver = config.get(section, 'driver', fallback = None)
 			
-				if server is not None and port is not None and database_name is not None:
-					self.default_connectors.append([accronym, server, port, database_name, driver, 1])
+				if server is not None and port is not None and database is not None:
+					self.default_connectors.append([accronym, server, port, database, driver, 1])
 		
 		return
 		
