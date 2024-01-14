@@ -26,7 +26,7 @@
 				<div class='login_form'>
 					<span class="w25"><label for="dwb_con_selector" class="">Available Servers</label></span>
 					<span class="w75"><select id="dwb_con_selector" name="dwb_connector">
-						<option tal:repeat="dwb_con available_dwb_cons" tal:attributes="selected 'selected' if dwb_con == current_dwb_con else None" value="${dwb_con}">${dwb_con}</option>
+						<option tal:repeat="dwb_con available_dwb_cons" tal:attributes="selected 'selected' if dwb_con['accronym'] == current_dwb_con else None" value="${dwb_con['accronym']}">${dwb_con['accronym']}</option>
 					</select></span>
 				</div>
 			</div>

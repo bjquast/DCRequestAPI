@@ -10,8 +10,9 @@ import secrets
 
 from .encryptor import Encryptor
 
+from DBConnectors.MSSQLConnector import MSSQLConnectionParams
+
 from dwb_authentication.mysql_connect import mysql_connect
-from dwb_authentication.MSSQLConnector import MSSQLConnector, MSSQLConnectionParams
 from dwb_authentication.dwb_account import DWB_Account
 
 
@@ -65,9 +66,9 @@ class DBSession():
 		return token
 	
 	
-	def set_session(self, server, port, database, username, password):
+	def set_session(self, server, port, database, driver, username, password):
 		
-		conparams = MSSQLConnectionParams(server = server, port = port, database = database, uid = username, pwd = password)
+		conparams = MSSQLConnectionParams(server = server, port = port, database = database, driver = driver, uid = username, pwd = password)
 		
 		dwb_account = DWB_Account(conparams)
 		if dwb_account.isValid() is False:
@@ -445,7 +446,7 @@ class DBSession():
 		
 		connectionparams = self.get_connectionparams_from_session(token)
 		if connectionparams is not None:
-			connectionstring = connectionparams.getMSConnectionString()
+			connectionstring = connectionparams.getConnectionString()
 			return connectionstring
 		else:
 			return None

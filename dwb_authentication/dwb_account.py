@@ -1,7 +1,7 @@
 import pudb
 
 
-from dwb_authentication.MSSQLConnector import MSSQLConnector
+from DBConnectors.MSSQLConnector import MSSQLConnector
 
 
 class DWB_Account():
@@ -11,7 +11,7 @@ class DWB_Account():
 
 
 	def isValid(self):
-		connectionstring = self.conparams.getMSConnectionString()
+		connectionstring = self.conparams.getConnectionString()
 		try:
 			dwb_con = MSSQLConnector(connectionstring = connectionstring)
 			self.server_roles = self.getServerRoles(dwb_con)

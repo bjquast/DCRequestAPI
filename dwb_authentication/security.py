@@ -1,7 +1,6 @@
 import pudb
 
 
-from dwb_authentication.MSSQLConnector import MSSQLConnector, MSSQLConnectionParams
 from dwb_authentication.dbsession import DBSession
 
 
@@ -10,7 +9,7 @@ class SecurityPolicy:
 		pass
 
 
-	def validate_credentials(self, server = None, port = None, database = None, username = None, password = None):
+	def validate_credentials(self, server = None, port = None, database = None, driver = None, username = None, password = None):
 		'''
 		# this is for the first login, when no token is available
 		# try to connect with credentials, if successful create new session
@@ -19,16 +18,8 @@ class SecurityPolicy:
 		
 		dbsession = DBSession()
 		
-		connectionparams = MSSQLConnectionParams(
-			server = server,
-			port = port,
-			database = database,
-			pwd = password,
-			uid = username
-		)
-		
 		# dbsession.set_session() checks if connection params are valid and returns None if they are not valid
-		token = dbsession.set_session(connectionparams.getServer(), connectionparams.getPort(), connectionparams.getDatabase(), username, password)
+		token = dbsession.set_session(server, port, database, driver, username, password)
 		return token
 
 

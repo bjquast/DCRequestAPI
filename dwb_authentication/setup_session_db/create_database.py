@@ -52,11 +52,14 @@ class SessionDBSetup():
 		query = """
 		CREATE TABLE `mssql_connectors` (
 			`db_connector_id` INT NOT NULL AUTO_INCREMENT,
+			`accronym` varchar(50) NOT NULL,
 			`server` varchar(255) NOT NULL,
 			`port` INT DEFAULT NULL,
 			`database` varchar(255) DEFAULT NULL,
+			`driver` varchar(255) DEFAULT NULL,
 			`remember_connector` tinyint(1) DEFAULT 0,
 			PRIMARY KEY (`db_connector_id`),
+			UNIQUE KEY `idx_accronym` (`accronym`),
 			UNIQUE KEY `idx_connector` (`server`,`port`,`database`),
 			KEY (`server`),
 			KEY (`database`)
@@ -121,13 +124,13 @@ class SessionDBSetup():
 			placeholders = []
 			values = []
 			for valuelist in self.default_connectors:
-				placeholders.append('(%s, %s, %s, %s)')
+				placeholders.append('(%s, %s, %s, %s, %s, %s)')
 				values.extend(valuelist)
 			placeholderstring = ', '.join(placeholders)
 			
 			query = """
 			INSERT INTO `mssql_connectors`
-			(`server`, `port`, `database`, `remember_connector`)
+			(`accronym`, `server`, `port`, `database`, `driver`, `remember_connector`)
 			VALUES {0}
 			;""".format(placeholderstring)
 			
@@ -142,12 +145,14 @@ class SessionDBSetup():
 		sections = config.sections()
 		for section in sections:
 			if section[:12]=='data_source_' and section!='data_source_test':
+				accronym = config.get(section, 'accronym', fallback = section[12:])
 				server = config.get(section, 'server', fallback = None)
 				port = config.get(section, 'port', fallback = None)
 				database_name = config.get(section, 'database', fallback = None)
+				driver = config.get(section, 'driver', fallback = None)
 			
 				if server is not None and port is not None and database_name is not None:
-					self.default_connectors.append([server, port, database_name, 1])
+					self.default_connectors.append([accronym, server, port, database_name, driver, 1])
 		
 		return
 		

@@ -12,10 +12,10 @@ class MSSQLConnector():
 	def __init__(self, connectionstring = None, config = None, autocommit=False):
 		if config is not None:
 			if 'server' in config and 'driver' in config:
-				self.connectionstring = '''Server={0};UID={1};PWD={2};Database={3};PORT={4};Driver={5}'''.format(config['server'], config['user'], config['passwd'], config['db'], config['port'], config['driver'])
+				self.connectionstring = '''Server={0};UID={1};PWD={2};Database={3};PORT={4};Driver={5}'''.format(config['server'], config['user'], config['password'], config['database'], config['port'], config['driver'])
 			elif 'dsn' in config:
-				self.connectionstring = '''DSN={0};UID={1};PWD={2};Database={3};PORT={4}'''.format(config['dsn'], config['user'], config['passwd'], config['db'], config['port'])
-			self.databasename = config['db']
+				self.connectionstring = '''DSN={0};UID={1};PWD={2};Database={3};PORT={4}'''.format(config['dsn'], config['user'], config['password'], config['database'], config['port'])
+			self.databasename = config['database']
 		elif connectionstring is not None:
 			self.connectionstring = connectionstring
 			# read the database name from connectionstring and assign it to attribute self.databasename
@@ -23,7 +23,7 @@ class MSSQLConnector():
 			if matchobj is not None:
 				self.databasename = matchobj.groups()[0]
 		else:
-			raise Exception ('No data base connection parameters given')
+			raise Exception ('No database connection parameters given')
 		
 		'''
 		take over attributes from MSSQLConnector class
@@ -64,7 +64,7 @@ class MSSQLConnector():
 
 
 class MSSQLConnectionParams():
-	def __init__(self, dsn = None, server = None, port = None, driver = '/usr/lib/x86_64-linux-gnu/odbc/libtdsodbc.so', database = None, uid = None, pwd = None):
+	def __init__(self, dsn = None, server = None, port = None, driver = None, database = None, uid = None, pwd = None):
 		self.paramsdict = {
 		}
 		self.setDSN(dsn)
@@ -73,8 +73,6 @@ class MSSQLConnectionParams():
 		self.setDatabase(database)
 		self.setUID(uid)
 		self.setPWD(pwd)
-		
-		# driver must be set when server parameter is used
 		self.setDriver(driver)
 		
 		
@@ -126,7 +124,7 @@ class MSSQLConnectionParams():
 		return self.paramsdict['PWD']
 	'''
 	
-	def getMSConnectionString(self):
+	def getConnectionString(self):
 		connectionstring = ''
 		paramslist = []
 		for key in self.paramsdict:

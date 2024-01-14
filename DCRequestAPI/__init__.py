@@ -7,7 +7,14 @@ from pyramid_beaker import session_factory_from_settings
 from dwb_authentication.security import SecurityPolicy
 
 
+# code might be kept in memory, how can i prevent that?
+from dwb_authentication.setup_session_db.create_database import SessionDBSetup
+
+
 def main(global_config, **settings):
+	session_db = SessionDBSetup()
+	del session_db
+	
 	config = Configurator(settings=settings)
 	
 	config.include('pyramid_beaker')

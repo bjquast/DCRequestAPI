@@ -4,7 +4,7 @@ from pyramid.renderers import render
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPSeeOther
 
 from dwb_authentication.security import SecurityPolicy
-from dwb_authentication.dwb_server.DWB_Server import DWB_Server
+from dwb_authentication.DWB_Servers import DWB_Servers
 
 #from pyramid.security import remember, forget
 
@@ -25,12 +25,15 @@ class LoginViews(object):
 		
 		self.message = None
 		
-		self.available_dwb_cons = DWB_Server().get_available_dwb_cons()
+		self.dwb_servers = DWB_Servers()
+		self.available_dwb_cons = self.dwb_servers.get_available_dwb_cons()
+		
 		self.dwb_connector = ''
 		
 		self.server = ''
 		self.port = ''
 		self.database = ''
+		self.driver = ''
 		self.login = ''
 		self.password = ''
 	
@@ -38,6 +41,9 @@ class LoginViews(object):
 	@view_config(route_name='login', accept='text/html')
 	@forbidden_view_config(accept='text/html')
 	def login_view(self):
+		
+		#pudb.set_trace()
+		
 		login_url = self.request.route_url('login')
 		referrer = self.request.url
 		if referrer == login_url:
@@ -61,9 +67,27 @@ class LoginViews(object):
 				}
 				self.message = messages[self.lang]
 			
+			elif self.server == '':
+				messages = {
+					'en': 'The server address for the connection to DiversityWorkbench is missing',
+					'de': 'Die Server-Adresse für die Verbindung zur DiversityWorkbench fehlt'
+				}
+			elif self.port == '':
+				messages = {
+					'en': 'The port for the connection to DiversityWorkbench is missing',
+					'de': 'Der Port für die Verbindung zur DiversityWorkbench fehlt'
+				}
+				self.message = messages[self.lang]
+			elif self.database == '':
+				messages = {
+					'en': 'The database name for the connection to DiversityWorkbench is missing',
+					'de': 'Der Datenbankname für die Verbindung zur DiversityWorkbench fehlt'
+				}
+				self.message = messages[self.lang]
+			
 			else:
 				security = SecurityPolicy()
-				token = security.validate_credentials(server = self.server, port = self.port, database = self.database, username = self.login, password = self.password)
+				token = security.validate_credentials(server = self.server, port = self.port, database = self.database, driver = self.driver, username = self.login, password = self.password)
 				
 				if token is not None:
 					self.request.session['token'] = token
@@ -101,7 +125,7 @@ class LoginViews(object):
 	
 	@view_config(route_name='logout')
 	def logout_view(self):
-		pudb.set_trace()
+		#pudb.set_trace()
 		logout_url = self.request.route_url('logout')
 		referrer = self.request.url
 		if referrer == logout_url:
@@ -158,48 +182,29 @@ class LoginViews(object):
 
 
 	def read_form_input(self):
-		self.serverpattern = re.compile(r'(^[^\:]+)\:')
-		self.portpattern = re.compile(r'\:(\d{2,5})\:')
-		self.dbpattern = re.compile(r'\:([^\:]+)$')
 		
 		self.login = self.request.params.get('login', '')
 		self.password = self.request.params.get('password', '')
-			
+		
+		
 		self.server = self.request.params.get('server', '')
 		self.port = self.request.params.get('port', '')
 		self.database = self.request.params.get('database', '')
+		self.driver = self.request.params.get('driver', '')
 		
 		self.dwb_connector = self.request.params.get('dwb_connector', '')
 		
-		if self.server == '':
+		if self.server == '' or self.port == '' or self.database == '':
 			if self.dwb_connector != '':
-				m = self.serverpattern.search(self.dwb_connector)
-				if m is not None:
-					self.server = m.group(1)
+				dwb_con = self.dwb_servers.get_dwb_con_by_accronym(self.dwb_connector)
+				if dwb_con is not None:
+				
+					self.server = dwb_con['server']
+					self.port = dwb_con['port']
+					self.database = dwb_con['database']
+					self.driver = dwb_con['driver']
 		
-		if self.port == '':
-			if self.dwb_connector != '':
-				m = self.portpattern.search(self.dwb_connector)
-				if m is not None:
-					self.port = m.group(1)
 		
-		if self.database == '':
-			if self.dwb_connector != '':
-				m = self.dbpattern.search(self.dwb_connector)
-				if m is not None:
-					self.database = m.group(1)
-		
-		# a little prevention against sql injection
-		if ';' in self.server:
-			self.server = None
-		
-		if ';' in self.database:
-			self.database = None
-		
-		try:
-			self.port = int(self.port)
-		except ValueError:
-			self.port = None
 		
 		
 
