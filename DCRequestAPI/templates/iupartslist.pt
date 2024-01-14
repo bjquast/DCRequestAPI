@@ -34,7 +34,6 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 		<div metal:use-macro="load: DCRequestAPI:templates/sorting_macro.pt"></div>
 
 		<div tal:condition="python: len(iupartslist) > 0" class="listview">
-			<br/ >
 			<table>
 				<thead>
 					<th tal:repeat="columnkey ordered_coldefs">${coldefs[columnkey]['en']}</th>

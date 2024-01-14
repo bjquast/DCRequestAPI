@@ -1,5 +1,5 @@
 .listview {
-	overflow: scroll;
+	overflow: auto;
 	height: 100%;
 	width: 97%;
 }
@@ -12,8 +12,11 @@
 }
 
 .listview th {
+	position: sticky;
+	top: 0px;
 	padding:1em;
 	border-bottom: 1px solid #ddd;
+	background-color: white;
 }
 
 .listview tr {
