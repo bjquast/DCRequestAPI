@@ -24,6 +24,7 @@ class Projects():
 			SELECT 
 			[rownumber],
 			idstemp.[idshash] AS [_id],
+			CONCAT(idstemp.[DatabaseID], '_', pp.[ProjectID]) AS [DB_ProjectID],
 			pp.[ProjectID],
 			pp.[Project],
 			pp.[ProjectURI]
@@ -55,9 +56,10 @@ class Projects():
 				self.projects_dict[row[1]] = []
 			
 			project = {
-				'ProjectID': row[2],
-				'Project': row[3],
-				'ProjectURI': row[4]
+				'DB_ProjectID': row[2],
+				'ProjectID': row[3],
+				'Project': row[4],
+				'ProjectURI': row[5]
 			}
 			
 			self.projects_dict[row[1]].append(project)

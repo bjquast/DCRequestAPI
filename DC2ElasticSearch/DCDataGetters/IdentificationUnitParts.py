@@ -22,7 +22,13 @@ class IdentificationUnitParts():
 			
 			query = """
 			SELECT 
-			idstemp.[idshash] AS [_id], idstemp.[DatabaseURI], idstemp.[CollectionSpecimenID], idstemp.[IdentificationUnitID], idstemp.[SpecimenPartID], 
+			idstemp.[idshash] AS [_id], 
+			idstemp.[DatabaseURI],
+			idstemp.[DatabaseAccronym],
+			idstemp.[DatabaseID],
+			idstemp.[CollectionSpecimenID], 
+			idstemp.[IdentificationUnitID], 
+			idstemp.[SpecimenPartID], 
 			idstemp.[SpecimenAccessionNumber], idstemp.[PartAccessionNumber],
 			CONVERT(NVARCHAR, cs.[AccessionDate], 120) AS [AccessionDate], 
 			cs.[DepositorsName], 

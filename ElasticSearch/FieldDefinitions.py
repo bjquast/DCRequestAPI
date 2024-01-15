@@ -21,7 +21,7 @@ fieldnames = [
 	'CollectionName',
 	'Projects.Project',
 	'CollectionSpecimenID',
-	#'Barcodes.AnalysisDisplay',
+	'Barcodes.Methods.region',
 ]
 
 fielddefinitions = {
@@ -179,12 +179,12 @@ fielddefinitions = {
 		'names': {'en': 'CollectionSpecimenID'},
 	},
 	
-	#'Barcodes.AnalysisDisplay': {
-	#	'names': {'en': 'Barcode Marker'},
-	#	'buckets': {
-	#		'field_query': 'Barcodes.AnalysisDisplay',
-	#		'size': 10
-	#	},
-	#	
-	#}
+	'Barcodes.Methods.region': {
+		'names': {'en': 'Barcode Marker'},
+		'buckets': {
+			'field_query': 'Barcodes.Methods.region.keyword',
+			'size': 10
+		},
+		
+	}
 }

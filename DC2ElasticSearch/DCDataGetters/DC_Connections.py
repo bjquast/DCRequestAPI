@@ -20,7 +20,9 @@ class DC_Connections():
 	def read_connectionparams(self):
 		sections = self.config.sections()
 		for section in sections:
-			if section[:12]=='data_source_' and section!='data_source_test':
+			if section[:12]=='data_source_' and section!='data_source_test' and len(section[12:]) > 0:
+				database_id = section[12:]
+				accronym = self.config.get(section, 'accronym', fallback = section[12:])
 				server = self.config.get(section, 'server', fallback = None)
 				port = self.config.get(section, 'port', fallback = None)
 				database_name = self.config.get(section, 'database', fallback = None)
@@ -34,7 +36,9 @@ class DC_Connections():
 				database_params = {
 					'connectionstring': connectionstring,
 					'server_url': server,
-					'database_name': database_name
+					'database_name': database_name,
+					'accronym': accronym,
+					'database_id': database_id
 				}
 				
 				self.databases.append(database_params)

@@ -14,6 +14,8 @@ class DataGetter():
 		self.dc_con = MSSQLConnector(dc_params['connectionstring'])
 		self.server_url = dc_params['server_url']
 		self.database_name = dc_params['database_name']
+		self.accronym = dc_params['accronym']
+		self.database_id = dc_params['database_id']
 		
 		self.cur = self.dc_con.getCursor()
 		self.con = self.dc_con.getConnection()
@@ -33,6 +35,8 @@ class DataGetter():
 		[rownumber] INT IDENTITY PRIMARY KEY, -- set an IDENTITY column that can be used for paging,
 		[idshash] NVARCHAR(255) NOT NULL,
 		[DatabaseURI] NVARCHAR(255),
+		[DatabaseID] NVARCHAR(50),
+		[DatabaseAccronym] NVARCHAR(255),
 		[CollectionSpecimenID] INT, 
 		[IdentificationUnitID] INT,
 		[SpecimenPartID] INT,
@@ -55,7 +59,7 @@ class DataGetter():
 	def fill_ids_temptable(self):
 		query = """
 		INSERT INTO [#temp_iu_part_ids]
-		([idshash], [DatabaseURI], [CollectionSpecimenID], [IdentificationUnitID], [SpecimenPartID], [SpecimenAccessionNumber], [PartAccessionNumber])
+		([idshash], [DatabaseURI], [DatabaseID], [DatabaseAccronym], [CollectionSpecimenID], [IdentificationUnitID], [SpecimenPartID], [SpecimenAccessionNumber], [PartAccessionNumber])
 		SELECT 
 		 -- for development
 		 -- TOP 20000
@@ -64,6 +68,8 @@ class DataGetter():
 			cs.CollectionSpecimenID, '_', iu.IdentificationUnitID, '_', csp.SpecimenPartID)), 2
 		) AS idshash,
 		'{0}/{1}' AS DatabaseURI,
+		'{2}' AS DatabaseID,
+		'{3}' AS DatabaseAccronym,
 		cs.CollectionSpecimenID, iu.IdentificationUnitID, csp.SpecimenPartID,
 		cs.AccessionNumber AS SpecimenAccessionNumber,
 		COALESCE(csp.AccessionNumber, cs.AccessionNumber) AS PartAccessionNumber
@@ -81,9 +87,9 @@ class DataGetter():
 		ORDER BY [CollectionSpecimenID], [IdentificationUnitID], [SpecimenPartID]
 		;"""
 		
-		log_query.info(query.format(self.server_url, self.database_name))
+		log_query.info(query.format(self.server_url, self.database_name, self.database_id, self.accronym))
 		
-		self.cur.execute(query.format(self.server_url, self.database_name))
+		self.cur.execute(query.format(self.server_url, self.database_name, self.database_id, self.accronym))
 		self.cur.commit()
 		
 		query = """

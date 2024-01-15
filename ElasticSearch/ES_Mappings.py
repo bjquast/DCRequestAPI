@@ -28,6 +28,10 @@ MappingsDict['iuparts'] = {
 			{'type': 'long'},
 		'DatabaseURI':
 			{'type': 'keyword'},
+		'DatabaseAccronym': 
+			{'type': 'keyword'},
+		'DatabaseID': 
+			{'type': 'keyword'},
 		'PartAccessionNumber':
 			{'type': 'text', 'fields': {
 					'keyword': {'type': 'keyword', 'ignore_above': 256},
@@ -297,6 +301,7 @@ MappingsDict['iuparts'] = {
 		
 		'Projects': {
 			'properties': {
+				'DB_ProjectID': {'type': 'keyword'}, # key combined of database key taken from config.in and ProjectID
 				'ProjectID': {'type': 'long'},
 				'Project': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 				'ProjectURI': {'type': 'keyword'},

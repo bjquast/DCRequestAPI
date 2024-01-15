@@ -51,7 +51,7 @@ class SessionDBSetup():
 		
 		query = """
 		CREATE TABLE `mssql_connectors` (
-			`db_connector_id` INT NOT NULL AUTO_INCREMENT,
+			`db_connector_id` VARCHAR(50),
 			`accronym` varchar(50) NOT NULL,
 			`server` varchar(255) NOT NULL,
 			`port` INT DEFAULT NULL,
@@ -77,7 +77,7 @@ class SessionDBSetup():
 			`encrypted_passwd` varchar(255),
 			`expiration_time` datetime NOT NULL,
 			`username` VARCHAR(50) NOT NULL,
-			`db_connector_id` INT NOT NULL,
+			`db_connector_id` VARCHAR(50) NOT NULL,
 			PRIMARY KEY (`session_id`),
 			UNIQUE KEY `hashed_token` (`hashed_token`),
 			KEY (`username`),
@@ -124,13 +124,13 @@ class SessionDBSetup():
 			placeholders = []
 			values = []
 			for valuelist in self.default_connectors:
-				placeholders.append('(%s, %s, %s, %s, %s, %s)')
+				placeholders.append('(%s, %s, %s, %s, %s, %s, %s)')
 				values.extend(valuelist)
 			placeholderstring = ', '.join(placeholders)
 			
 			query = """
 			INSERT INTO `mssql_connectors`
-			(`accronym`, `server`, `port`, `database`, `driver`, `remember_connector`)
+			(`db_connector_id`, `accronym`, `server`, `port`, `database`, `driver`, `remember_connector`)
 			VALUES {0}
 			;""".format(placeholderstring)
 			
@@ -145,7 +145,8 @@ class SessionDBSetup():
 		
 		sections = config.sections()
 		for section in sections:
-			if section[:12]=='data_source_' and section!='data_source_test':
+			if section[:12]=='data_source_' and section!='data_source_test' and len(section[12:]) > 0:
+				database_id = section[12:]
 				accronym = config.get(section, 'accronym', fallback = section[12:])
 				server = config.get(section, 'server', fallback = None)
 				port = config.get(section, 'port', fallback = None)
@@ -153,7 +154,7 @@ class SessionDBSetup():
 				driver = config.get(section, 'driver', fallback = None)
 			
 				if server is not None and port is not None and database is not None:
-					self.default_connectors.append([accronym, server, port, database, driver, 1])
+					self.default_connectors.append([database_id, accronym, server, port, database, driver, 1])
 		
 		return
 		
