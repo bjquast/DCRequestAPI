@@ -12,6 +12,8 @@ MappingsDict['settings'] = {
 }
 
 
+# do not use nested when there is no withholdflag in a sub-structure because it may duplicate the number of hits in aggregations when a term appears more than once in a substructure, e.g. identifications
+
 MappingsDict['iuparts'] = {
 	'properties': {
 		# the ID of this IdentificationUnit, CollectionSpecimen and SpecimenPart in Database (sha2 hash of the combined IDs)
@@ -217,7 +219,8 @@ MappingsDict['iuparts'] = {
 		# Identifications Object
 		'Identifications': {
 			# use a nested type here?
-			'type': 'nested',
+			# do not use nested when there is no withholdflag in a sub-structure because it may duplicate the number of hits in aggregations when a term appears more than once in a substructure, e.g. identifications
+			# 'type': 'nested',
 			'properties': {
 				'IdentificationSequenceID': {'type': 'short'},
 				'IdentificationDate': {

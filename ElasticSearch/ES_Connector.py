@@ -1,5 +1,5 @@
 import logging
-es_logger = logging.getLogger('elastic')
+es_logger = logging.getLogger('elastic_queries')
 
 from elasticsearch import Elasticsearch, BadRequestError
 from elasticsearch.helpers import streaming_bulk, bulk

@@ -20,7 +20,8 @@ fieldnames = [
 	'NumberOfUnits',
 	'CollectionName',
 	'Projects.Project',
-	'CollectionSpecimenID'
+	'CollectionSpecimenID',
+	#'Barcodes.AnalysisDisplay',
 ]
 
 fielddefinitions = {
@@ -46,7 +47,6 @@ fielddefinitions = {
 		'buckets': {
 			'field_query': 'Identifications.VernacularTerm',
 			'size': 10,
-			'path': 'Identifications',
 		},
 	},
 	
@@ -177,5 +177,14 @@ fielddefinitions = {
 	
 	'CollectionSpecimenID': {
 		'names': {'en': 'CollectionSpecimenID'},
-	}
+	},
+	
+	#'Barcodes.AnalysisDisplay': {
+	#	'names': {'en': 'Barcode Marker'},
+	#	'buckets': {
+	#		'field_query': 'Barcodes.AnalysisDisplay',
+	#		'size': 10
+	#	},
+	#	
+	#}
 }

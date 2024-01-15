@@ -1,7 +1,7 @@
 import logging
 import logging.config
 logging.config.fileConfig('logging.conf')
-logger = logging.getLogger('elastic')
+logger = logging.getLogger('elastic_queries')
 
 import json
 import math

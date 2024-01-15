@@ -1,5 +1,5 @@
 import logging
-es_logger = logging.getLogger('elastic')
+es_logger = logging.getLogger('elastic_indexer')
 
 import pudb
 

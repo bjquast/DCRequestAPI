@@ -6,7 +6,7 @@ import pudb
 import logging, logging.config
 
 logging.config.fileConfig('logging.conf')
-logger = logging.getLogger('elastic')
+logger = logging.getLogger('elastic_indexer')
 
 from ElasticSearch.ES_Indexer import ES_Indexer
 

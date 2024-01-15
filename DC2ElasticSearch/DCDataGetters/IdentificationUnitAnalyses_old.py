@@ -2,7 +2,7 @@
 import pudb
 
 import logging, logging.config
-logger = logging.getLogger('elastic')
+logger = logging.getLogger('elastic_indexer')
 log_query = logging.getLogger('query')
 
 
