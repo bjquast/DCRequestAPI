@@ -16,8 +16,10 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 <body>
 	<div metal:use-macro="load: DCRequestAPI:templates/header_macro.pt"></div>
 
-
-<div metal:use-macro="load: ./search_macro.pt"></div>
+<div class="flex-space-between">
+	<div metal:use-macro="load: ./search_macro.pt"></div>
+	<div metal:use-macro="load: ./preferences_macro.pt"></div>
+</div>
 
 <div id="filter-and-resulttable" class="flex-wrapped-row">
 	<div metal:use-macro="load: DCRequestAPI:templates/filters_macro.pt" id="filter_macro"></div>
@@ -36,7 +38,7 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 		<div tal:condition="python: len(iupartslist) > 0" class="listview">
 			<table>
 				<thead>
-					<th tal:repeat="columnkey ordered_coldefs">${coldefs[columnkey]['en']}</th>
+					<th tal:repeat="columnkey selected_sourcefields">${coldefs[columnkey]['en']}</th>
 				</thead>
 				<tbody>
 					<tr tal:repeat="iuparts iupartslist">

@@ -11,8 +11,9 @@ import pudb
 from ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
 
 class BucketAggregations():
-	def __init__(self, users_project_ids = []):
+	def __init__(self, users_project_ids = [], source_fields = []):
 		self.users_project_ids = users_project_ids
+		self.source_fields = source_fields
 		
 		self.aggs_fields = {}
 		self.nested_aggs_fields = {}
@@ -23,7 +24,12 @@ class BucketAggregations():
 
 
 	def read_field_definitions(self):
-		for fieldname in fieldnames:
+		if len(self.source_fields) > 0:
+			pass
+		else:
+			self.source_fields = fieldnames
+				
+		for fieldname in self.source_fields:
 			if fieldname in fielddefinitions:
 				if 'buckets' in fielddefinitions[fieldname] and 'path' in fielddefinitions[fieldname]['buckets'] and 'withholdflag' in fielddefinitions[fieldname]['buckets']:
 					self.nested_restricted_aggs_fields[fieldname] = fielddefinitions[fieldname]['buckets']
@@ -81,7 +87,7 @@ class BucketAggregations():
 						'filter': {
 							'bool': {
 								'should': [
-									{"terms": {"Projects.ProjectID": self.users_project_ids}},
+									{"terms": {"{0}.ProjectID".format(self.nested_restricted_aggs_fields[field]['path']): self.users_project_ids}},
 									{"term": {self.nested_restricted_aggs_fields[field]['withholdflag']: "false"}}
 								],
 								"minimum_should_match": 1

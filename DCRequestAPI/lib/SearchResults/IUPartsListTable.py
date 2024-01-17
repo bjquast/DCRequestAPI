@@ -6,58 +6,55 @@ from ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
 class IUPartsListTable():
 	def __init__(self):
 		self.coldefs = {}
+		self.default_sourcefields = []
+		self.selected_sourcefields = []
 		
 		self.readFieldDefinitions()
-		self.setColDefsOrder()
-
-
-	def setColDefsOrder(self, colkeys = []):
-		self.ordered_coldefs = []
-		if len(colkeys) <= 0:
-			for fieldname in fieldnames:
-				self.ordered_coldefs.append(fieldname)
-		
-		else:
-			for colkey in colkeys:
-				if colkey in fieldnames:
-					self.ordered_coldefs.append(colkey)
-		return
+		#self.setSourceFields()
 
 
 	def readFieldDefinitions(self):
-		
 		for fieldname in fieldnames:
 			if fieldname in fielddefinitions:
 				self.coldefs[fieldname] = fielddefinitions[fieldname]['names']
+				self.default_sourcefields.append(fieldname)
+				self.selected_sourcefields.append(fieldname)
 
 
-	def getSourceFields(self):
-		source_fields = [colkey for colkey in self.coldefs]
+	def setSelectedSourceFields(self, sourcefields = []):
+		self.selected_sourcefields = []
+		if len(sourcefields) <= 0:
+			for fieldname in fieldnames:
+				self.selected_sourcefields.append(fieldname)
 		
-		if 'Projects.ProjectID' not in self.coldefs:
-			source_fields.append('Projects.ProjectID')
-		
-		return source_fields
+		else:
+			for sourcefield in sourcefields:
+				if sourcefield in fieldnames:
+					self.selected_sourcefields.append(sourcefield)
+		return
 
 
-	def getColHeaders(self, lang = 'en'):
-		self.colheaders = []
-		for colkey in self.ordered_coldefs:
-			self.colheaders.append(self.coldefs[colkey])
-		return self.colheaders
+	def getSelectedSourceFields(self):
+		return self.selected_sourcefields
+
+
+	def getDefaultSourceFields(self):
+		return self.default_sourcefields
 
 
 	def setRowContent(self, doc_sources = [], users_project_ids = []):
 		
 		self.rows = []
 		
+		#pudb.set_trace()
+		
 		for doc_source in doc_sources:
 			values = []
-			for colkey in self.coldefs:
+			for colkey in self.selected_sourcefields:
 				colkey_parts = colkey.split('.')
 				if len(colkey_parts) > 1:
 					valuelist = self.getComplexElements(doc_source, colkey_parts, valuelist = [])
-					value = ',\n'.join(valuelist)
+					value = ',\n'.join([str(val) for val in valuelist])
 					values.append(value)
 				elif colkey in doc_source:
 					doc_element = doc_source[colkey]

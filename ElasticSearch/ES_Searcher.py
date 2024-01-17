@@ -89,20 +89,17 @@ class ES_Searcher():
 		return
 
 
-	def setSourceFields(self, source_fields=[]):
-		self.source_fields = source_fields
+	def setSourceFields(self, source_fields = []):
+		# copy the source_fields, otherwise the change here changes the source_fields variable in the caller 
+		self.source_fields = list(source_fields)
 		
+		# add the fields that are needed for filtering the results in WithholdFilters.applyFiltersToSources()
 		if 'Projects.ProjectID' not in self.source_fields:
-			source_fields.append('Projects.ProjectID')
-		source_fields.extend(self.withhold_fields)
+			self.source_fields.append('Projects.ProjectID')
+		self.source_fields.extend(self.withhold_fields)
 
 
 	def addUserLimitation(self):
-		#if self.user_id is not None:
-		#	projectmanager = ProjectManagement(self.uid)
-		#	available_projects = [project[0] for project in projectmanager.fetch_affiliated_projects()]
-		#else:
-		
 		# prepare the query as a subquery to the must-queries, so that it is guarantied that it is AND connected. 
 		# this is in contrast to should filters where the addition of other should filters might disable the AND connection
 		self.user_limitation = {"bool": {"should": [{"terms": {"Projects.ProjectID": self.users_project_ids}}, {"bool": {"must": [{"term": {"IUWithhold": "false"}}, {"term": {"SpecimenWithhold": "false"}}]}}], "minimum_should_match": 1}}
@@ -131,11 +128,11 @@ class ES_Searcher():
 		for param in self.search_params:
 			
 			if param == 'term_filters':
-				filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids).getTermFilterQueries(self.search_params['term_filters'])
+				filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids, source_fields = self.source_fields).getTermFilterQueries(self.search_params['term_filters'])
 				self.query['bool']["filter"].extend(filter_queries)
 			
 			if param == 'match_query':
-				match_query = MatchQuery(users_project_ids = self.users_project_ids).getMatchQuery(self.search_params['match_query'])
+				match_query = MatchQuery(users_project_ids = self.users_project_ids, source_fields = self.source_fields).getMatchQuery(self.search_params['match_query'])
 				if match_query is not None:
 					self.query['bool']['must'].append(match_query)
 		
@@ -164,7 +161,7 @@ class ES_Searcher():
 		#self.queryConstructor is set in the derived classes
 		self.setQuery()
 		
-		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids)
+		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = self.source_fields)
 		aggs = buckets_query.getAggregationsQuery()
 		
 		logger.debug(self.sort)

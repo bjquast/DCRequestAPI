@@ -48,8 +48,40 @@ class CollectionAgents():
 			self.rows = self.cur.fetchall()
 			self.rows2dict()
 			
+			# select the ProjectIDs for each Collector of a Specimen
+			query = """
+			SELECT DISTINCT
+			[rownumber],
+			idstemp.[idshash] AS [_id],
+			CONCAT(idstemp.[DatabaseID], '_', cp.[ProjectID]) AS [DB_ProjectID],
+			cp.[ProjectID]
+			FROM [#temp_iu_part_ids] idstemp
+			INNER JOIN IdentificationUnit iu 
+			ON iu.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND iu.[IdentificationUnitID] = idstemp.[IdentificationUnitID]
+			LEFT JOIN [CollectionProject] cp
+			ON cp.CollectionSpecimenID = iu.CollectionSpecimenID
+			WHERE idstemp.[rownumber] BETWEEN ? AND ?
+			ORDER BY idstemp.[idshash]
+			;"""
+			
+			self.cur.execute(query, [startrow,lastrow])
+			self.rows = self.cur.fetchall()
+			
+			self.addProjectIDs()
 			
 			return self.collectors_dict
+
+
+	def addProjectIDs(self):
+		for row in self.rows:
+			if row[1] in self.collectors_dict:
+				for collectordict in self.collectors_dict[row[1]]:
+					if 'ProjectID' not in collectordict:
+						collectordict['ProjectID'] = []
+						collectordict['DB_ProjectID'] = []
+					collectordict['ProjectID'].append(row[3])
+					collectordict['DB_ProjectID'].append(row[2])
+		return
 
 
 	def rows2dict(self):

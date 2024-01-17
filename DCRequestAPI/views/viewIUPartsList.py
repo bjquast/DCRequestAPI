@@ -35,13 +35,11 @@ class IUPartsListView():
 		self.set_search_params()
 		
 		iupartstable = IUPartsListTable()
-		source_fields = iupartstable.getSourceFields()
+		sourcefields = iupartstable.iupartstable.getDefaultSourceFields()
 		coldefs = iupartstable.coldefs
-		available_sorting_cols = iupartstable.coldefs
-		ordered_coldefs = iupartstable.ordered_coldefs
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
-		es_searcher.setSourceFields(source_fields)
+		es_searcher.setSourceFields(source_fields = sourcefields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
 		aggregations = es_searcher.getParsedAggregations()
 		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs], users_project_ids = self.users_project_ids)
@@ -57,7 +55,7 @@ class IUPartsListView():
 				if key in doc:
 					iupartdict[key] = doc[key]
 			
-			for colkey in ordered_coldefs:
+			for colkey in default_coldefkeys:
 				if colkey in doc['_source']:
 					iupartdict[colkey] = doc['_source'][colkey]
 			
@@ -72,9 +70,6 @@ class IUPartsListView():
 			'search_params': self.search_params,
 			'iuparts': iuparts,
 			'aggregations': aggregations,
-			#'ordered_coldefs': ordered_coldefs,
-			#'coldefs': coldefs,
-			'available_sorting_cols': available_sorting_cols,
 		}
 		
 		return pagecontent
@@ -89,13 +84,16 @@ class IUPartsListView():
 		self.set_requeststring()
 		
 		iupartstable = IUPartsListTable()
-		source_fields = iupartstable.getSourceFields()
+		if len(self.search_params['result_table_columns']) > 0:
+			iupartstable.setSelectedSourceFields(self.search_params['result_table_columns'])
+		
+		selected_sourcefields = iupartstable.getSelectedSourceFields()
+		default_sourcefields = iupartstable.getDefaultSourceFields()
 		coldefs = iupartstable.coldefs
-		available_sorting_cols = iupartstable.coldefs
-		ordered_coldefs = iupartstable.ordered_coldefs
+		
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
-		es_searcher.setSourceFields(source_fields)
+		es_searcher.setSourceFields(selected_sourcefields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
 		aggregations = es_searcher.getParsedAggregations()
 		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs], users_project_ids = self.users_project_ids)
@@ -111,9 +109,9 @@ class IUPartsListView():
 			'search_params': self.search_params,
 			'iupartslist': iupartslist,
 			'aggregations': aggregations,
-			'ordered_coldefs': ordered_coldefs,
 			'coldefs': coldefs,
-			'available_sorting_cols': available_sorting_cols,
+			'default_sourcefields': default_sourcefields,
+			'selected_sourcefields': selected_sourcefields, 
 			'open_filter_selectors': self.search_params['open_filter_selectors'],
 			'authenticated_user': self.uid
 		}
@@ -141,7 +139,7 @@ class IUPartsListView():
 		
 		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'match_query']
 		complex_params = ['term_filters',]
-		list_params = ['open_filter_selectors',]
+		list_params = ['open_filter_selectors', 'result_table_columns']
 		
 		for param_name in simple_params: 
 			if param_name in request_params and len(request_params[param_name]) > 0:

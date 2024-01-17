@@ -287,6 +287,9 @@ MappingsDict['iuparts'] = {
 				'CollectorsSpecimenFieldNumber': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 				'CollectorsDataWithholding': {'type': 'text', 'fields': {'keyword': {'type': 'keyword', 'ignore_above': 256}}},
 				'CollectorsWithhold': {'type': 'boolean'},
+				# have to add the ProjectID here as it is the only way to filter nested objects by ProjectID for aggregations?!
+				'ProjectID': {'type': 'long'},
+				'DB_ProjectID': {'type': 'keyword'}
 			}
 		},
 		

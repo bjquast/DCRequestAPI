@@ -120,6 +120,19 @@ input{
 	display: none;
 }
 
+.ul-no-bullet {
+	list-style-type: none;
+	padding-left: 1em;
+}
+
+.flex {
+	display: flex;
+	margin-right: 1em;
+}
+
+.flex div {
+	margin-right: 1em;
+}
 
 .flex-start {
 	display: flex;
