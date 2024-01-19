@@ -2,9 +2,6 @@
 	margin-top: 0.5em;
 	margin-left: 2.5%;
 	margin-right: 4%;
-	display: flex;
-	justify-content: space-between;
-	/*flex-wrap: wrap;*/
 	color: #363636;
 }
 

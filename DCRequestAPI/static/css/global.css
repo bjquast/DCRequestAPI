@@ -103,10 +103,12 @@ input{
 }
 
 .w25 {
+	display: inline-block;
 	width: 10em;
 }
 
 .w75 {
+	display: inline-block;
 	min-width: 20em;
 }
 

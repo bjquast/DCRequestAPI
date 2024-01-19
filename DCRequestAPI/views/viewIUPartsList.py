@@ -44,8 +44,8 @@ class IUPartsListView():
 		if len(self.loginparams) > 0:
 			self.token = self.userlogin.authenticate_user(self.loginparams)
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
-			
-			self.messages.extend(self.userlogin.get_messages())
+		
+		self.messages.extend(self.userlogin.get_messages())
 		
 		self.set_search_params()
 		
@@ -85,6 +85,7 @@ class IUPartsListView():
 			'search_params': self.search_params,
 			'iuparts': iuparts,
 			'aggregations': aggregations,
+			'messages': self.messages
 		}
 		
 		return pagecontent
@@ -93,10 +94,10 @@ class IUPartsListView():
 	@view_config(route_name='iupartslist', accept='text/html', renderer="DCRequestAPI:templates/iupartslist.pt")
 	def IUPartsListHTML(self):
 		
-		pudb.set_trace()
+		#pudb.set_trace()
 		
-		logout_submit = self.request.params.get('logout_submit', '')
-		if logout_submit == 'logout':
+		logout = self.request.params.get('logout', '')
+		if logout == 'logout':
 			self.userlogin.log_out_user()
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
@@ -104,7 +105,8 @@ class IUPartsListView():
 		if len(self.loginparams) == 3:
 			self.token = self.userlogin.authenticate_user(self.loginparams)
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
-			self.messages.extend(self.userlogin.get_messages())
+		
+		self.messages.extend(self.userlogin.get_messages())
 		
 		self.set_search_params()
 		self.set_requeststring()
@@ -141,7 +143,8 @@ class IUPartsListView():
 			'open_filter_selectors': self.search_params['open_filter_selectors'],
 			'authenticated_user': self.uid,
 			'available_dwb_cons': self.available_dwb_cons,
-			'current_dwb_con': self.loginparams.get('db_accronym', None)
+			'current_dwb_con': self.loginparams.get('db_accronym', None),
+			'messages': self.messages
 		}
 		return pagecontent
 

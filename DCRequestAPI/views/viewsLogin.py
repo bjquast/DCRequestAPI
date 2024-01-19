@@ -45,6 +45,7 @@ class LoginViews(object):
 		came_from = self.request.params.get('came_from', referrer)
 		
 		self.token = None
+		self.loginparams = {}
 		
 		if 'form.submitted' in self.request.params:
 			
@@ -53,11 +54,10 @@ class LoginViews(object):
 				self.token = self.userlogin.authenticate_user(self.loginparams)
 				#self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 			
+			self.messages.extend(self.userlogin.get_messages())
+			
 			if self.token is not None:
 				return HTTPFound(location=came_from)
-			
-			else:
-				self.messages.insert(0, 'Login failed, please check your credentials')
 		
 		responsedict = dict(
 			name='Login',

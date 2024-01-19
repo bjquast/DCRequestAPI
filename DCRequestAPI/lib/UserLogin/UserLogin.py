@@ -41,7 +41,10 @@ class UserLogin():
 		for key in loginparams:
 			if loginparams[key] is None or loginparams[key] == '':
 				self.missing_params.append(key)
-				self.messages.append('login is not possible, parameter {0} must be given'.format(key))
+				if key == 'db_accronym':
+					self.messages.append('Login is not possible, please select database')
+				else:
+					self.messages.append('Login is not possible, please enter {0}'.format(key))
 		
 		if len(self.missing_params) > 0:
 			loginparams = {}
@@ -78,11 +81,8 @@ class UserLogin():
 			for line in response.read().splitlines():
 				line = line.decode('ASCII')
 				if line.startswith(suffix):
+					self.messages.append('Your password is insecure. Please change the password immediately')
 					return False
-					#print("Bad password!", "Score:", line.split(':')[-1])
-		
-		if (unknown_password) is False:
-			self.messages.append('Your password is insecure. please change the password immediately')
 		
 		return unknown_password
 
@@ -102,6 +102,9 @@ class UserLogin():
 			self.roles = self.request.identity['dwb_roles']
 			self.users_projects = self.request.identity['projects']
 			self.users_project_ids = [project[0] for project in self.users_projects]
+		
+		else:
+			self.messages.append('Login failed, please check your credentials')
 		
 		#headers = remember(self.request, login)
 		return token

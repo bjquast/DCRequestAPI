@@ -9,8 +9,8 @@
 			<div><h1>Login</h1></div>
 		</fieldset>
 		
-		<div tal:condition="python: len(messages) > 0'" class="message error">
-			<p tal:repeat="message messages" class="message">${message}</p>
+		<div tal:condition="python: len(messages) > 0" class="message error">
+			<p tal:repeat="message messages">${message}</p>
 		</div>
 		<form action="${url}" method="post">
 			<input type="hidden" name="came_from" value="${came_from}"/>

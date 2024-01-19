@@ -28,14 +28,6 @@ function add_submit_events() {
 };
 
 
-function set_logout_button() {
-	$('#logout_button').click( function() {
-		$(this).val('logout');
-		$("#search_form").submit();
-	});
-}
-
-
 function add_filter_events() {
 	$('.bucket_entry').each( function () {
 		$(this).click( function() {
