@@ -23,6 +23,17 @@ class SecurityPolicy:
 		return token
 
 
+	def de_authenticate(self, request):
+		dbsession = DBSession()
+		
+		token = dbsession.get_token_from_request(request)
+		if token is not None:
+			dbsession.delete_session_by_token(token)
+		
+		self.reset_authenticated_identity()
+		return
+
+
 	def get_identity_by_token(self, request):
 		
 		dbsession = DBSession()

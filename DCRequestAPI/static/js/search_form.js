@@ -6,6 +6,7 @@ $(document).ready( function() {
 	add_remove_filter_events()
 	add_collapsible_filters_event();
 	add_submit_events();
+	set_logout_button();
 } );
 
 
@@ -25,6 +26,14 @@ function add_submit_events() {
 		})
 	});
 };
+
+
+function set_logout_button() {
+	$('#logout_button').click( function() {
+		$(this).val('logout');
+		$("#search_form").submit();
+	});
+}
 
 
 function add_filter_events() {

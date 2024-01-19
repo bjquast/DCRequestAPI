@@ -11,10 +11,27 @@
 				<h2 class="site-header-box-title">${pagetitle}</h2>
 			</div>
 			<div tal:condition="python: authenticated_user is None">
-				<a id="login_link" title="Login" href="${request.application_url}/login">Log in</a>
+				<details>
+					<summary>Login</summary>
+					<div>
+						<span class="w25" ><label for="login">Username</label></span>
+						<span class="w75"><input type="text" form="search_form" id="login" name="username" value=""/></span>
+					</div>
+					<div>
+						<span class="w25"><label for="password">Password</label></span>
+						<span class="w75"><input type="password" form="search_form" id="password" name="password" value=""/></span>
+					</div>
+					<div>
+						<span class="w25"><label for="dwb_con_selector" class="">Available Servers</label></span>
+						<span class="w75"><select id="dwb_con_selector" form="search_form" name="db_accronym">
+							<option tal:repeat="dwb_con available_dwb_cons" tal:attributes="selected 'selected' if dwb_con['accronym'] == current_dwb_con else None" value="${dwb_con['accronym']}">${dwb_con['accronym']}</option>
+						</select></span>
+					</div>
+					<button type="submit" value="Log in" form="search_form">Log in</button>
+				</details>
 			</div>
 			<div tal:condition="python: authenticated_user is not None">
-				<span>${authenticated_user} <a id="logout_link" title="Login" href="${request.application_url}/logout">Log out</a></span>
+				<span>${authenticated_user} <button id="logout_button" name="logout_submit" value="" form="search_form">Log out</button></span>
 			</div>
 		</div>
 		<div class="white-background">

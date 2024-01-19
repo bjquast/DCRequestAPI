@@ -7,7 +7,11 @@ from pyramid.view import (view_config, view_defaults)
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPSeeOther
 
 from ElasticSearch.ES_Searcher import ES_Searcher
+
 from DCRequestAPI.lib.SearchResults.IUPartsListTable import IUPartsListTable
+from DCRequestAPI.lib.UserLogin.UserLogin import UserLogin
+
+from dwb_authentication.DWB_Servers import DWB_Servers
 
 import pudb
 import json
@@ -19,18 +23,29 @@ class IUPartsListView():
 		self.request = request
 		self.uid = self.request.authenticated_userid
 		
-		
-		
 		self.roles = self.request.identity['dwb_roles']
 		self.users_projects = self.request.identity['projects']
 		self.users_project_ids = [project[0] for project in self.users_projects]
 		
+		self.userlogin = UserLogin(self.request)
+		
+		self.dwb_servers = DWB_Servers()
+		self.available_dwb_cons = self.dwb_servers.get_available_dwb_cons()
+		
+		self.messages = []
 
 
 	@view_config(route_name='iupartslist', accept='application/json', renderer="json")
 	def IUPartsListJSON(self):
 		
 		#pudb.set_trace()
+		
+		self.loginparams = self.userlogin.get_login_params()
+		if len(self.loginparams) > 0:
+			self.token = self.userlogin.authenticate_user(self.loginparams)
+			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
+			
+			self.messages.extend(self.userlogin.get_messages())
 		
 		self.set_search_params()
 		
@@ -78,7 +93,18 @@ class IUPartsListView():
 	@view_config(route_name='iupartslist', accept='text/html', renderer="DCRequestAPI:templates/iupartslist.pt")
 	def IUPartsListHTML(self):
 		
-		#pudb.set_trace()
+		pudb.set_trace()
+		
+		logout_submit = self.request.params.get('logout_submit', '')
+		if logout_submit == 'logout':
+			self.userlogin.log_out_user()
+			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
+		
+		self.loginparams = self.userlogin.get_login_params()
+		if len(self.loginparams) == 3:
+			self.token = self.userlogin.authenticate_user(self.loginparams)
+			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
+			self.messages.extend(self.userlogin.get_messages())
 		
 		self.set_search_params()
 		self.set_requeststring()
@@ -113,7 +139,9 @@ class IUPartsListView():
 			'default_sourcefields': default_sourcefields,
 			'selected_sourcefields': selected_sourcefields, 
 			'open_filter_selectors': self.search_params['open_filter_selectors'],
-			'authenticated_user': self.uid
+			'authenticated_user': self.uid,
+			'available_dwb_cons': self.available_dwb_cons,
+			'current_dwb_con': self.loginparams.get('db_accronym', None)
 		}
 		return pagecontent
 
@@ -172,24 +200,11 @@ class IUPartsListView():
 		paramslist = []
 		request_params = self.request.params.dict_of_lists()
 		for param in request_params:
-			# if param not in ['pagesize', 'page']:
-			for value in request_params[param]:
-				paramslist.append('{0}={1}'.format(param, value))
+			if param not in ['username', 'password', 'login_submit']:
+				for value in request_params[param]:
+					paramslist.append('{0}={1}'.format(param, value))
 		
 		self.requeststring = '&'.join(paramslist)
 		return
-	
-		
-	'''
-	search_params = {
-		'pagesize': 1000,
-		'page': 1,
-		'sorting_col': 'AccessionDate',
-		'sorting_dir': 'DESC',
-		'term_filters': {
-			'Projects.Project': ['Section Mammalia ZFMK'],
-			'CountryCache': ['Germany', ]
-		},
-		'match_query': 'Rulik',
-	}
-	'''
+
+

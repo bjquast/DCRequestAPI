@@ -14,7 +14,7 @@ class DWB_Servers():
 		self.servers = []
 		
 		query = """
-		SELECT `accronym`, `server`, `port`, `database`, `driver`
+		SELECT `db_connector_id`, `accronym`, `server`, `port`, `database`, `driver`
 		FROM `mssql_connectors`
 		;"""
 		
@@ -22,11 +22,12 @@ class DWB_Servers():
 		rows = self.cur.fetchall()
 		for row in rows:
 			server = {}
-			server['accronym'] = row[0]
-			server['server'] = row[1]
-			server['port'] = row[2]
-			server['database'] = row[3]
-			server['driver'] = row[4]
+			server['db_id'] = row[0]
+			server['accronym'] = row[1]
+			server['server'] = row[2]
+			server['port'] = row[3]
+			server['database'] = row[4]
+			server['driver'] = row[5]
 			self.servers.append(server)
 		return
 	
@@ -39,6 +40,15 @@ class DWB_Servers():
 		dwb_con = None
 		for server in self.servers:
 			if accronym == server['accronym']:
+				dwb_con = server
+		
+		return dwb_con
+
+
+	def get_dwb_con_by_db_id(self, db_id):
+		dwb_con = None
+		for server in self.servers:
+			if db_id == server['db_id']:
 				dwb_con = server
 		
 		return dwb_con

@@ -6,6 +6,8 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPSeeOther
 from dwb_authentication.security import SecurityPolicy
 from dwb_authentication.DWB_Servers import DWB_Servers
 
+from DCRequestAPI.lib.UserLogin.UserLogin import UserLogin
+
 #from pyramid.security import remember, forget
 
 import pudb
@@ -20,24 +22,16 @@ class LoginViews(object):
 	def __init__(self, request):
 		self.request = request
 		
-		self.lang = 'en'
 		self.uid = self.request.authenticated_userid
 		
-		self.message = None
+		self.userlogin = UserLogin(self.request)
 		
 		self.dwb_servers = DWB_Servers()
 		self.available_dwb_cons = self.dwb_servers.get_available_dwb_cons()
 		
-		self.dwb_connector = ''
-		
-		self.server = ''
-		self.port = ''
-		self.database = ''
-		self.driver = ''
-		self.login = ''
-		self.password = ''
-	
-	
+		self.messages = []
+
+
 	@view_config(route_name='login', accept='text/html')
 	@forbidden_view_config(accept='text/html')
 	def login_view(self):
@@ -49,73 +43,32 @@ class LoginViews(object):
 		if referrer == login_url:
 			referrer = self.request.route_url('iupartslist') # never use login form itself as came_from
 		came_from = self.request.params.get('came_from', referrer)
-		self.message = None
+		
+		self.token = None
 		
 		if 'form.submitted' in self.request.params:
-			self.read_form_input()
 			
-			if self.password == '' or self.password is None:
-				messages = {
-					'en': 'Please provide a password',
-					'de': 'Bitte geben Sie ein Passwort ein'
-				}
+			self.loginparams = self.userlogin.get_login_params()
+			if len(self.loginparams) > 0:
+				self.token = self.userlogin.authenticate_user(self.loginparams)
+				#self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 			
-			elif self.password_not_pawned(self.password) is False:
-				messages = {
-					'en': 'Your password is not secure, please contact the administrator',
-					'de': 'Ihr Passwort ist nicht sicher, bitte kontaktieren Sie den Administrator'
-				}
-				self.message = messages[self.lang]
-			
-			elif self.server == '':
-				messages = {
-					'en': 'The server address for the connection to DiversityWorkbench is missing',
-					'de': 'Die Server-Adresse für die Verbindung zur DiversityWorkbench fehlt'
-				}
-			elif self.port == '':
-				messages = {
-					'en': 'The port for the connection to DiversityWorkbench is missing',
-					'de': 'Der Port für die Verbindung zur DiversityWorkbench fehlt'
-				}
-				self.message = messages[self.lang]
-			elif self.database == '':
-				messages = {
-					'en': 'The database name for the connection to DiversityWorkbench is missing',
-					'de': 'Der Datenbankname für die Verbindung zur DiversityWorkbench fehlt'
-				}
-				self.message = messages[self.lang]
+			if self.token is not None:
+				return HTTPFound(location=came_from)
 			
 			else:
-				security = SecurityPolicy()
-				token = security.validate_credentials(server = self.server, port = self.port, database = self.database, driver = self.driver, username = self.login, password = self.password)
-				
-				if token is not None:
-					self.request.session['token'] = token
-					#headers = remember(self.request, login)
-					return HTTPFound(location=came_from)
-				
-				else:
-					messages = {
-						'en': 'Login failed, please check your credentials',
-						'de': 'Login gescheitert, bitte überprüfen Sie Nutzername und Passwort'
-					}
-					self.message = messages[self.lang]
-					
-					#pass
+				self.messages.insert(0, 'Login failed, please check your credentials')
 		
 		responsedict = dict(
 			name='Login',
-			message = self.message,
+			messages = self.messages,
 			url = self.request.application_url + '/login',
 			came_from = came_from,
-			login = self.login,
-			password= self.password,
-			server = self.server,
-			port = self.port,
-			database = self.database,
+			username = self.loginparams.get('username', None),
+			#password= self.password,
 			request = self.request,
 			available_dwb_cons = self.available_dwb_cons,
-			current_dwb_con = self.dwb_connector
+			current_dwb_con = self.loginparams.get('db_accronym', None)
 		)
 		
 		result = render('DCRequestAPI:templates/login.pt', responsedict)
@@ -153,60 +106,9 @@ class LoginViews(object):
 	
 
 
-	'''
-	check against https://haveibeenpwned.com disallow pawned passwords
-	code from:
-	https://pwcheck.gwdg.de/api.html
-	with usage of haveibeenpwned.com API
-	https://haveibeenpwned.com/API/v2#SearchingPwnedPasswordsByRange
-	'''
-	def password_not_pawned(self, password):
-		
-		import hashlib, urllib.request
-		
-		pwhash = hashlib.sha1(password.encode('utf8')).hexdigest().upper()
-		prefix = pwhash[:5]
-		suffix = pwhash[5:]
-		
-		unknown_password = False
-		
-		url = "https://api.pwnedpasswords.com/range/" + prefix
-		with urllib.request.urlopen(url) as response:
-			unknown_password = True
-			for line in response.read().splitlines():
-				line = line.decode('ASCII')
-				if line.startswith(suffix):
-					return False
-					#print("Bad password!", "Score:", line.split(':')[-1])
-		return unknown_password
 
 
-	def read_form_input(self):
-		
-		self.login = self.request.params.get('login', '')
-		self.password = self.request.params.get('password', '')
-		
-		
-		self.server = self.request.params.get('server', '')
-		self.port = self.request.params.get('port', '')
-		self.database = self.request.params.get('database', '')
-		self.driver = self.request.params.get('driver', '')
-		
-		self.dwb_connector = self.request.params.get('dwb_connector', '')
-		
-		if self.server == '' or self.port == '' or self.database == '':
-			if self.dwb_connector != '':
-				dwb_con = self.dwb_servers.get_dwb_con_by_accronym(self.dwb_connector)
-				if dwb_con is not None:
-				
-					self.server = dwb_con['server']
-					self.port = dwb_con['port']
-					self.database = dwb_con['database']
-					self.driver = dwb_con['driver']
-		
-		
-		
-		
+
 
 
 

@@ -1,6 +1,6 @@
 	
 <div>
-	<form id="search_form" action="${request.application_url}/list" method="GET" >
+	<form id="search_form" action="${request.application_url}/list" method="POST" >
 		<fieldset>
 			<legend>Search</legend>
 			<div id="searchbox">
