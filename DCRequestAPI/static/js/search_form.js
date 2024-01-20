@@ -5,6 +5,7 @@ $(document).ready( function() {
 	add_filter_events();
 	add_remove_filter_events()
 	add_collapsible_filters_event();
+	add_logout_event();
 	add_submit_events();
 } );
 
@@ -25,6 +26,21 @@ function add_submit_events() {
 		})
 	});
 };
+
+
+function add_logout_event() {
+	$("#logout_button").click( function(e) {
+		console.log('blah');
+		console.log('e.which', e.which);
+		
+		$('#logout_checkbox').attr('checked', 'checked');
+		
+		
+		$(this).val('logout');
+		console.log('########################### ', $(this).val());
+		$("#search_form").submit();
+	});
+}
 
 
 function add_filter_events() {

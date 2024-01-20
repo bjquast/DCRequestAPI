@@ -11,6 +11,8 @@ from ElasticSearch.ES_Searcher import ES_Searcher
 from DCRequestAPI.lib.SearchResults.IUPartsListTable import IUPartsListTable
 from DCRequestAPI.lib.UserLogin.UserLogin import UserLogin
 
+from DCRequestAPI.views.RequestParams import RequestParams
+
 from dwb_authentication.DWB_Servers import DWB_Servers
 
 import pudb
@@ -40,14 +42,13 @@ class IUPartsListView():
 		
 		#pudb.set_trace()
 		
-		self.loginparams = self.userlogin.get_login_params()
-		if len(self.loginparams) > 0:
-			self.token = self.userlogin.authenticate_user(self.loginparams)
+		if 'username' in self.request.params:
+			self.token = self.userlogin.authenticate_user()
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
 		self.messages.extend(self.userlogin.get_messages())
 		
-		self.set_search_params()
+		self.search_params = RequestParams().get_search_params(self.request)
 		
 		iupartstable = IUPartsListTable()
 		sourcefields = iupartstable.iupartstable.getDefaultSourceFields()
@@ -96,21 +97,19 @@ class IUPartsListView():
 		
 		#pudb.set_trace()
 		
-		self.loginparams = {}
-		
-		if 'submit.logout' in self.request.params:
+		if 'logout' in self.request.params and self.request.params['logout'] == 'logout':
 			self.userlogin.log_out_user()
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
-		if 'submit.login' in self.request.params:
-			self.loginparams = self.userlogin.get_login_params()
-			self.token = self.userlogin.authenticate_user(self.loginparams)
+		if 'username' in self.request.params and self.request.params['username'] is not None and self.request.params['username'] != '':
+			self.token = self.userlogin.authenticate_user()
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
 		self.messages.extend(self.userlogin.get_messages())
 		
-		self.set_search_params()
-		self.set_requeststring()
+		request_params = RequestParams()
+		self.search_params = request_params.get_search_params(self.request)
+		self.requeststring = request_params.get_requeststring(self.request)
 		
 		iupartstable = IUPartsListTable()
 		if len(self.search_params['result_table_columns']) > 0:
@@ -144,71 +143,12 @@ class IUPartsListView():
 			'open_filter_selectors': self.search_params['open_filter_selectors'],
 			'authenticated_user': self.uid,
 			'available_dwb_cons': self.available_dwb_cons,
-			'current_dwb_con': self.loginparams.get('db_accronym', None),
+			'current_dwb_con': self.request.params.get('db_accronym', None),
 			'messages': self.messages
 		}
 		return pagecontent
 
 
 
-	def set_search_params(self):
-		
-		# check if there is a json body in the request
-		try:
-			json_params = self.request.json_body
-			# prepare the params as dict of lists so it can be used in self.set_search_params()
-			request_params = {}
-			for key in json_params:
-				request_params[key] = []
-				if isinstance(json_params[key], list) or isinstance(json_params[key], tuple):
-					request_params[key].extend(json_params[key])
-				else:
-					request_params[key].append(json_params[key])
-		except:
-			request_params = self.request.params.dict_of_lists()
-		
-		self.search_params = {}
-		
-		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'match_query']
-		complex_params = ['term_filters',]
-		list_params = ['open_filter_selectors', 'result_table_columns']
-		
-		for param_name in simple_params: 
-			if param_name in request_params and len(request_params[param_name]) > 0:
-				self.search_params[param_name] = request_params[param_name][-1]
-		
-		for param_name in complex_params: 
-			if param_name in request_params and len(request_params[param_name]) > 0:
-				for searchquery in request_params[param_name]:
-					query = searchquery.split(':')
-					if len(query) == 2:
-						if param_name not in self.search_params:
-							self.search_params[param_name] = {}
-						if query[0] not in self.search_params[param_name]:
-							self.search_params[param_name][query[0]] = []
-						self.search_params[param_name][query[0]].append(query[1])
-			else:
-				self.search_params[param_name] = []
-		
-		for param_name in list_params:
-			if param_name in request_params:
-				self.search_params[param_name] = request_params[param_name]
-			else:
-				self.search_params[param_name] = []
-		
-		return
-
-
-	def set_requeststring(self):
-		self.requeststring = ''
-		paramslist = []
-		request_params = self.request.params.dict_of_lists()
-		for param in request_params:
-			if param not in ['username', 'password', 'logout', 'db_accronym']:
-				for value in request_params[param]:
-					paramslist.append('{0}={1}'.format(param, value))
-		
-		self.requeststring = '&'.join(paramslist)
-		return
 
 

@@ -26,10 +26,6 @@ class UserLogin():
 		
 		db_accronym = self.request.POST.get('db_accronym', '')
 		
-		if username is None or username == '' and password is None or password == '':
-			# do not try to authenticate, return empty loginparams
-			return {}
-		
 		loginparams = {}
 		
 		loginparams = {
@@ -87,7 +83,10 @@ class UserLogin():
 		return unknown_password
 
 
-	def authenticate_user(self, loginparams):
+	def authenticate_user(self):
+		loginparams = self.get_login_params()
+		if len(loginparams) < 3:
+			return None
 		
 		dwb_servers = DWB_Servers()
 		server = dwb_servers.get_dwb_con_by_accronym(loginparams['db_accronym'])

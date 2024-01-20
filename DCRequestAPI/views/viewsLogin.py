@@ -45,14 +45,11 @@ class LoginViews(object):
 		came_from = self.request.params.get('came_from', referrer)
 		
 		self.token = None
-		self.loginparams = {}
 		
 		if 'form.submitted' in self.request.params:
 			
-			self.loginparams = self.userlogin.get_login_params()
-			if len(self.loginparams) > 0:
-				self.token = self.userlogin.authenticate_user(self.loginparams)
-				#self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
+			self.token = self.userlogin.authenticate_user()
+			#self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 			
 			self.messages.extend(self.userlogin.get_messages())
 			
@@ -64,11 +61,11 @@ class LoginViews(object):
 			messages = self.messages,
 			url = self.request.application_url + '/login',
 			came_from = came_from,
-			username = self.loginparams.get('username', None),
+			username = self.request.params.get('username', None),
 			#password= self.password,
 			request = self.request,
 			available_dwb_cons = self.available_dwb_cons,
-			current_dwb_con = self.loginparams.get('db_accronym', None)
+			current_dwb_con = self.request.params.get('db_accronym', None)
 		)
 		
 		result = render('DCRequestAPI:templates/login.pt', responsedict)

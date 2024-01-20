@@ -28,11 +28,13 @@
 								<option tal:repeat="dwb_con available_dwb_cons" tal:attributes="selected 'selected' if dwb_con['accronym'] == current_dwb_con else None" value="${dwb_con['accronym']}">${dwb_con['accronym']}</option>
 							</select></span>
 						</div>
-						<button type="submit" value="Log in" name="submit.login" form="search_form">Log in</button>
+						<button id="login_button" type="submit" value="" name="login_button" form="search_form">Log in</button>
 					</details>
 				</div>
 				<div tal:condition="python: authenticated_user is not None">
-					<span>${authenticated_user} <button type="submit" value="Log in" name="submit.logout" form="search_form">Log out</button></span>
+					<!--log out is handled in search_form.js to prevent the log out when form is submitted with "enter" -->
+					<span>${authenticated_user} <button id="logout_button" type="button" name="logout_button" form="search_form">Log out</button></span>
+					<input id="logout_checkbox" type="checkbox" class="hidden" name="logout" value="logout" form="search_form">
 				</div>
 			</div>
 			<div class="white-background">
