@@ -6,7 +6,6 @@ $(document).ready( function() {
 	add_remove_filter_events()
 	add_collapsible_filters_event();
 	add_submit_events();
-	set_logout_button();
 } );
 
 

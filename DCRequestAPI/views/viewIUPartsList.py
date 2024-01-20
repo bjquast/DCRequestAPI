@@ -96,13 +96,14 @@ class IUPartsListView():
 		
 		#pudb.set_trace()
 		
-		logout = self.request.params.get('logout', '')
-		if logout == 'logout':
+		self.loginparams = {}
+		
+		if 'submit.logout' in self.request.params:
 			self.userlogin.log_out_user()
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
-		self.loginparams = self.userlogin.get_login_params()
-		if len(self.loginparams) == 3:
+		if 'submit.login' in self.request.params:
+			self.loginparams = self.userlogin.get_login_params()
 			self.token = self.userlogin.authenticate_user(self.loginparams)
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
@@ -203,7 +204,7 @@ class IUPartsListView():
 		paramslist = []
 		request_params = self.request.params.dict_of_lists()
 		for param in request_params:
-			if param not in ['username', 'password', 'login_submit']:
+			if param not in ['username', 'password', 'logout', 'db_accronym']:
 				for value in request_params[param]:
 					paramslist.append('{0}={1}'.format(param, value))
 		

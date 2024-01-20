@@ -28,11 +28,11 @@
 								<option tal:repeat="dwb_con available_dwb_cons" tal:attributes="selected 'selected' if dwb_con['accronym'] == current_dwb_con else None" value="${dwb_con['accronym']}">${dwb_con['accronym']}</option>
 							</select></span>
 						</div>
-						<button type="submit" value="Log in" form="search_form">Log in</button>
+						<button type="submit" value="Log in" name="submit.login" form="search_form">Log in</button>
 					</details>
 				</div>
 				<div tal:condition="python: authenticated_user is not None">
-					<span>${authenticated_user} <a href="${request.application_url}/list/?${requestparamsstring}&logout=logout">Log out</a></span>
+					<span>${authenticated_user} <button type="submit" value="Log in" name="submit.logout" form="search_form">Log out</button></span>
 				</div>
 			</div>
 			<div class="white-background">
