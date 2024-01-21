@@ -3,6 +3,10 @@ import pudb
 from dwb_authentication.DWB_Servers import DWB_Servers
 from dwb_authentication.security import SecurityPolicy
 
+
+# TODO: this should be named ValidateLoginData and do not double the functions done by SecurityPolicy and DBSession
+# To solve: access to db connection parameters
+
 class UserLogin():
 	def __init__(self, request):
 		self.request = request

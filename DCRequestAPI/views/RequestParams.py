@@ -25,7 +25,7 @@ class RequestParams():
 		
 		search_params = {}
 		
-		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'match_query']
+		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'match_query', 'aggregation']
 		complex_params = ['term_filters',]
 		list_params = ['open_filter_selectors', 'result_table_columns']
 		
@@ -60,7 +60,7 @@ class RequestParams():
 		paramslist = []
 		request_params = request.params.dict_of_lists()
 		for param in request_params:
-			if param not in ['username', 'password', 'logout', 'db_accronym']:
+			if param not in ['username', 'password', 'token', 'logout', 'db_accronym']:
 				for value in request_params[param]:
 					paramslist.append('{0}={1}'.format(param, value))
 		

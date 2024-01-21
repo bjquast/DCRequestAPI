@@ -10,6 +10,7 @@ from ElasticSearch.ES_Searcher import ES_Searcher
 
 from DCRequestAPI.lib.UserLogin.UserLogin import UserLogin
 
+from dwb_authentication.security import SecurityPolicy
 from dwb_authentication.DWB_Servers import DWB_Servers
 
 import pudb
@@ -39,16 +40,28 @@ class AggregationsView():
 		#pudb.set_trace()
 		
 		if 'username' in self.request.params:
-			self.token = self.userlogin.authenticate_user()
+			self.userlogin.authenticate_user()
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
+		
+		elif 'token' in self.request.params:
+			security = SecurityPolicy()
+			identity = security.get_identity_by_token(self.request)
+			self.uid = identity['username']
+			self.roles = identity['dwb_roles']
+			self.users_projects = identity['projects']
+			self.users_project_ids = [project[0] for project in self.users_projects]
 		
 		self.messages.extend(self.userlogin.get_messages())
 		
 		self.set_search_params()
 		
-		iupartstable = IUPartsListTable()
-		sourcefields = iupartstable.iupartstable.getDefaultSourceFields()
-		coldefs = iupartstable.coldefs
+		# remove aggregation from term filters to get all buckets in this aggregation
+		# but keep all other search params?
+		
+		if 'aggregation' in self.search_params:
+			agg_name = self.search_params['aggregation']
+			if agg_name in self.search_params['term_filters']:
+				del self.search_params['term_filters'][agg_name]
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
 		es_searcher.setSourceFields(source_fields = sourcefields)

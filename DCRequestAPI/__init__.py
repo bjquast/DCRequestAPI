@@ -6,7 +6,7 @@ from pyramid_beaker import session_factory_from_settings
 
 from dwb_authentication.security import SecurityPolicy
 
-
+# recreate the session db each time the server is started
 # code might be kept in memory, how can i prevent that?
 from dwb_authentication.setup_session_db.create_database import SessionDBSetup
 

@@ -51,11 +51,15 @@ class IUPartsListView():
 		self.search_params = RequestParams().get_search_params(self.request)
 		
 		iupartstable = IUPartsListTable()
-		sourcefields = iupartstable.iupartstable.getDefaultSourceFields()
+		if len(self.search_params['result_table_columns']) > 0:
+			iupartstable.setSelectedSourceFields(self.search_params['result_table_columns'])
+		
+		selected_sourcefields = iupartstable.getSelectedSourceFields()
+		#default_sourcefields = iupartstable.getDefaultSourceFields()
 		coldefs = iupartstable.coldefs
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
-		es_searcher.setSourceFields(source_fields = sourcefields)
+		es_searcher.setSourceFields(selected_sourcefields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
 		aggregations = es_searcher.getParsedAggregations()
 		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs], users_project_ids = self.users_project_ids)
@@ -71,13 +75,13 @@ class IUPartsListView():
 				if key in doc:
 					iupartdict[key] = doc[key]
 			
-			for colkey in default_coldefkeys:
+			for colkey in selected_sourcefields:
 				if colkey in doc['_source']:
 					iupartdict[colkey] = doc['_source'][colkey]
 			
 			iuparts.append(iupartdict)
 		
-		pagecontent = {
+		jsoncontent = {
 			'title': 'API for requests on DiversityCollection database',
 			'maxpage': maxpage,
 			'resultnum': resultnum,
@@ -89,7 +93,7 @@ class IUPartsListView():
 			'messages': self.messages
 		}
 		
-		return pagecontent
+		return jsoncontent
 
 
 	@view_config(route_name='iupartslist', accept='text/html', renderer="DCRequestAPI:templates/iupartslist.pt")

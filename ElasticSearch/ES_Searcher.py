@@ -93,10 +93,13 @@ class ES_Searcher():
 		# copy the source_fields, otherwise the change here changes the source_fields variable in the caller 
 		self.source_fields = list(source_fields)
 		
+		# moved to paginated_search
+		'''
 		# add the fields that are needed for filtering the results in WithholdFilters.applyFiltersToSources()
 		if 'Projects.ProjectID' not in self.source_fields:
 			self.source_fields.append('Projects.ProjectID')
 		self.source_fields.extend(self.withhold_fields)
+		'''
 
 
 	def addUserLimitation(self):
@@ -169,12 +172,14 @@ class ES_Searcher():
 		logger.debug(json.dumps(self.query))
 		#logger.debug(json.dumps(self.sort))
 		
-		if len(self.source_fields) == 0:
+		if len(self.source_fields) <= 0:
 			source_fields = True
-		elif len(self.source_fields) > 0:
-			source_fields = self.source_fields
 		else:
-			pass
+			# add the fields that are needed for filtering the results in WithholdFilters.applyFiltersToSources()
+			if 'Projects.ProjectID' not in self.source_fields:
+				self.source_fields.append('Projects.ProjectID')
+			self.source_fields.extend(self.withhold_fields)
+			source_fields = self.source_fields
 		
 		response = self.client.search(index=self.index, size=self.pagesize, sort=self.sort, query=self.query, from_=self.start, source=source_fields, track_total_hits=True, aggs=aggs)
 		
