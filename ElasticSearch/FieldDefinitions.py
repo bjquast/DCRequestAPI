@@ -22,6 +22,7 @@ fieldnames = [
 	'Projects.Project',
 	'CollectionSpecimenID',
 	'Barcodes.Methods.region',
+	'DatabaseAccronym',
 ]
 
 fielddefinitions = {
@@ -171,6 +172,14 @@ fielddefinitions = {
 		'names': {'en': 'Project(s)'},
 		'buckets': {
 			'field_query': 'Projects.Project',
+			'size': 10,
+		},
+	},
+	
+	'DatabaseAccronym': {
+		'names': {'en': 'Database'},
+		'buckets': {
+			'field_query': 'DatabaseAccronym',
 			'size': 10,
 		},
 	},
