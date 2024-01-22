@@ -346,10 +346,8 @@ class DBSession():
 		;"""
 		self.cur.execute(query)
 		self.con.commit()
-		
-		self.delete_unconnected_db_connectors()
-	
-	
+
+
 	def delete_session_by_token(self, token):
 		if token is None:
 			return
@@ -383,23 +381,8 @@ class DBSession():
 		;"""
 		self.cur.execute(query, [hashed_token])
 		self.con.commit()
-		
-		self.delete_unconnected_db_connectors()
-	
-	
-	def delete_unconnected_db_connectors(self):
-		
-		query = """
-		DELETE mc FROM `mssql_connectors` mc
-		LEFT JOIN `sessions` s
-		ON s.db_connector_id = mc.db_connector_id
-		WHERE s.session_id IS NULL AND mc.`remember_connector` = 0
-		;"""
-		
-		self.cur.execute(query)
-		self.con.commit()
-	
-	
+
+
 	def get_connectionparams_from_session(self, token):
 		if token is None:
 			return None
@@ -412,10 +395,10 @@ class DBSession():
 		ON s.db_connector_id = mc.db_connector_id
 		WHERE s.`hashed_token` = %s
 		;"""
-
+		
 		#logger_query.info(query)
 		#logger_query.info(hashed_token)
-                
+		
 		self.cur.execute(query, [hashed_token])
 		row = self.cur.fetchone()
 		if row is None:
