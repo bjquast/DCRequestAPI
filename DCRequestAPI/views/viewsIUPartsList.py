@@ -13,7 +13,6 @@ from DCRequestAPI.lib.UserLogin.UserLogin import UserLogin
 
 from DCRequestAPI.views.RequestParams import RequestParams
 
-from dwb_authentication.DWB_Servers import DWB_Servers
 
 import pudb
 import json
@@ -30,9 +29,6 @@ class IUPartsListView():
 		self.users_project_ids = [project[0] for project in self.users_projects]
 		
 		self.userlogin = UserLogin(self.request)
-		
-		self.dwb_servers = DWB_Servers()
-		self.available_dwb_cons = self.dwb_servers.get_available_dwb_cons()
 		
 		self.messages = []
 
@@ -146,8 +142,6 @@ class IUPartsListView():
 			'selected_sourcefields': selected_sourcefields, 
 			'open_filter_selectors': self.search_params['open_filter_selectors'],
 			'authenticated_user': self.uid,
-			'available_dwb_cons': self.available_dwb_cons,
-			'current_dwb_con': self.request.params.get('db_accronym', None),
 			'messages': self.messages
 		}
 		return pagecontent

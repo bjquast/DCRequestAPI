@@ -11,10 +11,17 @@ logger = logging.getLogger(__name__)
 class MSSQLConnector():
 	def __init__(self, connectionstring = None, config = None, autocommit=False):
 		if config is not None:
-			if 'server' in config and 'driver' in config:
-				self.connectionstring = '''Server={0};UID={1};PWD={2};Database={3};PORT={4};Driver={5}'''.format(config['server'], config['user'], config['password'], config['database'], config['port'], config['driver'])
-			elif 'dsn' in config:
-				self.connectionstring = '''DSN={0};UID={1};PWD={2};Database={3};PORT={4}'''.format(config['dsn'], config['user'], config['password'], config['database'], config['port'])
+			server = config.get('server', None)
+			dsn = config.get('dsn', None)
+			database = config.get('database', None)
+			port = config.get('port', None)
+			driver = config.get('driver', None)
+			username = config.get('username', None)
+			password = config.get('password', None)
+			
+			mssqlparams = MSSQLConnectionParams(dsn = dsn, server = server, port = port, driver = driver, database = database, uid = username, pwd = password)
+			self.connectionstring = mssqlparams.getConnectionString()
+			
 			self.databasename = config['database']
 		elif connectionstring is not None:
 			self.connectionstring = connectionstring
@@ -65,8 +72,8 @@ class MSSQLConnector():
 
 class MSSQLConnectionParams():
 	def __init__(self, dsn = None, server = None, port = None, driver = None, database = None, uid = None, pwd = None):
-		self.paramsdict = {
-		}
+		self.paramsdict = {}
+		
 		self.setDSN(dsn)
 		self.setServer(server)
 		self.setPort(port)

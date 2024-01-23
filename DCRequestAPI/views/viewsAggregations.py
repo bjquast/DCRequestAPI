@@ -28,9 +28,6 @@ class AggregationsView():
 		
 		self.userlogin = UserLogin(self.request)
 		
-		self.dwb_servers = DWB_Servers()
-		self.available_dwb_cons = self.dwb_servers.get_available_dwb_cons()
-		
 		self.messages = []
 
 

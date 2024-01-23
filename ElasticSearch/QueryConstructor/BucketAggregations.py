@@ -87,7 +87,8 @@ class BucketAggregations():
 						'filter': {
 							'bool': {
 								'should': [
-									{"terms": {"{0}.ProjectID".format(self.nested_restricted_aggs_fields[field]['path']): self.users_project_ids}},
+									# need to use the DB_ProjectID within the path for nested objects otherwise the filter fails
+									{"terms": {"{0}.DB_ProjectID".format(self.nested_restricted_aggs_fields[field]['path']): self.users_project_ids}},
 									{"term": {self.nested_restricted_aggs_fields[field]['withholdflag']: "false"}}
 								],
 								"minimum_should_match": 1
@@ -112,7 +113,7 @@ class BucketAggregations():
 				'filter': {
 					'bool': {
 						'should': [
-							{"terms": {"Projects.ProjectID": self.users_project_ids}},
+							{"terms": {"Projects.DB_ProjectID": self.users_project_ids}},
 							{"term": {self.restricted_aggs_fields[field]['withholdflag']: "false"}}
 						],
 						"minimum_should_match": 1

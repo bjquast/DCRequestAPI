@@ -96,8 +96,8 @@ class ES_Searcher():
 		# moved to paginated_search
 		'''
 		# add the fields that are needed for filtering the results in WithholdFilters.applyFiltersToSources()
-		if 'Projects.ProjectID' not in self.source_fields:
-			self.source_fields.append('Projects.ProjectID')
+		if 'Projects.DB_ProjectID' not in self.source_fields:
+			self.source_fields.append('Projects.DB_ProjectID')
 		self.source_fields.extend(self.withhold_fields)
 		'''
 
@@ -105,7 +105,7 @@ class ES_Searcher():
 	def addUserLimitation(self):
 		# prepare the query as a subquery to the must-queries, so that it is guarantied that it is AND connected. 
 		# this is in contrast to should filters where the addition of other should filters might disable the AND connection
-		self.user_limitation = {"bool": {"should": [{"terms": {"Projects.ProjectID": self.users_project_ids}}, {"bool": {"must": [{"term": {"IUWithhold": "false"}}, {"term": {"SpecimenWithhold": "false"}}]}}], "minimum_should_match": 1}}
+		self.user_limitation = {"bool": {"should": [{"terms": {"Projects.DB_ProjectID": self.users_project_ids}}, {"bool": {"must": [{"term": {"IUWithhold": "false"}}, {"term": {"SpecimenWithhold": "false"}}]}}], "minimum_should_match": 1}}
 		self.query["bool"]["must"].append(self.user_limitation)
 		return
 
@@ -176,8 +176,8 @@ class ES_Searcher():
 			source_fields = True
 		else:
 			# add the fields that are needed for filtering the results in WithholdFilters.applyFiltersToSources()
-			if 'Projects.ProjectID' not in self.source_fields:
-				self.source_fields.append('Projects.ProjectID')
+			if 'Projects.DB_ProjectID' not in self.source_fields:
+				self.source_fields.append('Projects.DB_ProjectID')
 			self.source_fields.extend(self.withhold_fields)
 			source_fields = self.source_fields
 		

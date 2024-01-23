@@ -7,6 +7,7 @@ fieldnames = [
 	'Identifications.VernacularTerm',
 	'FamilyCache',
 	'OrderCache',
+	'Identifications.TypeStatus',
 	'MaterialCategory',
 	'LocalityVerbatim',
 	'LocalityDescription',
@@ -21,6 +22,8 @@ fieldnames = [
 	'CollectionName',
 	'Projects.Project',
 	'CollectionSpecimenID',
+	'IdentificationUnitID',
+	'SpecimenPartID',
 	'Barcodes.Methods.region',
 	'DatabaseAccronym',
 ]
@@ -48,6 +51,7 @@ fielddefinitions = {
 		'buckets': {
 			'field_query': 'Identifications.VernacularTerm',
 			'size': 10,
+			'path': 'Identifications'
 		},
 	},
 	
@@ -64,6 +68,15 @@ fielddefinitions = {
 		'buckets': {
 			'field_query': 'OrderCache.keyword', 
 			'size': 10,
+		},
+	},
+	
+	'Identifications.TypeStatus': {
+		'names': {'en': 'Type status'},
+		'buckets': {
+			'field_query': 'Identifications.TypeStatus',
+			'size': 10,
+			'path': 'Identifications'
 		},
 	},
 	
@@ -186,6 +199,14 @@ fielddefinitions = {
 	
 	'CollectionSpecimenID': {
 		'names': {'en': 'CollectionSpecimenID'},
+	},
+	
+	'IdentificationUnitID': {
+		'names': {'en': 'IdentificationUnitID'},
+	},
+	
+	'SpecimenPartID': {
+		'names': {'en': 'SpecimenPartID'},
 	},
 	
 	'Barcodes.Methods.region': {

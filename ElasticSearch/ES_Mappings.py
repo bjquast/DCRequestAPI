@@ -223,8 +223,9 @@ MappingsDict['iuparts'] = {
 		# Identifications Object
 		'Identifications': {
 			# use a nested type here?
-			# do not use nested when there is no withholdflag in a sub-structure because it may duplicate the number of hits in aggregations when a term appears more than once in a substructure, e.g. identifications
-			# 'type': 'nested',
+			# do not use nested when there is no withholdflag in a sub-structure because it may duplicate the number of hits in aggregations when a term appears more than once in a substructure, e.g. identifications?
+			# need nested for type status?
+			'type': 'nested',
 			'properties': {
 				'IdentificationSequenceID': {'type': 'short'},
 				'IdentificationDate': {

@@ -34,7 +34,7 @@ class WithholdFilters():
 		for doc in docs:
 			
 			source = doc['_source']
-			project_ids = [project['ProjectID'] for project in source['Projects']]
+			project_ids = [project['DB_ProjectID'] for project in source['Projects']]
 			
 			project_matched = False
 			
