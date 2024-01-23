@@ -5,15 +5,14 @@ from DBConnectors.MSSQLConnector import MSSQLConnector
 
 
 class DWB_Account():
-	def __init__(self, connectionparams):
-		self.conparams = connectionparams
-		self.username = connectionparams.getUID()
+	def __init__(self, conparams):
+		self.conparams = conparams
+		self.username = conparams['username']
 
 
 	def isValid(self):
-		connectionstring = self.conparams.getConnectionString()
 		try:
-			dwb_con = MSSQLConnector(connectionstring = connectionstring)
+			dwb_con = MSSQLConnector(config = self.conparams)
 			self.server_roles = self.getServerRoles(dwb_con)
 			self.users_projects = self.getUsersProjects(dwb_con)
 			dwb_con.closeConnection()
@@ -22,7 +21,8 @@ class DWB_Account():
 		except:
 			# TODO: find out the exceptions
 			return False
-	
+
+
 	def getServerRoles(self, dwb_con):
 		con = dwb_con.getConnection()
 		cur = dwb_con.getCursor()
@@ -43,7 +43,8 @@ class DWB_Account():
 		for row in rows:
 			roles.append(row[0])
 		return roles
-	
+
+
 	def getUsersProjects(self, dwb_con):
 		con = dwb_con.getConnection()
 		cur = dwb_con.getCursor()

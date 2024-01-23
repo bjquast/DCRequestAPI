@@ -28,23 +28,17 @@ class UserLogin():
 		username = self.request.POST.get('username', '')
 		password = self.request.POST.get('password', '')
 		
-		db_accronym = self.request.POST.get('db_accronym', '')
-		
 		loginparams = {}
 		
 		loginparams = {
 			'username': username,
-			'password': password,
-			'db_accronym': db_accronym,
+			'password': password
 		}
 		
 		for key in loginparams:
 			if loginparams[key] is None or loginparams[key] == '':
 				self.missing_params.append(key)
-				if key == 'db_accronym':
-					self.messages.append('Login is not possible, please select database')
-				else:
-					self.messages.append('Login is not possible, please enter {0}'.format(key))
+				self.messages.append('Login is not possible, please enter {0}'.format(key))
 		
 		if len(self.missing_params) > 0:
 			loginparams = {}
@@ -89,14 +83,11 @@ class UserLogin():
 
 	def authenticate_user(self):
 		loginparams = self.get_login_params()
-		if len(loginparams) < 3:
+		if len(loginparams) < 2:
 			return None
 		
-		dwb_servers = DWB_Servers()
-		server = dwb_servers.get_dwb_con_by_accronym(loginparams['db_accronym'])
-		
 		security = SecurityPolicy()
-		token = security.validate_credentials(server = server['server'], port = server['port'], database = server['database'], driver = server['driver'], username = loginparams['username'], password = loginparams['password'])
+		token = security.validate_credentials(username = loginparams['username'], password = loginparams['password'])
 		
 		if token is not None:
 			self.request.session['token'] = token

@@ -26,9 +26,6 @@ class LoginViews(object):
 		
 		self.userlogin = UserLogin(self.request)
 		
-		self.dwb_servers = DWB_Servers()
-		self.available_dwb_cons = self.dwb_servers.get_available_dwb_cons()
-		
 		self.messages = []
 
 
@@ -63,9 +60,7 @@ class LoginViews(object):
 			came_from = came_from,
 			username = self.request.params.get('username', None),
 			#password= self.password,
-			request = self.request,
-			available_dwb_cons = self.available_dwb_cons,
-			current_dwb_con = self.request.params.get('db_accronym', None)
+			request = self.request
 		)
 		
 		result = render('DCRequestAPI:templates/login.pt', responsedict)

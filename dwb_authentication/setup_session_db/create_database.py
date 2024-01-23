@@ -12,7 +12,7 @@ class SessionDBSetup():
 		
 		self.delete_tables()
 		self.create_tables()
-		self.set_default_connectors()
+		self.set_connectors()
 
 
 	def delete_tables(self):
@@ -26,6 +26,13 @@ class SessionDBSetup():
 		
 		query = """
 		DROP TABLE IF EXISTS `dwb_roles`
+		;"""
+		
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
+		DROP TABLE IF EXISTS `session_has_connector`
 		;"""
 		
 		self.cur.execute(query)
@@ -57,7 +64,6 @@ class SessionDBSetup():
 			`port` INT DEFAULT NULL,
 			`database` varchar(255) DEFAULT NULL,
 			`driver` varchar(255) DEFAULT NULL,
-			`remember_connector` tinyint(1) DEFAULT 0,
 			PRIMARY KEY (`db_connector_id`),
 			UNIQUE KEY `idx_accronym` (`accronym`),
 			UNIQUE KEY `idx_connector` (`server`,`port`,`database`),
@@ -77,10 +83,21 @@ class SessionDBSetup():
 			`encrypted_passwd` varchar(255),
 			`expiration_time` datetime NOT NULL,
 			`username` VARCHAR(50) NOT NULL,
-			`db_connector_id` VARCHAR(50) NOT NULL,
 			PRIMARY KEY (`session_id`),
 			UNIQUE KEY `hashed_token` (`hashed_token`),
-			KEY (`username`),
+			KEY (`username`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+		;"""
+		
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
+		CREATE TABLE `session_has_connector` (
+			`session_id` INT NOT NULL,
+			`db_connector_id` VARCHAR(50) NOT NULL,
+			UNIQUE KEY `session_has_connector_idx` (`session_id`, `db_connector_id`),
+			FOREIGN KEY (`session_id`) REFERENCES `sessions` (`session_id`),
 			FOREIGN KEY (`db_connector_id`) REFERENCES `mssql_connectors` (`db_connector_id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 		;"""
@@ -93,8 +110,10 @@ class SessionDBSetup():
 		CREATE TABLE `dwb_roles` (
 			`users_dwb_role` VARCHAR(255),
 			`session_id` INT NOT NULL,
-			PRIMARY KEY(`session_id`, `users_dwb_role`),
-			FOREIGN KEY(`session_id`) REFERENCES `sessions` (`session_id`)
+			`db_connector_id` VARCHAR(50),
+			PRIMARY KEY(`session_id`, `db_connector_id`, `users_dwb_role`),
+			FOREIGN KEY(`session_id`) REFERENCES `session_has_connector` (`session_id`),
+			FOREIGN KEY(`db_connector_id`) REFERENCES `session_has_connector` (`db_connector_id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 		;
 		"""
@@ -104,11 +123,13 @@ class SessionDBSetup():
 		
 		query = """
 		CREATE TABLE `dwb_projects` (
-			`users_dwb_project_id` INT,
+			`users_dwb_project_id` VARCHAR(50),
 			`project_name` VARCHAR(255),
 			`session_id` INT NOT NULL,
-			PRIMARY KEY(`session_id`, `users_dwb_project_id`),
-			FOREIGN KEY(`session_id`) REFERENCES `sessions` (`session_id`)
+			`db_connector_id` VARCHAR(50),
+			PRIMARY KEY(`session_id`, `db_connector_id`, `users_dwb_project_id`),
+			FOREIGN KEY(`session_id`) REFERENCES `session_has_connector` (`session_id`),
+			FOREIGN KEY(`db_connector_id`) REFERENCES `session_has_connector` (`db_connector_id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 		;
 		"""
@@ -116,21 +137,21 @@ class SessionDBSetup():
 		self.con.commit()
 
 
-	def set_default_connectors(self):
+	def set_connectors(self):
 		
-		self.read_default_connectors()
+		self.read_connectors()
 		
-		if len(self.default_connectors) > 0:
+		if len(self.connectors) > 0:
 			placeholders = []
 			values = []
-			for valuelist in self.default_connectors:
-				placeholders.append('(%s, %s, %s, %s, %s, %s, %s)')
+			for valuelist in self.connectors:
+				placeholders.append('(%s, %s, %s, %s, %s, %s)')
 				values.extend(valuelist)
 			placeholderstring = ', '.join(placeholders)
 			
 			query = """
 			INSERT INTO `mssql_connectors`
-			(`db_connector_id`, `accronym`, `server`, `port`, `database`, `driver`, `remember_connector`)
+			(`db_connector_id`, `accronym`, `server`, `port`, `database`, `driver`)
 			VALUES {0}
 			;""".format(placeholderstring)
 			
@@ -139,9 +160,9 @@ class SessionDBSetup():
 			self.con.commit()
 
 
-	def read_default_connectors(self):
+	def read_connectors(self):
 		# read the default connection parameters without any credentials!
-		self.default_connectors = []
+		self.connectors = []
 		
 		sections = config.sections()
 		for section in sections:
@@ -154,7 +175,7 @@ class SessionDBSetup():
 				driver = config.get(section, 'driver', fallback = None)
 			
 				if server is not None and port is not None and database is not None:
-					self.default_connectors.append([database_id, accronym, server, port, database, driver, 1])
+					self.connectors.append([database_id, accronym, server, port, database, driver])
 		
 		return
 		

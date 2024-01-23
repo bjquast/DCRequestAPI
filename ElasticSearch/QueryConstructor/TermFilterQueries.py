@@ -108,7 +108,7 @@ class TermFilterQueries():
 							}
 						],
 						"should": [
-							{"terms": {"Projects.ProjectID": self.users_project_ids}},
+							{"terms": {"Projects.DB_ProjectID": self.users_project_ids}},
 							{"term": {self.simple_restricted_fields[filter_key]['withholdflag']: "false"}}
 						],
 						"minimum_should_match": 1
@@ -165,7 +165,8 @@ class TermFilterQueries():
 								}
 							],
 							"should": [
-								{"terms": {"{0}.ProjectID".format(self.nested_restricted_fields[filter_key]['path']): self.users_project_ids}},
+								# need to use the DB_ProjectID within the path for nested objects otherwise the filter fails
+								{"terms": {"{0}.DB_ProjectID".format(self.nested_restricted_fields[filter_key]['path']): self.users_project_ids}},
 								{"term": {self.nested_restricted_fields[filter_key]['withholdflag']: "false"}}
 							],
 							"minimum_should_match": 1

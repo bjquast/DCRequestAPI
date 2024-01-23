@@ -22,16 +22,7 @@
 				<span class="w25"><label for="password_input">Password</label></span>
 				<span class="w75"><input type="password" id="password_input" name="password" value=""/></span>
 			</div>
-			<br />
 			
-			<div tal:condition="python: len(available_dwb_cons) > 0" id="dwb_connector_form">
-				<div class='login_form'>
-					<span class="w25"><label for="dwb_con_selector" class="">Available Servers</label></span>
-					<span class="w75"><select id="dwb_con_selector" name="db_accronym">
-						<option tal:repeat="dwb_con available_dwb_cons" tal:attributes="selected 'selected' if dwb_con['accronym'] == current_dwb_con else None" value="${dwb_con['accronym']}">${dwb_con['accronym']}</option>
-					</select></span>
-				</div>
-			</div>
 			<br />
 			
 			<div class='login_form'>
