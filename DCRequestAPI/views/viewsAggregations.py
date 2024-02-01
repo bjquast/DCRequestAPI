@@ -10,7 +10,6 @@ from ElasticSearch.ES_Searcher import ES_Searcher
 
 from DCRequestAPI.lib.UserLogin.UserLogin import UserLogin
 
-from dwb_authentication.security import SecurityPolicy
 from dwb_authentication.DWB_Servers import DWB_Servers
 
 import pudb
@@ -34,19 +33,15 @@ class AggregationsView():
 	@view_config(route_name='aggregations', accept='application/json', renderer="json")
 	def viewAggregationsJSON(self):
 		
-		#pudb.set_trace()
+		pudb.set_trace()
 		
 		if 'username' in self.request.params:
 			self.userlogin.authenticate_user()
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
 		elif 'token' in self.request.params:
-			security = SecurityPolicy()
-			identity = security.get_identity_by_token(self.request)
-			self.uid = identity['username']
-			self.roles = identity['dwb_roles']
-			self.users_projects = identity['projects']
-			self.users_project_ids = [project[0] for project in self.users_projects]
+			self.userlogin.authenticate_by_token(self.request.params['token'])
+			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
 		self.messages.extend(self.userlogin.get_messages())
 		
@@ -54,6 +49,7 @@ class AggregationsView():
 		
 		# remove aggregation from term filters to get all buckets in this aggregation
 		# but keep all other search params?
+		# that might be confusing for users
 		
 		if 'aggregation' in self.search_params:
 			agg_name = self.search_params['aggregation']
@@ -64,35 +60,10 @@ class AggregationsView():
 		es_searcher.setSourceFields(source_fields = sourcefields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
 		aggregations = es_searcher.getParsedAggregations()
-		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs], users_project_ids = self.users_project_ids)
-		
-		# set the coldefs for each iupart as keys for the json dicts 
-		iuparts = []
-		for doc in docs:
-			iupartdict = {
-				'_id': doc['_id']
-			}
-			
-			for key in ['_score', '_ignored']:
-				if key in doc:
-					iupartdict[key] = doc[key]
-			
-			for colkey in default_coldefkeys:
-				if colkey in doc['_source']:
-					iupartdict[colkey] = doc['_source'][colkey]
-			
-			iuparts.append(iupartdict)
 		
 		pagecontent = {
-			'title': 'API for requests on DiversityCollection database',
-			'maxpage': maxpage,
-			'resultnum': resultnum,
-			'page': int(self.search_params.get('page', 1)),
-			'pagesize': int(self.search_params.get('pagesize', 1000)),
 			'search_params': self.search_params,
-			'iuparts': iuparts,
 			'aggregations': aggregations,
-			'messages': self.messages
 		}
 		
 		return pagecontent

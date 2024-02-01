@@ -36,7 +36,7 @@ class RequestParams():
 		for param_name in complex_params: 
 			if param_name in request_params and len(request_params[param_name]) > 0:
 				for searchquery in request_params[param_name]:
-					query = searchquery.split(':')
+					query = searchquery.split(':', 1)
 					if len(query) == 2:
 						if param_name not in search_params:
 							search_params[param_name] = {}

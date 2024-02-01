@@ -90,17 +90,26 @@ class UserLogin():
 		token = security.validate_credentials(username = loginparams['username'], password = loginparams['password'])
 		
 		if token is not None:
-			self.request.session['token'] = token
-			
-			self.uid = self.request.authenticated_userid
-			self.roles = self.request.identity['dwb_roles']
-			self.users_projects = self.request.identity['projects']
-			self.users_project_ids = [project[0] for project in self.users_projects]
+			self.authenticate_by_token(token)
 		
 		else:
 			self.messages.append('Login failed, please check your credentials')
 		
 		#headers = remember(self.request, login)
+		return token
+
+
+	def authenticate_by_token(self, token):
+		self.request.session['token'] = token
+		
+		self.uid = self.request.authenticated_userid
+		self.roles = self.request.identity['dwb_roles']
+		self.users_projects = self.request.identity['projects']
+		self.users_project_ids = [project[0] for project in self.users_projects]
+		
+		if self.uid is None:
+			self.messages.append('Access token is not valid, please log in again')
+		
 		return token
 
 

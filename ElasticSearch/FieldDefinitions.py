@@ -33,7 +33,6 @@ fielddefinitions = {
 		'names': {'en': 'Accessionnumber', },
 		'buckets': {
 			'field_query': 'PartAccessionNumber.keyword', 
-			'size': 10,
 		},
 		
 	},
@@ -42,7 +41,6 @@ fielddefinitions = {
 		'names': {'en': 'Taxon / Species'},
 		'buckets': {
 			'field_query': 'LastIdentificationCache.keyword', 
-			'size': 10,
 		},
 	},
 	
@@ -50,7 +48,6 @@ fielddefinitions = {
 		'names': {'en': 'Vernacular name'},
 		'buckets': {
 			'field_query': 'Identifications.VernacularTerm',
-			'size': 10,
 			'path': 'Identifications'
 		},
 	},
@@ -59,7 +56,6 @@ fielddefinitions = {
 		'names': {'en': 'Family'},
 		'buckets': {
 			'field_query': 'FamilyCache.keyword', 
-			'size': 10,
 		},
 	},
 	
@@ -67,7 +63,6 @@ fielddefinitions = {
 		'names': {'en': 'Order'},
 		'buckets': {
 			'field_query': 'OrderCache.keyword', 
-			'size': 10,
 		},
 	},
 	
@@ -75,7 +70,6 @@ fielddefinitions = {
 		'names': {'en': 'Type status'},
 		'buckets': {
 			'field_query': 'Identifications.TypeStatus',
-			'size': 10,
 			'path': 'Identifications'
 		},
 	},
@@ -84,7 +78,6 @@ fielddefinitions = {
 		'names': {'en': 'Specimen type'},
 		'buckets': {
 			'field_query': 'MaterialCategory',
-			'size': 10,
 			'withholdflag': 'PartWithhold',
 		},
 	},
@@ -93,7 +86,6 @@ fielddefinitions = {
 		'names': {'en': 'Sampling locality'},
 		'buckets': {
 			'field_query': 'LocalityVerbatim.keyword',
-			'size': 10,
 			'withholdflag': 'EventWithhold',
 		},
 	},
@@ -102,7 +94,6 @@ fielddefinitions = {
 		'names': {'en': 'Locality description'},
 		'buckets': {
 			'field_query': 'LocalityDescription.keyword',
-			'size': 10,
 			'withholdflag': 'EventWithhold',
 		},
 	},
@@ -111,7 +102,6 @@ fielddefinitions = {
 		'names': {'en': 'Habitat'},
 		'buckets': {
 			'field_query': 'HabitatDescription.keyword',
-			'size': 10,
 			'withholdflag': 'EventWithhold',
 		},
 	},
@@ -120,7 +110,6 @@ fielddefinitions = {
 		'names': {'en': 'Collecting method'},
 		'buckets': {
 			'field_query': 'CollectingMethod.keyword',
-			'size': 10,
 			'withholdflag': 'EventWithhold',
 		},
 	},
@@ -129,7 +118,6 @@ fielddefinitions = {
 		'names': {'en': 'Country'},
 		'buckets': {
 			'field_query': 'CountryCache.keyword',
-			'size': 10,
 			'withholdflag': 'EventWithhold',
 		},
 	},
@@ -142,7 +130,6 @@ fielddefinitions = {
 		'names': {'en': 'Collector(s)'},
 		'buckets': {
 			'field_query': 'CollectionAgents.CollectorsName.keyword',
-			'size': 10,
 			'withholdflag': 'CollectionAgents.CollectorsWithhold',
 			'path': 'CollectionAgents',
 		},
@@ -153,7 +140,6 @@ fielddefinitions = {
 		'names': {'en': 'Life stage'},
 		'buckets': {
 			'field_query': 'LifeStage',
-			'size': 10,
 		},
 	},
 	
@@ -161,7 +147,6 @@ fielddefinitions = {
 		'names': {'en': 'Sex'},
 		'buckets': {
 			'field_query': 'Gender',
-			'size': 10,
 		},
 	},
 	
@@ -169,7 +154,6 @@ fielddefinitions = {
 		'names': {'en': 'Number of specimens'},
 		'buckets': {
 			'field_query': 'NumberOfUnits',
-			'size': 10,
 		},
 	},
 	
@@ -177,7 +161,6 @@ fielddefinitions = {
 		'names': {'en': 'Collection'},
 		'buckets': {
 			'field_query': 'CollectionName',
-			'size': 10,
 		},
 	},
 	
@@ -185,7 +168,6 @@ fielddefinitions = {
 		'names': {'en': 'Project(s)'},
 		'buckets': {
 			'field_query': 'Projects.Project',
-			'size': 10,
 		},
 	},
 	
@@ -193,7 +175,6 @@ fielddefinitions = {
 		'names': {'en': 'Database'},
 		'buckets': {
 			'field_query': 'DatabaseAccronym',
-			'size': 10,
 		},
 	},
 	
@@ -213,7 +194,6 @@ fielddefinitions = {
 		'names': {'en': 'Barcode Marker'},
 		'buckets': {
 			'field_query': 'Barcodes.Methods.region.keyword',
-			'size': 10
 		},
 		
 	}

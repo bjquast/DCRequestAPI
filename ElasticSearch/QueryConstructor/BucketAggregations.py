@@ -11,9 +11,10 @@ import pudb
 from ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
 
 class BucketAggregations():
-	def __init__(self, users_project_ids = [], source_fields = []):
+	def __init__(self, users_project_ids = [], source_fields = [], size = 10):
 		self.users_project_ids = users_project_ids
 		self.source_fields = source_fields
+		self.size = size
 		
 		self.aggs_fields = {}
 		self.nested_aggs_fields = {}
@@ -55,7 +56,7 @@ class BucketAggregations():
 	def setAggregationsQuery(self):
 		
 		for field in self.aggs_fields:
-			self.aggs_query[field] = {'terms': {'field': self.aggs_fields[field]['field_query'], 'size': self.aggs_fields[field]['size']}}
+			self.aggs_query[field] = {'terms': {'field': self.aggs_fields[field]['field_query'], 'size': self.size}}
 		
 		return
 
@@ -68,7 +69,7 @@ class BucketAggregations():
 				},
 				'aggs': {
 					'buckets': {
-						'terms': {'field': self.nested_aggs_fields[field]['field_query'], 'size': self.nested_aggs_fields[field]['size']}
+						'terms': {'field': self.nested_aggs_fields[field]['field_query'], 'size': self.size}
 					}
 				}
 			}
@@ -96,7 +97,7 @@ class BucketAggregations():
 						},
 						'aggs': {
 							'buckets': {
-								'terms': {'field': self.nested_restricted_aggs_fields[field]['field_query'], 'size': self.nested_restricted_aggs_fields[field]['size']}
+								'terms': {'field': self.nested_restricted_aggs_fields[field]['field_query'], 'size': self.size}
 							}
 						}
 					}
@@ -121,7 +122,7 @@ class BucketAggregations():
 				},
 				'aggs': {
 					'buckets': {
-						'terms': {'field': self.restricted_aggs_fields[field]['field_query'], 'size': self.restricted_aggs_fields[field]['size']}
+						'terms': {'field': self.restricted_aggs_fields[field]['field_query'], 'size': self.size}
 					}
 				}
 			}

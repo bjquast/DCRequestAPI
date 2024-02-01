@@ -42,6 +42,10 @@ class IUPartsListView():
 			self.token = self.userlogin.authenticate_user()
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
+		elif 'token' in self.request.params:
+			self.userlogin.authenticate_by_token(self.request.params['token'])
+			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
+		
 		self.messages.extend(self.userlogin.get_messages())
 		
 		self.search_params = RequestParams().get_search_params(self.request)
@@ -103,6 +107,10 @@ class IUPartsListView():
 		
 		if 'username' in self.request.params and self.request.params['username'] is not None and self.request.params['username'] != '':
 			self.token = self.userlogin.authenticate_user()
+			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
+		
+		elif 'token' in self.request.params:
+			self.userlogin.authenticate_by_token(self.request.params['token'])
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
 		self.messages.extend(self.userlogin.get_messages())
