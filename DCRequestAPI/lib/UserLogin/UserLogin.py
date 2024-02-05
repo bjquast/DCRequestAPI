@@ -20,18 +20,8 @@ class UserLogin():
 		self.messages = []
 
 
-	def check_login_parameters(self):
-		pass
-
-
-
-	def get_login_params(self):
+	def check_loginparams(self, username, password):
 		self.missing_params = []
-		
-		username = self.request.POST.get('username', '')
-		password = self.request.POST.get('password', '')
-		
-		loginparams = {}
 		
 		loginparams = {
 			'username': username,
@@ -84,8 +74,8 @@ class UserLogin():
 		return unknown_password
 
 
-	def authenticate_user(self):
-		loginparams = self.get_login_params()
+	def authenticate_user(self, username, password):
+		loginparams = self.check_loginparams(username, password)
 		if len(loginparams) < 2:
 			return None
 		

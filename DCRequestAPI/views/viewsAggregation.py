@@ -19,23 +19,34 @@ import json
 
 class AggregationView():
 	def __init__(self, request):
+		
 		self.request = request
 		self.uid = self.request.authenticated_userid
 		
 		self.roles = self.request.identity['dwb_roles']
 		self.users_projects = self.request.identity['projects']
 		self.users_project_ids = [project[0] for project in self.users_projects]
-		pudb.set_trace()
+		
 		self.userlogin = UserLogin(self.request)
 		
 		self.messages = []
 		
-		if 'username' in self.request.params:
-			self.userlogin.authenticate_user()
+		request_params = RequestParams(self.request)
+		self.search_params = request_params.search_params
+		self.credentials = request_params.credentials
+		
+		# check if there are any authentication data given in request
+		# and if so: authenticate the user
+		if 'logout' in self.credentials and self.credentials['logout'] == 'logout':
+			self.userlogin.log_out_user()
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
-		elif 'token' in self.request.params:
-			self.userlogin.authenticate_by_token(self.request.params['token'])
+		if 'username' in self.credentials and 'password' in self.credentials:
+			self.token = self.userlogin.authenticate_user(self.credentials['username'], self.credentials['password'])
+			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
+		
+		elif 'token' in self.credentials:
+			self.userlogin.authenticate_by_token(self.credentials['token'])
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
 		self.messages.extend(self.userlogin.get_messages())
@@ -45,8 +56,6 @@ class AggregationView():
 	def viewAggregationJSON(self):
 		
 		#pudb.set_trace()
-		
-		self.search_params = RequestParams().get_search_params(self.request)
 		
 		# remove aggregation from term filters to get all buckets in this aggregation
 		# but keep all other search params?

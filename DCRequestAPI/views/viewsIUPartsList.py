@@ -29,21 +29,25 @@ class IUPartsListView():
 		self.users_project_ids = [project[0] for project in self.users_projects]
 		
 		self.userlogin = UserLogin(self.request)
-		
 		self.messages = []
+		
+		request_params = RequestParams(self.request)
+		self.search_params = request_params.search_params
+		self.requeststring = request_params.requeststring
+		self.credentials = request_params.credentials
 		
 		# check if there are any authentication data given in request
 		# and if so: authenticate the user
-		if 'logout' in self.request.params and self.request.params['logout'] == 'logout':
+		if 'logout' in self.credentials and self.credentials['logout'] == 'logout':
 			self.userlogin.log_out_user()
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
-		if 'username' in self.request.params and self.request.params['username'] is not None and self.request.params['username'] != '':
-			self.token = self.userlogin.authenticate_user()
+		if 'username' in self.credentials and 'password' in self.credentials:
+			self.token = self.userlogin.authenticate_user(self.credentials['username'], self.credentials['password'])
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
-		elif 'token' in self.request.params:
-			self.userlogin.authenticate_by_token(self.request.params['token'])
+		elif 'token' in self.credentials:
+			self.userlogin.authenticate_by_token(self.credentials['token'])
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
 		self.messages.extend(self.userlogin.get_messages())
@@ -53,8 +57,6 @@ class IUPartsListView():
 	def IUPartsListJSON(self):
 		
 		#pudb.set_trace()
-		
-		self.search_params = RequestParams().get_search_params(self.request)
 		
 		iupartstable = IUPartsListTable()
 		if len(self.search_params['result_table_columns']) > 0:
@@ -106,10 +108,6 @@ class IUPartsListView():
 	def IUPartsListHTML(self):
 		
 		#pudb.set_trace()
-		
-		request_params = RequestParams()
-		self.search_params = request_params.get_search_params(self.request)
-		self.requeststring = request_params.get_requeststring(self.request)
 		
 		iupartstable = IUPartsListTable()
 		if len(self.search_params['result_table_columns']) > 0:

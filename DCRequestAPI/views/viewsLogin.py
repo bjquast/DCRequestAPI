@@ -8,7 +8,8 @@ from dwb_authentication.DWB_Servers import DWB_Servers
 
 from DCRequestAPI.lib.UserLogin.UserLogin import UserLogin
 
-#from pyramid.security import remember, forget
+from DCRequestAPI.views.RequestParams import RequestParams
+
 
 import pudb
 import re
@@ -23,9 +24,7 @@ class LoginViews(object):
 		self.request = request
 		
 		self.uid = self.request.authenticated_userid
-		
 		self.userlogin = UserLogin(self.request)
-		
 		self.messages = []
 
 
@@ -33,7 +32,7 @@ class LoginViews(object):
 	@forbidden_view_config(accept='text/html')
 	def login_view(self):
 		
-		#pudb.set_trace()
+		pudb.set_trace()
 		
 		login_url = self.request.route_url('login')
 		referrer = self.request.url
@@ -45,8 +44,7 @@ class LoginViews(object):
 		
 		if 'form.submitted' in self.request.params:
 			
-			self.token = self.userlogin.authenticate_user()
-			#self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
+			self.token = self.userlogin.authenticate_user(self.request.params.get('username', ''), self.request.params.get('password', ''))
 			
 			self.messages.extend(self.userlogin.get_messages())
 			
@@ -58,8 +56,7 @@ class LoginViews(object):
 			messages = self.messages,
 			url = self.request.application_url + '/login',
 			came_from = came_from,
-			username = self.request.params.get('username', None),
-			#password= self.password,
+			username = self.request.params.get('username', ''),
 			request = self.request
 		)
 		
@@ -82,20 +79,34 @@ class LoginViews(object):
 		return HTTPFound(location = came_from)
 
 
-	'''
-	@view_config(route_name='authenticated_user', renderer='json')
-	def authenticated_user_view(self):
-		if self.request.params.get('token', ''):
-			security = SecurityPolicy()
-			identity = security.get_identity_by_token(self.request)
-			if identity is not None:
-				return identity
-			else:
-				return {}
-		else:
-			return {}
-	'''
 	
+	@view_config(route_name='login', accept='application/json', renderer='json')
+	def login_view_json(self):
+		pudb.set_trace()
+		
+		self.userlogin = UserLogin(self.request)
+		self.messages = []
+		
+		request_params = RequestParams(self.request)
+		self.credentials = request_params.credentials
+		
+		token = None
+		
+		# check if there are any authentication data given in request
+		# and if so: authenticate the user
+		if 'username' in self.credentials and 'password' in self.credentials:
+			token = self.userlogin.authenticate_user(self.credentials['username'], self.credentials['password'])
+		
+		self.messages.extend(self.userlogin.get_messages())
+		
+		response = {
+			'token': token
+		}
+		if len(self.messages) > 0:
+			response['messages'] = self.messages
+		
+		return response
+
 
 
 
