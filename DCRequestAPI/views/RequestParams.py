@@ -67,7 +67,8 @@ class RequestParams():
 		credentials = ['username', 'password', 'token', 'logout']
 		for param_name in credentials: 
 			if param_name in self.params_dict and len(self.params_dict[param_name]) > 0:
-				self.credentials[param_name] = self.params_dict[param_name][-1]
+				if self.params_dict[param_name][-1] != '' and self.params_dict[param_name][-1] is not None:
+					self.credentials[param_name] = self.params_dict[param_name][-1]
 		return
 
 

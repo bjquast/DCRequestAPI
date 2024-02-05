@@ -50,9 +50,11 @@ if __name__ == "__main__":
 			es_indexer.bulkUpdateFields(projects_dict, 'Projects', i)
 			
 			identifications = Identifications(data_getter)
-			identifications_dict = identifications.get_data_page(i)
+			identifications_dict, flat_identification_fields = identifications.get_data_page(i)
 			
 			es_indexer.bulkUpdateFields(identifications_dict, 'Identifications', i)
+			for field in flat_identification_fields:
+				es_indexer.bulkUpdateFields(flat_identification_fields[field], field, i)
 			
 			collectors = CollectionAgents(data_getter)
 			collectors_dict = collectors.get_data_page(i)

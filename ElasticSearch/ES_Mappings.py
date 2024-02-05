@@ -467,6 +467,12 @@ MappingsDict['iuparts'] = {
 				'AnalysisTypeNotes': {'type': 'keyword'},
 			}
 		},
+		# flat mappings of existing nested structures
+		
+		# Identifications
+		'VernacularTerms': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+		'TypeStatus':  {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+		
 		
 	}
 }

@@ -33,6 +33,7 @@
 							data-filter-value="${bucket['key']}">
 							${bucket['key']} (${bucket['doc_count']})
 						</li>
+						<li><button id="more_button_${aggs_name}" class="more_filter_entries_button" data-filter-key="${aggs_name}">more</button></li>
 					</ul>
 				</details>
 			</div>

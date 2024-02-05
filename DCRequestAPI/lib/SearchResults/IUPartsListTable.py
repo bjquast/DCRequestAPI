@@ -59,7 +59,7 @@ class IUPartsListTable():
 				elif colkey in doc_source:
 					doc_element = doc_source[colkey]
 					if isinstance(doc_element, list) or isinstance(doc_element, tuple):
-						value = ',\n'.join.doc_element
+						value = ',\n'.join(doc_element)
 						values.append(value)
 					else:
 						values.append(doc_element)

@@ -4,10 +4,10 @@ import pudb
 fieldnames = [
 	'PartAccessionNumber',
 	'LastIdentificationCache',
-	'Identifications.VernacularTerm',
+	'VernacularTerms',
 	'FamilyCache',
 	'OrderCache',
-	'Identifications.TypeStatus',
+	'TypeStatus',
 	'MaterialCategory',
 	'LocalityVerbatim',
 	'LocalityDescription',
@@ -44,11 +44,10 @@ fielddefinitions = {
 		},
 	},
 	
-	'Identifications.VernacularTerm': {
+	'VernacularTerms': {
 		'names': {'en': 'Vernacular name'},
 		'buckets': {
-			'field_query': 'Identifications.VernacularTerm',
-			'path': 'Identifications'
+			'field_query': 'VernacularTerms',
 		},
 	},
 	
@@ -66,11 +65,10 @@ fielddefinitions = {
 		},
 	},
 	
-	'Identifications.TypeStatus': {
+	'TypeStatus': {
 		'names': {'en': 'Type status'},
 		'buckets': {
-			'field_query': 'Identifications.TypeStatus',
-			'path': 'Identifications'
+			'field_query': 'TypeStatus.keyword_lc'
 		},
 	},
 	

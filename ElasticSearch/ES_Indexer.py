@@ -80,14 +80,10 @@ class ES_Indexer():
 				'_op_type': 'update',
 				'_id': key,
 				'doc': {
-					fieldname: [],
+					fieldname: datadict[key],
 				}
 			}
 			
-			for element in datadict[key]:
-				actions_dict[key]['doc'][fieldname].append( 
-					element
-				)
 			yield actions_dict[key]
 
 
