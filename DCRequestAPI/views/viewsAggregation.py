@@ -9,14 +9,15 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPSeeOther
 from ElasticSearch.ES_Searcher import ES_Searcher
 
 from DCRequestAPI.lib.UserLogin.UserLogin import UserLogin
-
 from dwb_authentication.DWB_Servers import DWB_Servers
+
+from DCRequestAPI.views.RequestParams import RequestParams
 
 import pudb
 import json
 
 
-class AggregationsView():
+class AggregationView():
 	def __init__(self, request):
 		self.request = request
 		self.uid = self.request.authenticated_userid
@@ -24,16 +25,10 @@ class AggregationsView():
 		self.roles = self.request.identity['dwb_roles']
 		self.users_projects = self.request.identity['projects']
 		self.users_project_ids = [project[0] for project in self.users_projects]
-		
+		pudb.set_trace()
 		self.userlogin = UserLogin(self.request)
 		
 		self.messages = []
-
-
-	@view_config(route_name='aggregations', accept='application/json', renderer="json")
-	def viewAggregationsJSON(self):
-		
-		pudb.set_trace()
 		
 		if 'username' in self.request.params:
 			self.userlogin.authenticate_user()
@@ -44,8 +39,14 @@ class AggregationsView():
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
 		self.messages.extend(self.userlogin.get_messages())
+
+
+	@view_config(route_name='aggregation', accept='application/json', renderer="json")
+	def viewAggregationJSON(self):
 		
-		self.set_search_params()
+		#pudb.set_trace()
+		
+		self.search_params = RequestParams().get_search_params(self.request)
 		
 		# remove aggregation from term filters to get all buckets in this aggregation
 		# but keep all other search params?
@@ -57,13 +58,10 @@ class AggregationsView():
 				del self.search_params['term_filters'][agg_name]
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
-		es_searcher.setSourceFields(source_fields = sourcefields)
-		docs, maxpage, resultnum = es_searcher.paginatedSearch()
-		aggregations = es_searcher.getParsedAggregations()
+		buckets = es_searcher.singleAggregationSearch(agg_name)
 		
 		pagecontent = {
-			'search_params': self.search_params,
-			'aggregations': aggregations,
+			agg_name: buckets,
 		}
 		
 		return pagecontent

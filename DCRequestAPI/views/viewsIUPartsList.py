@@ -31,14 +31,14 @@ class IUPartsListView():
 		self.userlogin = UserLogin(self.request)
 		
 		self.messages = []
-
-
-	@view_config(route_name='iupartslist', accept='application/json', renderer="json")
-	def IUPartsListJSON(self):
 		
-		#pudb.set_trace()
+		# check if there are any authentication data given in request
+		# and if so: authenticate the user
+		if 'logout' in self.request.params and self.request.params['logout'] == 'logout':
+			self.userlogin.log_out_user()
+			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
-		if 'username' in self.request.params:
+		if 'username' in self.request.params and self.request.params['username'] is not None and self.request.params['username'] != '':
 			self.token = self.userlogin.authenticate_user()
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
@@ -47,6 +47,12 @@ class IUPartsListView():
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
 		self.messages.extend(self.userlogin.get_messages())
+
+
+	@view_config(route_name='iupartslist', accept='application/json', renderer="json")
+	def IUPartsListJSON(self):
+		
+		#pudb.set_trace()
 		
 		self.search_params = RequestParams().get_search_params(self.request)
 		
@@ -100,20 +106,6 @@ class IUPartsListView():
 	def IUPartsListHTML(self):
 		
 		#pudb.set_trace()
-		
-		if 'logout' in self.request.params and self.request.params['logout'] == 'logout':
-			self.userlogin.log_out_user()
-			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
-		
-		if 'username' in self.request.params and self.request.params['username'] is not None and self.request.params['username'] != '':
-			self.token = self.userlogin.authenticate_user()
-			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
-		
-		elif 'token' in self.request.params:
-			self.userlogin.authenticate_by_token(self.request.params['token'])
-			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
-		
-		self.messages.extend(self.userlogin.get_messages())
 		
 		request_params = RequestParams()
 		self.search_params = request_params.get_search_params(self.request)

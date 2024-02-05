@@ -152,6 +152,25 @@ class ES_Searcher():
 		self.client.indices.put_settings(index=self.index, body=body)
 
 
+	def singleAggregationSearch(self, aggregation_name, size = 200):
+		#pudb.set_trace()
+		
+		self.setQuery()
+		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size)
+		aggs = buckets_query.getAggregationsQuery()
+		
+		source_fields = False
+		
+		response = self.client.search(index=self.index, query=self.query, source=source_fields, aggs=aggs, size = 0)
+		
+		buckets = []
+		if 'aggregations' in response:
+			self.raw_aggregations = response['aggregations']
+			buckets = self.getBucketListFromAggregation(self.raw_aggregations[aggregation_name])
+		
+		return buckets
+
+
 	def paginatedSearch(self):
 		
 		self.updateMaxResultWindow(max_result_window=2000000)
@@ -216,6 +235,20 @@ class ES_Searcher():
 			elif isinstance(raw_aggregation['buckets'], dict) and 'buckets' in raw_aggregation['buckets']:
 				self.parseRawAggregation(raw_aggregation['buckets'], colname)
 		return
+
+
+	def getBucketListFromAggregation(self, raw_aggregation):
+		#pudb.set_trace()
+		buckets = []
+		if 'buckets' in raw_aggregation:
+			if isinstance(raw_aggregation['buckets'], list) or isinstance(raw_aggregation['buckets'], tuple):
+				for bucket in raw_aggregation['buckets']:
+					buckets.append([bucket['key'], bucket['doc_count']])
+			elif isinstance(raw_aggregation['buckets'], dict) and 'buckets' in raw_aggregation['buckets']:
+				buckets = self.getBucketListFromAggregation(raw_aggregation['buckets'])
+			else:
+				buckets = []
+		return buckets
 
 
 	def getParsedAggregations(self):

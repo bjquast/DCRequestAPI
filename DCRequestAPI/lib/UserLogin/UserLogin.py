@@ -18,7 +18,10 @@ class UserLogin():
 		
 		self.missing_params = []
 		self.messages = []
-		
+
+
+	def check_login_parameters(self):
+		pass
 
 
 
