@@ -13,6 +13,8 @@ from dwb_authentication.DWB_Servers import DWB_Servers
 
 from DCRequestAPI.views.RequestParams import RequestParams
 
+from ElasticSearch.FieldDefinitions import fielddefinitions
+
 import pudb
 import json
 
@@ -62,16 +64,26 @@ class AggregationView():
 		# that might be confusing for users
 		
 		if 'aggregation' in self.search_params:
-			agg_name = self.search_params['aggregation']
-			if agg_name in self.search_params['term_filters']:
-				del self.search_params['term_filters'][agg_name]
+			agg_key = self.search_params['aggregation']
+			if agg_key in self.search_params['term_filters']:
+				del self.search_params['term_filters'][agg_key]
+		
+		if agg_key not in fielddefinitions:
+			return {
+				'message': '{0} can is not available as bucket aggregation'.format(agg_key),
+				'buckets': {}
+			}
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
-		buckets = es_searcher.singleAggregationSearch(agg_name)
+		buckets = es_searcher.singleAggregationSearch(agg_key)
 		
-		pagecontent = {
-			agg_name: buckets,
+		
+		
+		buckets_dict = {
+			'aggregation': agg_key,
+			'aggregation_names': fielddefinitions[agg_key].get('names', {'en', None}),
+			'buckets': buckets
 		}
 		
-		return pagecontent
+		return buckets_dict
 

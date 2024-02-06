@@ -19,6 +19,8 @@ fieldnames = [
 	'LifeStage',
 	'Gender',
 	'NumberOfUnits',
+	# NumberOfSpecimenImages does not work. because it is a numeric type it can not be set to case_insensitiv in TermFilterQuery. Think about RangeQuery implementation 
+	# 'NumberOfSpecimenImages',
 	'CollectionName',
 	'Projects.Project',
 	'CollectionSpecimenID',
@@ -152,6 +154,14 @@ fielddefinitions = {
 		'names': {'en': 'Number of specimens'},
 		'buckets': {
 			'field_query': 'NumberOfUnits',
+		},
+	},
+	
+	'NumberOfSpecimenImages': {
+		'names': {'en': 'Number of images'},
+		'buckets': {
+			'field_query': 'NumberOfSpecimenImages',
+			'type': 'number'
 		},
 	},
 	
