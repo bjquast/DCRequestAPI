@@ -11,6 +11,7 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 	<link rel="stylesheet" type="text/css" href="${request.static_url('DCRequestAPI:static/css/header.css')}">
 	
 	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/extern_js/jquery-3.6.1/jquery-3.6.1.js')}"></script>
+	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/js/AppliedFiltersField.js')}"></script>
 	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/js/FilterOverlay.js')}"></script>
 	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/js/search_form.js')}"></script>
 </head>

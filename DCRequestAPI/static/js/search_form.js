@@ -1,10 +1,20 @@
 'use strict'
 
+let appliedfilters = new AppliedFiltersField();
+let filteroverlay = new FilterOverlay(appliedfilters);
+
+
 
 $(document).ready( function() {
+	
 	add_filter_events();
-	add_remove_filter_events()
-	add_collapsible_filters_event();
+	
+	set_more_button_events();
+	add_collapsible_events();
+	add_collapsible_status_event();
+	
+	appliedfilters.add_remove_filter_events();
+	
 	add_logout_event();
 	add_submit_events();
 } );
@@ -43,58 +53,40 @@ function add_filter_events() {
 			let filter_name = $(this).data('filter-name');
 			let filter_key = $(this).data('filter-key');
 			let filter_value = $(this).data('filter-value');
-			add_filter(filter_id, filter_name, filter_key, filter_value);
+			appliedfilters.add_filter(filter_id, filter_name, filter_key, filter_value);
 		});
 	});
 }
 
 
-function add_filter(filter_id, filter_name, filter_key, filter_value) {
-	
-	let filter_exists = false;
-	
-	$('.filter_checkbox').each( function () {
-		if (filter_id == $(this).data('filter-id')) {
-			filter_exists = true;
+function set_more_button_events() {
+	$('.filter_selectors').each( function () {
+		if ($(this).attr('open') == 'open') {
+			let more_button = $(this).find('.more_filter_entries_button');
+			more_button.click( function() {
+				let agg_key = $(this).data('filter-key');
+				filteroverlay.openOverlay(agg_key);
+			});
+		}
+		else {
+			$(this).find('.more_filter_entries_button').each( function () {
+				$(this).off();
+			});
 		}
 	});
-	
-	if (filter_exists == false) {
-		$('#applied_filters').append('<div class="filter_checkbox new_filter"></div>');
-		$('#applied_filters .new_filter').attr('data-filter-id', filter_id);
-		$('#applied_filters .new_filter').append('<input type="checkbox" form="search_form" checked="checked" value="' + filter_key + ':' + filter_value + '" name="term_filters">');
-		$('#applied_filters .new_filter>input').attr('data-filter-id', filter_id);
-		$('#applied_filters .new_filter').append('<label><b>' + filter_name + ': </b>' + filter_value + '</label>');
-		$('#applied_filters .new_filter').removeClass('new_filter');
-		
-		// only submit when the filter was not set before
-		$("#search_form").submit();
-	}
 }
 
 
-function add_remove_filter_events() {
-	$('#applied_filters .filter_checkbox>input').each( function () {
-		$(this).change( function() {
-			let filter_id = $(this).data('filter-id');
-			remove_filter(filter_id);
+function add_collapsible_events() {
+	$('.filter_selectors').each( function () {
+		$(this).on('toggle', function() {
+			set_more_button_events();
 		});
 	});
 }
 
 
-function remove_filter(filter_id) {
-	$('#applied_filters .filter_checkbox').each( function () {
-		if ($(this).data('filter-id') == filter_id) {
-			$(this).remove();
-		}
-	});
-	
-	$("#search_form").submit();
-}
-
-
-function add_collapsible_filters_event() {
+function add_collapsible_status_event() {
 	$('#search_form').on('submit', function () {
 		$('.filter_selectors').each( function () {
 			if ($(this).attr('open') == 'open') {
@@ -106,3 +98,4 @@ function add_collapsible_filters_event() {
 		});
 	});
 }
+
