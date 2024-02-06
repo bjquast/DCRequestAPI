@@ -75,7 +75,7 @@ class CollectionAgents():
 	def addProjectIDs(self):
 		for row in self.rows:
 			if row[1] in self.collectors_dict:
-				for collectordict in self.collectors_dict[row[1]]:
+				for collectordict in self.collectors_dict[row[1]]['CollectionAgents']:
 					if 'ProjectID' not in collectordict:
 						collectordict['ProjectID'] = []
 						collectordict['DB_ProjectID'] = []
@@ -90,7 +90,8 @@ class CollectionAgents():
 		collectors_order = 0
 		for row in self.rows:
 			if row[1] not in self.collectors_dict:
-				self.collectors_dict[row[1]] = []
+				self.collectors_dict[row[1]] = {}
+				self.collectors_dict[row[1]]['CollectionAgents'] = []
 				collectors_order = 0
 			
 			collector = {
@@ -104,7 +105,7 @@ class CollectionAgents():
 			
 			collectors_order += 1
 			
-			self.collectors_dict[row[1]].append(collector)
+			self.collectors_dict[row[1]]['CollectionAgents'].append(collector)
 			
 		return
 

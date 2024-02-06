@@ -473,6 +473,8 @@ MappingsDict['iuparts'] = {
 		'VernacularTerms': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		'TypeStatus':  {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		
+		# Images
+		'NumberOfSpecimenImages': {'type': 'integer', 'null_value': 0},
 		
 	}
 }

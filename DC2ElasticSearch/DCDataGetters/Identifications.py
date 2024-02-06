@@ -46,20 +46,18 @@ class Identifications():
 			self.rows2dicts()
 			
 			
-			return self.identifications_dict, self.flat_identification_fields
+			return self.identifications_dict
 
 
 	def rows2dicts(self):
 		self.identifications_dict = {}
 		
-		self.flat_identification_fields = {
-			'VernacularTerms': {},
-			'TypeStatus': {}
-		}
-		
 		for row in self.rows:
 			if row[1] not in self.identifications_dict:
-				self.identifications_dict[row[1]] = []
+				self.identifications_dict[row[1]] = {}
+				self.identifications_dict[row[1]]['Identifications'] = []
+				self.identifications_dict[row[1]]['VernacularTerms'] = []
+				self.identifications_dict[row[1]]['TypeStatus'] = []
 			
 			identification = {
 				'IdentificationSequenceID': row[2],
@@ -72,19 +70,15 @@ class Identifications():
 				
 			}
 			
-			self.identifications_dict[row[1]].append(identification)
+			self.identifications_dict[row[1]]['Identifications'].append(identification)
 			
 			if row[5] is not None and row[5] != '':
-				if row[1] not in self.flat_identification_fields['VernacularTerms']:
-					self.flat_identification_fields['VernacularTerms'][row[1]] = []
-				
-				self.flat_identification_fields['VernacularTerms'][row[1]].append(row[5])
+				if row[5] not in self.identifications_dict[row[1]]['VernacularTerms']:
+					self.identifications_dict[row[1]]['VernacularTerms'].append(row[5])
 			
 			if row[7] is not None and row[7] != '':
-				if row[1] not in self.flat_identification_fields['TypeStatus']:
-					self.flat_identification_fields['TypeStatus'][row[1]] = []
-			
-				self.flat_identification_fields['TypeStatus'][row[1]].append(row[7])
+				if row[7] not in self.identifications_dict[row[1]]['TypeStatus']:
+					self.identifications_dict[row[1]]['TypeStatus'].append(row[7])
 			
 		return
 

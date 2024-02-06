@@ -73,6 +73,40 @@ class ES_Indexer():
 		return
 
 
+	def yieldDocsForUpdate(self, datadict):
+		actions_dict = {}
+		for key in datadict.keys():
+			actions_dict[key] = {
+				'_op_type': 'update',
+				'_id': key,
+				'doc': datadict[key]
+			}
+			
+			yield actions_dict[key]
+
+
+	def bulkUpdateDocs(self, datadict, name_for_logging, page):
+		doc_count = len(datadict)
+		
+		self.successes, self.fails = 0, 0
+		
+		for ok, response in streaming_bulk(client=self.client, index=self.index, actions=self.yieldDocsForUpdate(datadict), yield_ok=True, raise_on_error=False, request_timeout=60):
+			if not ok:
+				self.fails += 1
+				es_logger.info(response)
+			else:
+				self.successes += 1
+		
+		if self.fails > 0:
+			es_logger.info('>>> Update failed! Tried to update {0} docs of {1} into {2}, {3} failed updates. {4} page {5} <<<'.format(self.successes, doc_count, self.index, self.fails, name_for_logging, page))
+		else:
+			es_logger.info('>>> Updated {0} docs of {1} into {2}. {3} page {4} <<<'.format(self.successes, doc_count, self.index, name_for_logging, page))
+		
+		self.client.indices.refresh(index=self.index)
+		return
+
+
+
 	def yieldUpdateData(self, datadict, fieldname):
 		actions_dict = {}
 		for key in datadict.keys():

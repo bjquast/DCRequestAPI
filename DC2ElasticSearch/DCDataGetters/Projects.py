@@ -53,7 +53,8 @@ class Projects():
 		
 		for row in self.rows:
 			if row[1] not in self.projects_dict:
-				self.projects_dict[row[1]] = []
+				self.projects_dict[row[1]] = {}
+				self.projects_dict[row[1]]['Projects'] = []
 			
 			project = {
 				'DB_ProjectID': row[2],
@@ -62,7 +63,7 @@ class Projects():
 				'ProjectURI': row[5]
 			}
 			
-			self.projects_dict[row[1]].append(project)
+			self.projects_dict[row[1]]['Projects'].append(project)
 			
 		return
 

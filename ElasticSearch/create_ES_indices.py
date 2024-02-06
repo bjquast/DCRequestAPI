@@ -47,24 +47,22 @@ if __name__ == "__main__":
 			projects = Projects(data_getter)
 			projects_dict = projects.get_data_page(i)
 			
-			es_indexer.bulkUpdateFields(projects_dict, 'Projects', i)
+			es_indexer.bulkUpdateDocs(projects_dict, 'Projects', i)
 			
 			identifications = Identifications(data_getter)
-			identifications_dict, flat_identification_fields = identifications.get_data_page(i)
+			identifications_dict = identifications.get_data_page(i)
 			
-			es_indexer.bulkUpdateFields(identifications_dict, 'Identifications', i)
-			for field in flat_identification_fields:
-				es_indexer.bulkUpdateFields(flat_identification_fields[field], field, i)
+			es_indexer.bulkUpdateDocs(identifications_dict, 'Identifications', i)
 			
 			collectors = CollectionAgents(data_getter)
 			collectors_dict = collectors.get_data_page(i)
 			
-			es_indexer.bulkUpdateFields(collectors_dict, 'CollectionAgents', i)
+			es_indexer.bulkUpdateDocs(collectors_dict, 'CollectionAgents', i)
 			
 			images = CollectionSpecimenImages(data_getter)
 			images_dict = images.get_data_page(i)
 			
-			es_indexer.bulkUpdateFields(images_dict, 'Images', i)
+			es_indexer.bulkUpdateDocs(images_dict, 'Images', i)
 			
 			barcode_amp_filter_ids = {
 			'161': {
@@ -72,10 +70,10 @@ if __name__ == "__main__":
 					'16': ['73', '63', '64', '65', '66', '71', '72', '74', '75', '84', '91', '92']
 				}
 			}
-			analyses = IdentificationUnitAnalyses(data_getter, barcode_amp_filter_ids)
+			analyses = IdentificationUnitAnalyses(data_getter, barcode_amp_filter_ids, 'Barcodes')
 			analyses_dict = analyses.get_data_page(i)
 			
-			es_indexer.bulkUpdateFields(analyses_dict, 'Barcodes', i)
+			es_indexer.bulkUpdateDocs(analyses_dict, 'Barcodes', i)
 			
 			fogs_amp_filter_ids = {
 			'327': {
@@ -83,10 +81,10 @@ if __name__ == "__main__":
 					'25': ['144', '145', '146', '148']
 				}
 			}
-			analyses = IdentificationUnitAnalyses(data_getter, fogs_amp_filter_ids)
+			analyses = IdentificationUnitAnalyses(data_getter, fogs_amp_filter_ids, 'FOGS')
 			analyses_dict = analyses.get_data_page(i)
 			
-			es_indexer.bulkUpdateFields(analyses_dict, 'FOGS', i)
+			es_indexer.bulkUpdateDocs(analyses_dict, 'FOGS', i)
 			
 			mam_measurements_amp_filter_ids = {
 			'210': {},
@@ -107,10 +105,10 @@ if __name__ == "__main__":
 			'302': {},
 			'303': {}
 			}
-			analyses = IdentificationUnitAnalyses(data_getter, mam_measurements_amp_filter_ids)
+			analyses = IdentificationUnitAnalyses(data_getter, mam_measurements_amp_filter_ids, 'MAM_Measurements')
 			analyses_dict = analyses.get_data_page(i)
 			
-			es_indexer.bulkUpdateFields(analyses_dict, 'MAM_Measurements', i)
+			es_indexer.bulkUpdateDocs(analyses_dict, 'MAM_Measurements', i)
 			
 		
 		#pudb.set_trace()

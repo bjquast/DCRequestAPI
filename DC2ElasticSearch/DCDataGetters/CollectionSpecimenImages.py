@@ -123,7 +123,9 @@ class CollectionSpecimenImages():
 		
 		for row in self.rows:
 			if row[1] not in self.images_dict:
-				self.images_dict[row[1]] = []
+				self.images_dict[row[1]] = {}
+				self.images_dict[row[1]]['Images'] = []
+				self.images_dict[row[1]]['NumberOfSpecimenImages'] = 0
 			
 			image = {
 				'URI': row[2],
@@ -143,7 +145,8 @@ class CollectionSpecimenImages():
 				'ImageWithhold': row[16]
 			}
 			
-			self.images_dict[row[1]].append(image)
+			self.images_dict[row[1]]['Images'].append(image)
+			self.images_dict[row[1]]['NumberOfSpecimenImages'] += 1
 			
 		return
 

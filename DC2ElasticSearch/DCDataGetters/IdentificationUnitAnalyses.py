@@ -7,10 +7,11 @@ log_query = logging.getLogger('query')
 
 
 class IdentificationUnitAnalyses():
-	def __init__(self, datagetter, amp_ids):
+	def __init__(self, datagetter, amp_ids, fieldname):
 		self.datagetter = datagetter
 		
 		self.amp_ids = amp_ids
+		self.fieldname = fieldname
 		
 		self.cur = self.datagetter.cur
 		self.con = self.datagetter.con
@@ -400,7 +401,8 @@ class IdentificationUnitAnalyses():
 		
 		for idshash in self.keys_dict:
 			if idshash not in self.iuanalyses_dict:
-				self.iuanalyses_dict[idshash] = []
+				self.iuanalyses_dict[idshash] = {}
+				self.iuanalyses_dict[idshash][self.fieldname] = []
 			
 			for analysis_pk in self.keys_dict[idshash]:
 				analysis = self.analyses_dict[analysis_pk]
@@ -420,7 +422,7 @@ class IdentificationUnitAnalyses():
 					
 					analysis['Methods'].append(method)
 				
-				self.iuanalyses_dict[idshash].append(analysis)
+				self.iuanalyses_dict[idshash][self.fieldname].append(analysis)
 		
 		return
 
