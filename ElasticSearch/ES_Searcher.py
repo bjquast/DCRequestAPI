@@ -153,11 +153,13 @@ class ES_Searcher():
 
 
 	def singleAggregationSearch(self, aggregation_name, size = 200):
-		#pudb.set_trace()
 		
 		self.setQuery()
 		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size)
 		aggs = buckets_query.getAggregationsQuery()
+		
+		logger.debug(json.dumps(aggs))
+		logger.debug(json.dumps(self.query))
 		
 		source_fields = False
 		

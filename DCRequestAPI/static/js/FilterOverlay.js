@@ -7,15 +7,25 @@ class FilterOverlay {
 	}
 
 
+	readFormParameter() {
+		let self = this;
+		let form = document.getElementById("search_form");
+		self.form_data = new FormData(form);
+	}
+
 	requestBuckets() {
 		let self = this;
 		self.buckets = [];
 		
+		self.form_data.append('aggregation', self.agg_key);
+		
 		$.ajax({
 			url: "./aggregation",
 			type: 'POST',
+			processData: false,
+			contentType: false,
 			dataType: 'json',
-			data: {'aggregation': self.agg_key}
+			data: self.form_data
 		})
 		.fail(function (xhr, textStatus, errorThrown) {
 			let error_response = xhr.responseJSON;
@@ -34,6 +44,7 @@ class FilterOverlay {
 	openOverlay(agg_key) {
 		let self = this;
 		self.agg_key = agg_key;
+		self.readFormParameter();
 		self.requestBuckets();
 	}
 

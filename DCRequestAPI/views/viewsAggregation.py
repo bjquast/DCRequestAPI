@@ -65,8 +65,8 @@ class AggregationView():
 		
 		if 'aggregation' in self.search_params:
 			agg_key = self.search_params['aggregation']
-			if agg_key in self.search_params['term_filters']:
-				del self.search_params['term_filters'][agg_key]
+			#if agg_key in self.search_params['term_filters']:
+			#	del self.search_params['term_filters'][agg_key]
 		
 		if agg_key not in fielddefinitions:
 			return {
