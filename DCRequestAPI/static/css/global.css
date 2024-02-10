@@ -127,6 +127,10 @@ input{
 	padding-left: 1em;
 }
 
+.clickable {
+	cursor: pointer;
+}
+
 .flex {
 	display: flex;
 	margin-right: 1em;

@@ -1,20 +1,18 @@
 
-#buckets-overlay-header {
+.overlay-header {
 	position: sticky;
 	top: 0;
-	padding: 1em;
 	background: #fffbf0; 
 }
 
-#buckets-overlay-headline {
+.overlay-headline {
 	display: flex;
 	justify-content: space-between;
+	padding: 1em;
 }
 
-.buckets-overlay {
+.overlay {
 	width: 60%;
-	max-height: 60%;
-	overflow: auto;
 	background: #fffbf0; 
 	border: thin solid #e7c157;
 	position: absolute;
@@ -24,13 +22,21 @@
 	z-index: 10;
 }
 
-.buckets-overlay ul {
-	margin-top: 2em;
-	display: flex;
-	flex-wrap: wrap;
+.selectable-items-list {
+	overflow: auto;
+	height: 20em;
 }
 
-.buckets-overlay li {
+.selectable-items-list ul {
+	margin-bottom: 0.5em;
+	display: flex;
+	/*flex-direction: column;*/
+	flex-direction: row;
+	flex-wrap: wrap;
+	list-style-type: none;
+}
+
+.overlay li {
 	width: 15em;
 	margin-right: 0.5em;
 }

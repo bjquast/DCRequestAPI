@@ -53,9 +53,9 @@ class BucketsOverlay {
 
 	createOverlayWindow() {
 		let self = this;
-		$('#buckets-overlay-slot').append('<div id="buckets-overlay" class="buckets-overlay"></div>');
-		$('#buckets-overlay').append('<div id="buckets-overlay-header"></div>');
-		$('#buckets-overlay-header').append('<div id="buckets-overlay-headline"></div>');
+		$('#buckets-overlay-slot').append('<div id="buckets-overlay" class="overlay"></div>');
+		$('#buckets-overlay').append('<div id="buckets-overlay-header" class="overlay-header"></div>');
+		$('#buckets-overlay-header').append('<div id="buckets-overlay-headline" class="overlay-headline"></div>');
 		
 		if (self.buckets['aggregation_names']['en']) {
 			$('#buckets-overlay-headline').append('<div><label>' + self.buckets['aggregation_names']['en'] + '</label></div>');
@@ -71,7 +71,7 @@ class BucketsOverlay {
 		$('#buckets-overlay-header').append('<div id="buckets-overlay-selected-div"></div>');
 		$('#buckets-overlay-selected-div').append('<ul id="buckets-overlay-selected-list"></ul>');
 		
-		$('#buckets-overlay').append('<div id="buckets-list"></div>');
+		$('#buckets-overlay').append('<div id="buckets-list" class="selectable-items-list"></div>');
 	}
 
 
@@ -83,7 +83,7 @@ class BucketsOverlay {
 			let bucket_id = 'bucket_entry_' + i;
 			let bucket_value = self.buckets['buckets'][i][0] + ' (' + self.buckets['buckets'][i][1] + ')';
 			
-			$('#buckets-list ul').append('<li id="' + bucket_id + '" class="bucket_entry">' + bucket_value + '</li>');
+			$('#buckets-list ul').append('<li id="' + bucket_id + '" class="bucket_entry clickable">' + bucket_value + '</li>');
 			$('#' + bucket_id).attr('data-filter-id', 'filter_' + self.buckets['aggregation'] + '_' + self.buckets['buckets'][i][0]);
 			$('#' + bucket_id).attr('data-filter-key', self.buckets['aggregation']);
 			$('#' + bucket_id).attr('data-filter-value', self.buckets['buckets'][i][0]);

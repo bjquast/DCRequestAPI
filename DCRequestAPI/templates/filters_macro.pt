@@ -24,9 +24,9 @@
 			<div tal:repeat="aggs_name selected_sourcefields" class="filter-select-box">
 				<details tal:condition="python: aggs_name in aggregations" class="filter_selectors" tal:attributes="open 'open' if aggs_name in open_filter_selectors else None">
 					<input type="checkbox" form="search_form" name="open_filter_selectors" class="hidden" value="${aggs_name}" tal:attributes="checked 'checked' if aggs_name in open_filter_selectors else None">
-					<summary>${coldefs[aggs_name]['en']}</summary>
+					<summary class="clickable">${coldefs[aggs_name]['en']}</summary>
 					<ul class="ul-no-bullet">
-						<li tal:repeat="bucket aggregations[aggs_name]" class="bucket_entry" 
+						<li tal:repeat="bucket aggregations[aggs_name]" class="bucket_entry clickable" 
 							data-filter-id="filter_${aggs_name}_${bucket['key']}" 
 							data-filter-name="${coldefs[aggs_name]['en']}"
 							data-filter-key="${aggs_name}"

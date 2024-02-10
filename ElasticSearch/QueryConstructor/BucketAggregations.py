@@ -11,10 +11,14 @@ import pudb
 from ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
 
 class BucketAggregations():
-	def __init__(self, users_project_ids = [], source_fields = [], size = 10):
+	def __init__(self, users_project_ids = [], source_fields = [], size = 10, sort_alphanum = False, sort_dir = 'asc'):
 		self.users_project_ids = users_project_ids
 		self.source_fields = source_fields
 		self.size = size
+		self.sort_alphanum = sort_alphanum
+		self.sort_dir = sort_dir.lower()
+		
+		self.sortstring = None
 		
 		self.aggs_fields = {}
 		self.nested_aggs_fields = {}
@@ -45,6 +49,7 @@ class BucketAggregations():
 
 	def getAggregationsQuery(self):
 		self.aggs_query = {}
+		
 		self.setAggregationsQuery()
 		self.setNestedAggregationsQuery()
 		self.setRestrictedAggregationsQuery()
@@ -53,10 +58,24 @@ class BucketAggregations():
 		return self.aggs_query
 
 
+	def getSorting(self):
+		sorting = {}
+		if self.sort_alphanum is True:
+			if self.sort_dir not in ['asc', 'desc']:
+				self.sort_dir = 'asc'
+			
+			sorting = {"_key": self.sort_dir}
+			
+		return sorting
+
+
 	def setAggregationsQuery(self):
 		
 		for field in self.aggs_fields:
 			self.aggs_query[field] = {'terms': {'field': self.aggs_fields[field]['field_query'], 'size': self.size}}
+			sorting_dict = self.getSorting()
+			if len(sorting_dict) > 0:
+				self.aggs_query[field]['terms']['order'] = sorting_dict
 		
 		return
 
@@ -73,6 +92,9 @@ class BucketAggregations():
 					}
 				}
 			}
+			sorting_dict = self.getSorting()
+			if len(sorting_dict) > 0:
+				self.aggs_query[field]['aggs']['buckets']['terms']['order'] = sorting_dict
 		return
 
 
@@ -103,7 +125,10 @@ class BucketAggregations():
 					}
 				}
 			}
-		
+			
+			sorting_dict = self.getSorting()
+			if len(sorting_dict) > 0:
+				self.aggs_query[field]['aggs']['buckets']['aggs']['buckets']['terms']['order'] = sorting_dict
 		return
 
 
@@ -126,5 +151,8 @@ class BucketAggregations():
 					}
 				}
 			}
+			sorting_dict = self.getSorting()
+			if len(sorting_dict) > 0:
+				self.aggs_query[field]['aggs']['buckets']['terms']['order'] = sorting_dict
 		return
 

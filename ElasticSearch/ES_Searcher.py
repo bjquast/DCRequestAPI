@@ -152,10 +152,12 @@ class ES_Searcher():
 		self.client.indices.put_settings(index=self.index, body=body)
 
 
-	def singleAggregationSearch(self, aggregation_name, size = 200):
+	def singleAggregationSearch(self, aggregation_name, size = 5000):
+		
+		#pudb.set_trace()
 		
 		self.setQuery()
-		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size)
+		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size, sort_alphanum = True)
 		aggs = buckets_query.getAggregationsQuery()
 		
 		logger.debug(json.dumps(aggs))
