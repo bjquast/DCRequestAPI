@@ -9,10 +9,11 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 	<link rel="stylesheet" type="text/css" href="${request.static_url('DCRequestAPI:static/css/listview.css')}">
 	<link rel="stylesheet" type="text/css" href="${request.static_url('DCRequestAPI:static/css/filters.css')}">
 	<link rel="stylesheet" type="text/css" href="${request.static_url('DCRequestAPI:static/css/header.css')}">
+	<link rel="stylesheet" type="text/css" href="${request.static_url('DCRequestAPI:static/css/overlays.css')}">
 	
 	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/extern_js/jquery-3.6.1/jquery-3.6.1.js')}"></script>
 	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/js/AppliedFiltersField.js')}"></script>
-	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/js/FilterOverlay.js')}"></script>
+	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/js/BucketsOverlay.js')}"></script>
 	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/js/search_form.js')}"></script>
 </head>
 <body>
@@ -23,7 +24,7 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 	<div metal:use-macro="load: ./preferences_macro.pt"></div>
 </div>
 
-<div id="filter-overlay-slot"></div>
+<div id="buckets-overlay-slot"></div>
 
 <div id="filter-and-resulttable" class="flex-wrapped-row">
 	<div metal:use-macro="load: DCRequestAPI:templates/filters_macro.pt" id="filter_macro"></div>

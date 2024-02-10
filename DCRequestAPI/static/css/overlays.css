@@ -1,0 +1,37 @@
+
+#buckets-overlay-header {
+	position: sticky;
+	top: 0;
+	padding: 1em;
+	background: #fffbf0; 
+}
+
+#buckets-overlay-headline {
+	display: flex;
+	justify-content: space-between;
+}
+
+.buckets-overlay {
+	width: 60%;
+	max-height: 60%;
+	overflow: auto;
+	background: #fffbf0; 
+	border: thin solid #e7c157;
+	position: absolute;
+	top: 30%;
+	left: 10%;
+	margin: auto;
+	z-index: 10;
+}
+
+.buckets-overlay ul {
+	margin-top: 2em;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.buckets-overlay li {
+	width: 15em;
+	margin-right: 0.5em;
+}
+

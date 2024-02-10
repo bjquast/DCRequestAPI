@@ -1,7 +1,7 @@
 'use strict'
 
 let appliedfilters = new AppliedFiltersField();
-let filteroverlay = new FilterOverlay(appliedfilters);
+let bucketsoverlay = new BucketsOverlay(appliedfilters);
 
 
 
@@ -65,7 +65,7 @@ function set_more_button_events() {
 			let more_button = $(this).find('.more_filter_entries_button');
 			more_button.click( function() {
 				let agg_key = $(this).data('filter-key');
-				filteroverlay.openOverlay(agg_key);
+				bucketsoverlay.openOverlay(agg_key);
 			});
 		}
 		else {

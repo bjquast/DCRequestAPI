@@ -2,9 +2,12 @@
 
 class AppliedFiltersField {
 
-	add_filter(filter_id, filter_name, filter_key, filter_value) {
+	add_filter(filter_id, filter_name, filter_key, filter_value, auto_submit) {
 		let self = this;
 		
+		if (auto_submit == undefined) {
+			let auto_submit = true;
+		}
 		let filter_exists = false;
 		
 		$('.filter_checkbox').each( function () {
@@ -13,6 +16,7 @@ class AppliedFiltersField {
 			}
 		});
 		
+		// add filter only when it was not added before
 		if (filter_exists == false) {
 			$('#applied_filters').append('<div class="filter_checkbox new_filter"></div>');
 			$('#applied_filters .new_filter').attr('data-filter-id', filter_id);
@@ -21,8 +25,9 @@ class AppliedFiltersField {
 			$('#applied_filters .new_filter').append('<label><b>' + filter_name + ': </b>' + filter_value + '</label>');
 			$('#applied_filters .new_filter').removeClass('new_filter');
 			
-			// only submit when the filter was not set before
-			$("#search_form").submit();
+			if (auto_submit == true) {
+				$("#search_form").submit();
+			}
 		}
 	}
 
