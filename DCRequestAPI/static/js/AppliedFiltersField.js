@@ -4,9 +4,8 @@ class AppliedFiltersField {
 
 	add_filter(filter_id, filter_name, filter_key, filter_value, auto_submit) {
 		let self = this;
-		
 		if (auto_submit == undefined) {
-			let auto_submit = true;
+			auto_submit = true;
 		}
 		let filter_exists = false;
 		
