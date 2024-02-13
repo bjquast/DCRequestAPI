@@ -261,6 +261,8 @@ MappingsDict['iuparts'] = {
 			}
 		},
 		'HierarchyCache': {'type': 'text'},
+		'TaxonNameURI': {'type': 'keyword', 'ignore_above': 256},
+		'TaxonNameURI_sha': {'type': 'keyword', 'ignore_above': 256},
 		'OnlyObserved': {'type': 'boolean'},
 		'LifeStage': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		'Gender': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
@@ -295,9 +297,22 @@ MappingsDict['iuparts'] = {
 		},
 		
 		# Taxa matched in GBIF or TNT taxonomy
-		'GBIFTNTMatchedTaxon': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
-		'GBIFTNTMatchedParentTaxa': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
-		'GBIFTNTMatchedTaxonURI': {'type': 'keyword'},
+		'MatchedTaxon': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+		'MatchedTaxonAuthor': {'type': 'keyword'},
+		'MatchedTaxonRank': {'type': 'keyword'},
+		'MatchedTaxonURI': {'type': 'keyword'},
+		'MatchedTaxonURL': {'type': 'keyword'},
+		'MatchedParentTaxa': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+		'MatchedRankedParentTaxa': {
+			'type': 'nested',
+			'properties': {
+				'TaxonURI': {'type': 'keyword'},
+				'TaxonURL': {'type': 'keyword'},
+				'Taxon': {'type': 'keyword'},
+				'Rank': {'type': 'keyword'}
+			}
+		},
+		
 		
 		'CollectionID': {'type': 'long'},
 		'CollectionName': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},

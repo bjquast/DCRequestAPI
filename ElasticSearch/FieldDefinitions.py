@@ -7,6 +7,8 @@ fieldnames = [
 	'VernacularTerms',
 	'FamilyCache',
 	'OrderCache',
+	#'MatchedTaxon',
+	'MatchedParentTaxa',
 	'TypeStatus',
 	'MaterialCategory',
 	'LocalityVerbatim',
@@ -40,7 +42,7 @@ fielddefinitions = {
 	},
 	
 	'LastIdentificationCache': {
-		'names': {'en': 'Taxon / Species'},
+		'names': {'en': 'Identified Taxon'},
 		'buckets': {
 			'field_query': 'LastIdentificationCache.keyword', 
 		},
@@ -64,6 +66,20 @@ fielddefinitions = {
 		'names': {'en': 'Order'},
 		'buckets': {
 			'field_query': 'OrderCache.keyword', 
+		},
+	},
+	
+	'MatchedTaxon': {
+		'names': {'en': 'Taxon in GBIF'},
+		'buckets': {
+			'field_query': 'MatchedTaxon', 
+		},
+	},
+	
+	'MatchedParentTaxa': {
+		'names': {'en': 'Taxonomy'},
+		'buckets': {
+			'field_query': 'MatchedParentTaxa', 
 		},
 	},
 	

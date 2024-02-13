@@ -29,7 +29,8 @@ class IdentificationUnitParts():
 			idstemp.[CollectionSpecimenID], 
 			idstemp.[IdentificationUnitID], 
 			idstemp.[SpecimenPartID], 
-			idstemp.[SpecimenAccessionNumber], idstemp.[PartAccessionNumber],
+			idstemp.[SpecimenAccessionNumber], 
+			idstemp.[PartAccessionNumber],
 			CONVERT(NVARCHAR, cs.[AccessionDate], 120) AS [AccessionDate], 
 			cs.[DepositorsName], 
 			cs.[DataWithholdingReason] AS SpecimenWithholdingReason, 
@@ -91,7 +92,10 @@ class IdentificationUnitParts():
 			TRIM(iu.[LastIdentificationCache]) AS [LastIdentificationCache],
 			TRIM(iu.[FamilyCache]) AS [FamilyCache],
 			TRIM(iu.[OrderCache]) AS [OrderCache],
+			TRIM(iu.[TaxonomicGroup]) AS [TaxonomicGroup],
 			iu.[HierarchyCache],
+			i_last.NameURI AS [TaxonNameURI],
+			CONVERT(VARCHAR(256), HASHBYTES('SHA2_256', i_last.NameURI), 2) AS [TaxonNameURI_sha],
 			CASE 
 				WHEN iu.[OnlyObserved] = 0 THEN 'false'
 				ELSE 'true'
@@ -114,25 +118,22 @@ class IdentificationUnitParts():
 			COALESCE(c_csp.[CollectionID], c_cs.[CollectionID]) AS [CollectionID],
 			COALESCE(c_csp.[CollectionName], c_cs.[CollectionName]) AS [CollectionName],
 			COALESCE(c_csp.[CollectionAcronym], c_cs.[CollectionAcronym]) AS [CollectionAcronym]
-			/*
-			c_cs.[CollectionID] AS [CollectionID_for_Specimen],
-			c_cs.[CollectionName] AS [CollectionName_for_Specimen],
-			c_cs.[CollectionAcronym] AS [CollectionAcronym_for_Specimen],
-			c_csp.[CollectionID] AS [CollectionID_for_SpecimenPart],
-			c_csp.[CollectionName] AS [CollectionName_for_SpecimenPart],
-			c_csp.[CollectionAcronym] AS [CollectionAcronym_for_SpecimenPart],
-			*/
 			FROM [#temp_iu_part_ids] idstemp
-			/* 
-			 -- not needed, IdentificationUnitID, CollectionSpecimenID and SpecimenPartID in #temp_iu_part_ids is specific enough 
-			 -- because the [#temp_iu_part_ids] table holds the single parts
-			INNER JOIN IdentificationUnitInPart iup
-				ON iup.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] 
-				AND iup.[IdentificationUnitID] = idstemp.[IdentificationUnitID]
-				AND iup.[SpecimenPartID] = idstemp.[SpecimenPartID]
-			*/
 			INNER JOIN IdentificationUnit iu 
 			ON iu.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND iu.[IdentificationUnitID] = idstemp.[IdentificationUnitID]
+			LEFT JOIN (
+				SELECT i.TaxonomicName, i.NameURI, i.IdentificationUnitID, i.CollectionSpecimenID
+				FROM Identification i
+				INNER JOIN (
+					SELECT i.IdentificationUnitID, i.CollectionSpecimenID, MAX(i.IdentificationSequence) AS IdentificationSequence_Max
+					FROM Identification i
+					GROUP BY i.IdentificationUnitID, i.CollectionSpecimenID
+				) i_max
+				ON i.IdentificationUnitID = i_max.IdentificationUnitID 
+				AND i.CollectionSpecimenID = i_max.CollectionSpecimenID
+				AND i.IdentificationSequence = i_max.IdentificationSequence_Max
+			) i_last
+			ON i_last.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND i_last.IdentificationUnitID = idstemp.[IdentificationUnitID]
 			LEFT JOIN CollectionSpecimenPart csp 
 			ON csp.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND csp.[SpecimenPartID] = idstemp.[SpecimenPartID]
 			INNER JOIN CollectionSpecimen cs 
