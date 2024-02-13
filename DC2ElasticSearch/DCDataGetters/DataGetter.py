@@ -62,9 +62,9 @@ class DataGetter():
 		([idshash], [DatabaseURI], [DatabaseID], [DatabaseAccronym], [CollectionSpecimenID], [IdentificationUnitID], [SpecimenPartID], [SpecimenAccessionNumber], [PartAccessionNumber])
 		SELECT 
 		 -- for development
-		 -- TOP 20000
-		CONVERT(NVARCHAR(255), HASHBYTES(
-			'SHA2_512', CONCAT('{0}/{1}', '_', 
+		TOP 20000
+		CONVERT(VARCHAR(256), HASHBYTES(
+			'SHA2_256', CONCAT('{0}/{1}', '_', 
 			cs.CollectionSpecimenID, '_', iu.IdentificationUnitID, '_', csp.SpecimenPartID)), 2
 		) AS idshash,
 		'{0}/{1}' AS DatabaseURI,

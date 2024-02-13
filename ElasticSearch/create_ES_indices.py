@@ -21,6 +21,8 @@ from DC2ElasticSearch.DCDataGetters.CollectionAgents import CollectionAgents
 from DC2ElasticSearch.DCDataGetters.CollectionSpecimenImages import CollectionSpecimenImages
 from DC2ElasticSearch.DCDataGetters.IdentificationUnitAnalyses import IdentificationUnitAnalyses
 
+from DC2ElasticSearch.TaxaMatcher.TaxaMatcher import TaxaMatcher
+
 
 if __name__ == "__main__":
 	#pudb.set_trace()
@@ -28,7 +30,6 @@ if __name__ == "__main__":
 	es_indexer = ES_Indexer()
 	es_indexer.deleteIndex()
 	es_indexer.createIndex()
-	
 	
 	dc_databases = DC_Connections()
 	dc_databases.read_connectionparams()
@@ -109,6 +110,28 @@ if __name__ == "__main__":
 			analyses_dict = analyses.get_data_page(i)
 			
 			es_indexer.bulkUpdateDocs(analyses_dict, 'MAM_Measurements', i)
+			
+			pudb.set_trace()
+			taxamatcher = TaxaMatcher()
+			taxamatcher.createSpecimenTempTable()
+			valuelists = []
+			for idshash in iu_parts_dict:
+				valuelists.append([
+					iu_parts_dict[idshash]['_id'],
+					iu_parts_dict[idshash]['LastIdentificationCache'],
+					iu_parts_dict[idshash]['FamilyCache'],
+					iu_parts_dict[idshash]['OrderCache'],
+					iu_parts_dict[idshash]['TaxonomicGroup'],
+					iu_parts_dict[idshash]['TaxonNameURI'],
+					iu_parts_dict[idshash]['TaxonNameURI_sha'],
+					iu_parts_dict[idshash]['PartAccessionNumber'],
+				])
+			taxamatcher.fillSpecimenTempTable(valuelists)
+			taxamatcher.matchTaxa()
+			
+			matched_taxa_dict = {}
+			
+			
 			
 		
 		#pudb.set_trace()
