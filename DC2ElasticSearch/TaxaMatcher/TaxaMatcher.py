@@ -61,14 +61,14 @@ class TaxaMatcher():
 	
 	def createSpecimenTempTable(self):
 		query = """
-		DROP -- TEMPORARY 
+		DROP TEMPORARY 
 		TABLE IF EXISTS {0}
 		;""".format(self.specimentable)
 		self.cur.execute(query)
 		self.con.commit()
 		
 		query = """
-		CREATE -- TEMPORARY 
+		CREATE TEMPORARY 
 		TABLE `{0}` (
 		`_id` VARCHAR(255) NOT NULL,
 		`taxon_id` INT,

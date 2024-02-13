@@ -126,7 +126,8 @@ class TaxaMatchTable():
 		
 		# all matched taxa of the current set will be stored in matchingresults table
 		query = """
-		DROP TEMPORARY TABLE IF EXISTS matchingresults;
+		DROP TEMPORARY 
+		TABLE IF EXISTS matchingresults;
 		;"""
 		querylog.debug(query)
 		self.cur.execute(query)
