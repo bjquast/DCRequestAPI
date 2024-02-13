@@ -62,7 +62,7 @@ class DataGetter():
 		([idshash], [DatabaseURI], [DatabaseID], [DatabaseAccronym], [CollectionSpecimenID], [IdentificationUnitID], [SpecimenPartID], [SpecimenAccessionNumber], [PartAccessionNumber])
 		SELECT 
 		 -- for development
-		TOP 20000
+		 -- TOP 20000
 		CONVERT(VARCHAR(256), HASHBYTES(
 			'SHA2_256', CONCAT('{0}/{1}', '_', 
 			cs.CollectionSpecimenID, '_', iu.IdentificationUnitID, '_', csp.SpecimenPartID)), 2

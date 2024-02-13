@@ -51,6 +51,7 @@ class TaxaMatchTable():
 			cs.taxon_id = mt.id,
 			cs.taxon = mt.taxon,
 			cs.author = mt.author,
+			cs.`rank` = mt.`rank`,
 			cs.FamilyCache = mt.familyCache,
 			cs.OrderCache = mt.orderCache
 		;""".format(self.specimentable, self.taxamergetable, self.taxarelationtable)
@@ -73,6 +74,7 @@ class TaxaMatchTable():
 			cs.taxon_id = mt.id,
 			cs.taxon = mt.taxon,
 			cs.author = mt.author,
+			cs.`rank` = mt.`rank`,
 			cs.FamilyCache = mt.familyCache,
 			cs.OrderCache = mt.orderCache
 		;""".format(self.specimentable, self.synonymsmergetable, self.taxamergetable)
@@ -86,8 +88,6 @@ class TaxaMatchTable():
 
 
 	def createTempTable(self):
-		# table that holds a set of specimen data from DC, according to pagesize
-		# this is used to compare it against the SMNS_Coll_Taxa table that contains all taxa extracted from TaxonNames and / or GBIF
 		query = """
 		DROP -- TEMPORARY 
 		TABLE IF EXISTS taxonmatcher;
@@ -140,7 +140,7 @@ class TaxaMatchTable():
 		`taxon_id` INT(10),
 		`taxon` varchar(255),
 		`author` varchar(255),
-		`rank` varchar(25),
+		`rank` varchar(50),
 		KEY `specimen_id` (`specimen_id`)
 		)
 		;
@@ -494,14 +494,15 @@ class TaxaMatchTable():
 		return
 	
 	
-	def updateTaxonAndAuthorInSpecimens(self):
+	def updateTaxonAuthorAndRankInSpecimens(self):
 		query = """
 		 -- after matchTaxa method matchingresults holds the ids of specimens for that a taxon have been found
 		UPDATE `{0}` s
 		INNER JOIN matchingresults mr
 			ON (s._id = mr.specimen_id)
 		SET s.taxon = mr.taxon, 
-		s.author = mr.author
+		s.author = mr.author,
+		s.`rank` = mr.`rank`
 		;""".format(self.specimentable)
 		self.cur.execute(query)
 		self.con.commit()

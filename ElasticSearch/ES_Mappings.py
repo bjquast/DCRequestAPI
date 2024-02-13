@@ -298,11 +298,16 @@ MappingsDict['iuparts'] = {
 		
 		# Taxa matched in GBIF or TNT taxonomy
 		'MatchedTaxon': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
-		'MatchedParentTaxa': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+		'MatchedTaxonAuthor': {'type': 'keyword'},
+		'MatchedTaxonRank': {'type': 'keyword'},
 		'MatchedTaxonURI': {'type': 'keyword'},
+		'MatchedTaxonURL': {'type': 'keyword'},
+		'MatchedParentTaxa': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		'MatchedRankedParentTaxa': {
 			'type': 'nested',
 			'properties': {
+				'TaxonURI': {'type': 'keyword'},
+				'TaxonURL': {'type': 'keyword'},
 				'Taxon': {'type': 'keyword'},
 				'Rank': {'type': 'keyword'}
 			}

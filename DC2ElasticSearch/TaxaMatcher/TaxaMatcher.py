@@ -74,6 +74,7 @@ class TaxaMatcher():
 		`taxon_id` INT,
 		`taxon` VARCHAR(255),
 		`author` VARCHAR(255),
+		`rank` VARCHAR(50),
 		`LastIdentificationCache` VARCHAR(255),
 		`FamilyCache` VARCHAR(255),
 		`OrderCache` VARCHAR(255),
@@ -168,7 +169,7 @@ class TaxaMatcher():
 			self.matchingtable.insertIntoTempTable(self.placeholderstring, self.values)
 			self.matchingtable.matchTaxa()
 			self.matchingtable.updateTaxonIDsInSpecimens()
-			self.matchingtable.updateTaxonAndAuthorInSpecimens()
+			self.matchingtable.updateTaxonAuthorAndRankInSpecimens()
 		
 		return
 
@@ -214,8 +215,11 @@ class TaxaMatcher():
 				taxondict = self.namepatterns_botany.matchTaxonName(taxonstring)
 				kingdom = 'Protozoa'
 			else:
-				self.taxa_not_matched.append([specimen_id, taxonstring, None])
-				self.placeholders_taxa_not_matched.append('(%s, %s, %s)')
+				try:
+					logger.debug('kingdom not found for taxonomicgroup: {0}'.format(taxonomicgroup))
+				except:
+					logger.debug('kingdom not found for taxonomicgroup: ')
+					logger.debug(taxonomicgroup)
 				continue
 			
 			if taxondict is None:
@@ -249,19 +253,39 @@ class TaxaMatcher():
 
 
 	def getMatchedTaxaDict(self):
+		matched_taxa_dict = {}
+		
 		query = """
-		SELECT cs.`_id`, cs.taxon_id, cs.taxon, cs.author,
-		mt.id AS parent_taxon_id, mt.taxon AS parent_taxon, mt.`rank` AS parent_taxon_rank
+		SELECT cs.`_id`, cs.taxon, cs.author, cs.`rank`,
+		mt.TaxonNameURI, mt.TaxonURL,
+		anc.taxon AS parent_taxon, anc.`rank` AS parent_taxon_rank, 
+		anc.`TaxonNameURI` AS parent_taxon_uri, anc.`TaxonURL` as parent_taxon_url
 		FROM {0} cs
-		INNER JOIN {1} tr
+		INNER JOIN {1} mt
+		ON mt.id = cs.taxon_id
+		INNER JOIN {2} tr
 		ON (cs.taxon_id = tr.DescendantID)
-		INNER JOIN {2} mt
-		ON (mt.id = tr.AncestorID)
-		;""".format(self.specimentable, self.matchingtable.taxarelationtable, self.matchingtable.taxamergetable)
+		INNER JOIN {1} anc
+		ON (anc.id = tr.AncestorID AND anc.taxon != 'root')
+		;""".format(self.specimentable, self.matchingtable.taxamergetable, self.matchingtable.taxarelationtable)
 		self.cur.execute(query)
 		rows = self.cur.fetchall()
+		
 		for row in rows:
-			pass
+				if row[0] not in matched_taxa_dict:
+					matched_taxa_dict[row[0]] = {}
+					matched_taxa_dict[row[0]]['MatchedTaxon'] = row[1]
+					matched_taxa_dict[row[0]]['MatchedTaxonAuthor'] = row[2]
+					matched_taxa_dict[row[0]]['MatchedTaxonRank'] = row[3]
+					matched_taxa_dict[row[0]]['MatchedTaxonURI'] = row[4]
+					matched_taxa_dict[row[0]]['MatchedTaxonURL'] = row[5]
+					matched_taxa_dict[row[0]]['MatchedParentTaxa'] = []
+					matched_taxa_dict[row[0]]['MatchedRankedParentTaxa'] = []
+					
+				matched_taxa_dict[row[0]]['MatchedParentTaxa'].append(row[6])
+				matched_taxa_dict[row[0]]['MatchedRankedParentTaxa'].append({'Taxon': row[6], 'Rank': row[7], 'TaxonURI': row[8], 'TaxonURL': row[9]})
+		
+		return matched_taxa_dict
 		
 	
 	'''

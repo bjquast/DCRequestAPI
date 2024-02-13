@@ -111,7 +111,6 @@ if __name__ == "__main__":
 			
 			es_indexer.bulkUpdateDocs(analyses_dict, 'MAM_Measurements', i)
 			
-			pudb.set_trace()
 			taxamatcher = TaxaMatcher()
 			taxamatcher.createSpecimenTempTable()
 			valuelists = []
@@ -129,7 +128,8 @@ if __name__ == "__main__":
 			taxamatcher.fillSpecimenTempTable(valuelists)
 			taxamatcher.matchTaxa()
 			
-			matched_taxa_dict = {}
+			matched_taxa_dict = taxamatcher.getMatchedTaxaDict()
+			es_indexer.bulkUpdateDocs(matched_taxa_dict, 'MatchedTaxa', i)
 			
 			
 			
