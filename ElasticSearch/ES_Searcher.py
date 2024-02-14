@@ -203,6 +203,12 @@ class ES_Searcher():
 				self.source_fields.append('Projects.DB_ProjectID')
 			self.source_fields.extend(self.withhold_fields)
 			source_fields = self.source_fields
+			
+			# add the fields that are necessary for linking out from the retrieved data
+			if 'PartAccessionNumber' not in self.source_fields:
+				self.source_fields.append('PartAccessionNumber')
+			if 'StableIdentifierURL' not in self.source_fields:
+				self.source_fields.append('StableIdentifierURL')
 		
 		response = self.client.search(index=self.index, size=self.pagesize, sort=self.sort, query=self.query, from_=self.start, source=source_fields, track_total_hits=True, aggs=aggs)
 		

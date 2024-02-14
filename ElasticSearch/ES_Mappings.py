@@ -55,6 +55,12 @@ MappingsDict['iuparts'] = {
 				}
 			},
 		
+		'StableIdentifierURL': {'type': 'keyword'},
+		'LastUpdated': {"type": "date",
+			"format": "yyyy-MM-dd HH:mm:ss",
+			'ignore_malformed': True
+		},
+		
 		# database management
 		'SpecimenWithholdingReason':
 			{'type': 'text', 'fields': {'keyword': {'type': 'keyword', 'ignore_above': 256}}},

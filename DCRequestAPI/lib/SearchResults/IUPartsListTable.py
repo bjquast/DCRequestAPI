@@ -31,6 +31,10 @@ class IUPartsListTable():
 			for sourcefield in sourcefields:
 				if sourcefield in fieldnames:
 					self.selected_sourcefields.append(sourcefield)
+			if 'PartAccessionNumber' not in self.selected_sourcefields:
+				self.selected_sourcefields.insert(0, 'PartAccessionNumber')
+			if 'StableIdentifierURL' not in self.selected_sourcefields:
+				self.selected_sourcefields.insert(1, 'StableIdentifierURL')
 		return
 
 

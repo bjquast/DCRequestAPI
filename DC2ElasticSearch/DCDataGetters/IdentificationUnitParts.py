@@ -31,6 +31,8 @@ class IdentificationUnitParts():
 			idstemp.[SpecimenPartID], 
 			idstemp.[SpecimenAccessionNumber], 
 			idstemp.[PartAccessionNumber],
+			CONCAT_WS('/', REPLACE(dbo.StableIdentifierBase(), 'http:', 'https:'), idstemp.[CollectionSpecimenID], idstemp.[IdentificationUnitID], idstemp.[SpecimenPartID]) AS [StableIdentifierURL],
+			CONVERT (NVARCHAR, cs.[LogupdatedWhen], 120) AS [LastUpdated],
 			CONVERT(NVARCHAR, cs.[AccessionDate], 120) AS [AccessionDate], 
 			cs.[DepositorsName], 
 			cs.[DataWithholdingReason] AS SpecimenWithholdingReason, 

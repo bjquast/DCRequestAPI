@@ -3,6 +3,7 @@ import pudb
 
 fieldnames = [
 	'PartAccessionNumber',
+	'StableIdentifierURL',
 	'LastIdentificationCache',
 	'VernacularTerms',
 	'FamilyCache',
@@ -37,6 +38,14 @@ fielddefinitions = {
 		'names': {'en': 'Accessionnumber', },
 		'buckets': {
 			'field_query': 'PartAccessionNumber.keyword', 
+		},
+		
+	},
+	
+	'StableIdentifierURL': {
+		'names': {'en': 'URL', },
+		'buckets': {
+			'field_query': 'StableIdentifierURL', 
 		},
 		
 	},

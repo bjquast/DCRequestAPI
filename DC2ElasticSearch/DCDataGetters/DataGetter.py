@@ -85,11 +85,11 @@ class DataGetter():
 		 -- WHERE cs.AccessionNumber = 'ZFMK-TIS-46'
 		 -- WHERE cs.CollectionSpecimenID = 14
 		ORDER BY [CollectionSpecimenID], [IdentificationUnitID], [SpecimenPartID]
-		;"""
+		;""".format(self.server_url, self.database_name, self.database_id, self.accronym)
 		
-		log_query.info(query.format(self.server_url, self.database_name, self.database_id, self.accronym))
+		log_query.info(query)
 		
-		self.cur.execute(query.format(self.server_url, self.database_name, self.database_id, self.accronym))
+		self.cur.execute(query)
 		self.cur.commit()
 		
 		query = """

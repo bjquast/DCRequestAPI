@@ -69,7 +69,7 @@ class IUPartsListView():
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
 		es_searcher.setSourceFields(selected_sourcefields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
-		aggregations = es_searcher.getParsedAggregations()
+		#aggregations = es_searcher.getParsedAggregations()
 		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs], users_project_ids = self.users_project_ids)
 		
 		# set the coldefs for each iupart as keys for the json dicts 
@@ -97,7 +97,7 @@ class IUPartsListView():
 			'pagesize': int(self.search_params.get('pagesize', 1000)),
 			'search_params': self.search_params,
 			'iuparts': iuparts,
-			'aggregations': aggregations,
+			#'aggregations': aggregations,
 			'messages': self.messages
 		}
 		
