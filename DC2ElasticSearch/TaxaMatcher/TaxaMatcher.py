@@ -266,7 +266,7 @@ class TaxaMatcher():
 		INNER JOIN {2} tr
 		ON (cs.taxon_id = tr.DescendantID)
 		INNER JOIN {1} anc
-		ON (anc.id = tr.AncestorID AND anc.taxon != 'root')
+		ON (anc.id = tr.AncestorID AND anc.taxon != 'root' AND anc.id != cs.taxon_id)
 		;""".format(self.specimentable, self.matchingtable.taxamergetable, self.matchingtable.taxarelationtable)
 		self.cur.execute(query)
 		rows = self.cur.fetchall()
