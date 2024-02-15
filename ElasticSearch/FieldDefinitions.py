@@ -3,7 +3,7 @@ import pudb
 
 fieldnames = [
 	'PartAccessionNumber',
-	'StableIdentifierURL',
+	#'StableIdentifierURL',
 	'LastIdentificationCache',
 	'VernacularTerms',
 	'FamilyCache',

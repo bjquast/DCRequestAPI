@@ -8,7 +8,7 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPSeeOther
 
 from ElasticSearch.ES_Searcher import ES_Searcher
 
-from DCRequestAPI.lib.SearchResults.IUPartsListTable import IUPartsListTable
+from DCRequestAPI.lib.SearchResults.IUPartsTable import IUPartsTable
 from DCRequestAPI.lib.UserLogin.UserLogin import UserLogin
 
 from DCRequestAPI.views.RequestParams import RequestParams
@@ -58,7 +58,7 @@ class IUPartsListView():
 		
 		#pudb.set_trace()
 		
-		iupartstable = IUPartsListTable()
+		iupartstable = IUPartsTable()
 		if len(self.search_params['result_table_columns']) > 0:
 			iupartstable.setSelectedSourceFields(self.search_params['result_table_columns'])
 		
@@ -70,7 +70,7 @@ class IUPartsListView():
 		es_searcher.setSourceFields(selected_sourcefields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
 		#aggregations = es_searcher.getParsedAggregations()
-		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs], users_project_ids = self.users_project_ids)
+		#iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs])
 		
 		# set the coldefs for each iupart as keys for the json dicts 
 		iuparts = []
@@ -109,7 +109,7 @@ class IUPartsListView():
 		
 		#pudb.set_trace()
 		
-		iupartstable = IUPartsListTable()
+		iupartstable = IUPartsTable()
 		if len(self.search_params['result_table_columns']) > 0:
 			iupartstable.setSelectedSourceFields(self.search_params['result_table_columns'])
 		
@@ -122,7 +122,7 @@ class IUPartsListView():
 		es_searcher.setSourceFields(selected_sourcefields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
 		aggregations = es_searcher.getParsedAggregations()
-		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs], users_project_ids = self.users_project_ids)
+		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs])
 		
 		pagecontent = {
 			'request': self.request,

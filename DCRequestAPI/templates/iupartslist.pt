@@ -47,7 +47,20 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 				</thead>
 				<tbody>
 					<tr tal:repeat="iuparts iupartslist">
-						<td tal:repeat="iupfield iuparts">${iupfield}</td>
+						
+						<td tal:repeat="columnkey selected_sourcefields">
+							<block tal:condition="python: columnkey == 'PartAccessionNumber'">
+								${structure:iuparts['PartAccessionNumber'][0]}
+							</block>
+							
+							<block tal:condition="python: columnkey == 'StableIdentifierURL'">
+								${structure:iuparts['StableIdentifierURL'][0]}
+							</block>
+							
+							<block tal:condition="python: columnkey not in ['PartAccessionNumber', 'StableIdentifierURL']" tal:repeat="iupfield iuparts[columnkey]">
+								${iupfield}
+							</block>
+						</td>
 					</tr>
 				</tbody>
 			</table>
