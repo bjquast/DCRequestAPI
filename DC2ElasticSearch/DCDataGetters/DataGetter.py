@@ -10,7 +10,6 @@ from DBConnectors.MSSQLConnector import MSSQLConnector
 class DataGetter():
 	def __init__(self, dc_params):
 		
-		
 		self.dc_con = MSSQLConnector(dc_params['connectionstring'])
 		self.server_url = dc_params['server_url']
 		self.database_name = dc_params['database_name']

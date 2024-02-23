@@ -15,6 +15,7 @@ from DC2ElasticSearch.DCDataGetters.DataGetter import DataGetter
 
 
 from DC2ElasticSearch.DCDataGetters.IdentificationUnitParts import IdentificationUnitParts
+from DC2ElasticSearch.DCDataGetters.Collections import Collections
 from DC2ElasticSearch.DCDataGetters.Projects import Projects
 from DC2ElasticSearch.DCDataGetters.Identifications import Identifications
 from DC2ElasticSearch.DCDataGetters.CollectionAgents import CollectionAgents
@@ -39,11 +40,20 @@ if __name__ == "__main__":
 		data_getter.create_ids_temptable()
 		data_getter.fill_ids_temptable()
 		
+		collections = None
+		
 		for i in range(1, data_getter.max_page + 1):
 			iu_parts = IdentificationUnitParts(data_getter)
 			iu_parts_dict = iu_parts.get_data_page(i)
 			
 			es_indexer.bulkIndex(iu_parts_dict, i)
+			
+			if collections is None:
+				# initiate only once as it creates temp tables for Collection hierarchy
+				collections = Collections(data_getter)
+			collections_dict = collections.get_data_page(i)
+			
+			es_indexer.bulkUpdateDocs(collections_dict, 'Collections', i)
 			
 			projects = Projects(data_getter)
 			projects_dict = projects.get_data_page(i)

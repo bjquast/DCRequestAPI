@@ -67,5 +67,6 @@
 
 .page_radiobutton_label {
 	color: blue;
+	cursor: pointer;
 }
 

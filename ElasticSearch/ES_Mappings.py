@@ -315,7 +315,8 @@ MappingsDict['iuparts'] = {
 				'TaxonURI': {'type': 'keyword'},
 				'TaxonURL': {'type': 'keyword'},
 				'Taxon': {'type': 'keyword'},
-				'Rank': {'type': 'keyword'}
+				'Rank': {'type': 'keyword'},
+				'TreeLevel': {'type': 'integer'}
 			}
 		},
 		
@@ -323,6 +324,15 @@ MappingsDict['iuparts'] = {
 		'CollectionID': {'type': 'long'},
 		'CollectionName': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		'CollectionAcronym': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+		
+		'ParentCollections': {
+			'type': 'nested',
+			'properties': {
+				'CollectionID': {'type': 'long'},
+				'CollectionName': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+				'TreeLevel': {'type': 'integer'},
+			}
+		},
 		
 		'Projects': {
 			'properties': {

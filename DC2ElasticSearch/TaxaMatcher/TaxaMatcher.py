@@ -259,7 +259,7 @@ class TaxaMatcher():
 		SELECT cs.`_id`, cs.taxon, cs.author, cs.`rank`,
 		mt.TaxonNameURI, mt.TaxonURL,
 		anc.taxon AS parent_taxon, anc.`rank` AS parent_taxon_rank, 
-		anc.`TaxonNameURI` AS parent_taxon_uri, anc.`TaxonURL` as parent_taxon_url
+		anc.`TaxonNameURI` AS parent_taxon_uri, anc.`TaxonURL` AS parent_taxon_url, anc.taxon_tree_level AS TreeLevel
 		FROM {0} cs
 		INNER JOIN {1} mt
 		ON mt.id = cs.taxon_id
@@ -283,7 +283,7 @@ class TaxaMatcher():
 					matched_taxa_dict[row[0]]['MatchedRankedParentTaxa'] = []
 					
 				matched_taxa_dict[row[0]]['MatchedParentTaxa'].append(row[6])
-				matched_taxa_dict[row[0]]['MatchedRankedParentTaxa'].append({'Taxon': row[6], 'Rank': row[7], 'TaxonURI': row[8], 'TaxonURL': row[9]})
+				matched_taxa_dict[row[0]]['MatchedRankedParentTaxa'].append({'Taxon': row[6], 'Rank': row[7], 'TaxonURI': row[8], 'TaxonURL': row[9], 'TreeLevel': row[10]})
 		
 		return matched_taxa_dict
 		

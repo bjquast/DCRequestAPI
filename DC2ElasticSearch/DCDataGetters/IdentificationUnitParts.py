@@ -116,10 +116,7 @@ class IdentificationUnitParts():
 				WHEN iu.[DataWithholdingReason] IS NULL THEN 'false'
 				ELSE 'true'
 			END AS IUWithhold,
-			iu.[DisplayOrder] AS [IUDisplayOrder],
-			COALESCE(c_csp.[CollectionID], c_cs.[CollectionID]) AS [CollectionID],
-			COALESCE(c_csp.[CollectionName], c_cs.[CollectionName]) AS [CollectionName],
-			COALESCE(c_csp.[CollectionAcronym], c_cs.[CollectionAcronym]) AS [CollectionAcronym]
+			iu.[DisplayOrder] AS [IUDisplayOrder]
 			FROM [#temp_iu_part_ids] idstemp
 			INNER JOIN IdentificationUnit iu 
 			ON iu.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND iu.[IdentificationUnitID] = idstemp.[IdentificationUnitID]
@@ -148,11 +145,6 @@ class IdentificationUnitParts():
 			ON (celaltitude.CollectionEventID = ce.CollectionEventID and celaltitude.LocalisationSystemID = 4)
 			LEFT JOIN CollectionEventLocalisation cel_named_area
 			ON (cel_named_area.CollectionEventID = ce.CollectionEventID and cel_named_area.LocalisationSystemID = 7)
-			 -- Collection either via CollectionSpecimenPart or CollectionSpecimen 
-			LEFT JOIN [Collection] c_csp
-			ON c_csp.[CollectionID] = csp.[CollectionID]
-			LEFT JOIN [Collection] c_cs
-			ON c_cs.[CollectionID] = csp.[CollectionID]
 			WHERE idstemp.[rownumber] BETWEEN ? AND ?
 			;"""
 			self.cur.execute(query, [startrow,lastrow])

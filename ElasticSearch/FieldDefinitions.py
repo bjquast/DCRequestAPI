@@ -10,6 +10,7 @@ fieldnames = [
 	'OrderCache',
 	#'MatchedTaxon',
 	'MatchedParentTaxa',
+	'MatchedRankedParentTaxa.Rank',
 	'TypeStatus',
 	'MaterialCategory',
 	'LocalityVerbatim',
@@ -229,5 +230,26 @@ fielddefinitions = {
 			'field_query': 'Barcodes.Methods.region.keyword',
 		},
 		
+	},
+	
+	# MatchedParentRankedTaxa
+	'MatchedRankedParentTaxa.Rank': {
+		'names': {'en': 'Taxonomic Rank'},
+		'buckets': {
+			'field_query': 'MatchedRankedParentTaxa.Rank',
+			'path': 'MatchedRankedParentTaxa'
+		},
+	},
+	
+	'MatchedRankedParentTaxa.Taxon': {
+		'names': {'en': 'Ranked Taxon'},
+		'buckets': {
+			'field_query': 'MatchedRankedParentTaxa.Taxon',
+			'filter': None,
+			'path': 'MatchedRankedParentTaxa'
+		},
 	}
+	
+	
+	
 }

@@ -10,7 +10,7 @@ class NamePatternsZoology():
 		
 		self.author_prefix_pattern = r'(al|f|j|jr|ms|sr|v|v[ao]n|zu[rm]?|bis|d[aeiou]?|de[nrmls]?|degli|e|l[ae]s?|s|ter|t|y)'
 		
-		self.taxonname_pattern = r'([A-Z][a-z\-\_]+)(?:\s+(\(([^\,]*?)\)))?(?:\s+((?!{0}[\'\s]+)[a-z\-\_]+)*)?(?:\s+((?!{0}[\'\s]+)[a-z\-\_]+)*)?(?:\s*((\()?([A-Z\u00C0-\u00D6\u00D8-\u00DEa-z\u00DF-\u00F6\u00F8-\u00FF].*?)\,\s*(\d{{2,4}})\s*(\))?)?)?.*?'.format(self.author_prefix_pattern)
+		self.taxonname_pattern = r'([A-Z][a-z\-\_]+)(?:\s+(\(([^\,\d]*?)\)))?(?:\s+((?!{0}[\'\s]+)[a-z\-\_]+)*)?(?:\s+((?!{0}[\'\s]+)[a-z\-\_]+)*)?(?:\s*((\()?([A-Z\u00C0-\u00D6\u00D8-\u00DEa-z\u00DF-\u00F6\u00F8-\u00FF].*?)\,?\s*(\d{{2,4}})\s*(\))?)?)?.*?'.format(self.author_prefix_pattern)
 		self.compiled_pattern = re.compile(self.taxonname_pattern)
 		
 		self.ranks = [
