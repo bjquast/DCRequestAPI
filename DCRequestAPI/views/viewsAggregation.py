@@ -13,7 +13,7 @@ from dwb_authentication.DWB_Servers import DWB_Servers
 
 from DCRequestAPI.views.RequestParams import RequestParams
 
-from ElasticSearch.FieldDefinitions import fielddefinitions
+from ElasticSearch.FieldDefinitions import FieldDefinitions
 
 import pudb
 import json
@@ -52,6 +52,8 @@ class AggregationView():
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
 		self.messages.extend(self.userlogin.get_messages())
+		
+		self.fielddefinitions = FieldDefinitions().fielddefinitions
 
 
 	@view_config(route_name='aggregation', accept='application/json', renderer="json")
@@ -68,7 +70,7 @@ class AggregationView():
 			#if agg_key in self.search_params['term_filters']:
 			#	del self.search_params['term_filters'][agg_key]
 		
-		if agg_key not in fielddefinitions:
+		if agg_key not in self.fielddefinitions:
 			return {
 				'message': '{0} can is not available as bucket aggregation'.format(agg_key),
 				'buckets': {}
@@ -81,7 +83,7 @@ class AggregationView():
 		
 		buckets_dict = {
 			'aggregation': agg_key,
-			'aggregation_names': fielddefinitions[agg_key].get('names', {'en', None}),
+			'aggregation_names': self.fielddefinitions[agg_key].get('names', {'en', None}),
 			'buckets': buckets
 		}
 		

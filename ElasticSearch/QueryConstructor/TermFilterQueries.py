@@ -3,43 +3,17 @@ import logging.config
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('elastic_queries')
 
-import json
-import math
-
 import pudb
 
-from ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
+from ElasticSearch.QueryConstructor.QuerySorter import QuerySorter
 
-class TermFilterQueries():
+class TermFilterQueries(QuerySorter):
 	def __init__(self, users_project_ids = [], source_fields = []):
 		self.users_project_ids = users_project_ids
-		self.source_fields = source_fields
 		
-		self.nested_fields = {}
-		self.nested_restricted_fields = {}
-		self.simple_fields = {}
-		self.simple_restricted_fields = {}
-		
-		self.read_field_definitions()
+		QuerySorter.__init__(self, source_fields)
+		self.sort_queries_by_definitions()
 
-
-	def read_field_definitions(self):
-		if len(self.source_fields) > 0:
-			pass
-		else:
-			self.source_fields = fieldnames
-		
-		for fieldname in self.source_fields:
-			if fieldname in fielddefinitions:
-				if 'buckets' in fielddefinitions[fieldname] and 'path' in fielddefinitions[fieldname]['buckets'] and 'withholdflag' in fielddefinitions[fieldname]['buckets']:
-					self.nested_restricted_fields[fieldname] = fielddefinitions[fieldname]['buckets']
-				elif 'buckets' in fielddefinitions[fieldname] and 'path' in fielddefinitions[fieldname]['buckets'] and 'withholdflag' not in fielddefinitions[fieldname]['buckets']:
-					self.nested_fields[fieldname] = fielddefinitions[fieldname]['buckets']
-				elif 'buckets' in fielddefinitions[fieldname] and 'withholdflag' in fielddefinitions[fieldname]['buckets']:
-					self.simple_restricted_fields[fieldname] = fielddefinitions[fieldname]['buckets']
-				elif 'buckets' in fielddefinitions[fieldname]:
-					self.simple_fields[fieldname] = fielddefinitions[fieldname]['buckets']
-		return
 
 
 	def getTermFilterQueries(self, filters):

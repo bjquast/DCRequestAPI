@@ -1,6 +1,6 @@
 import pudb
 
-from ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
+from ElasticSearch.FieldDefinitions import FieldDefinitions
 
 
 class IUPartsTable():
@@ -10,14 +10,19 @@ class IUPartsTable():
 		self.selected_sourcefields = []
 		self.required_sourcefields = ['StableIdentifierURL', ]
 		
+		fielddefs = FieldDefinitions()
+		self.fieldnames = fielddefs.fieldnames
+		self.fielddefinitions = fielddefs.fielddefinitions
+		
 		self.readFieldDefinitions()
 		#self.setSourceFields()
 
 
 	def readFieldDefinitions(self):
-		for fieldname in fieldnames:
-			if fieldname in fielddefinitions:
-				self.coldefs[fieldname] = fielddefinitions[fieldname]['names']
+		
+		for fieldname in self.fieldnames:
+			if fieldname in self.fielddefinitions:
+				self.coldefs[fieldname] = self.fielddefinitions[fieldname]['names']
 				self.default_sourcefields.append(fieldname)
 				self.selected_sourcefields.append(fieldname)
 
@@ -25,12 +30,12 @@ class IUPartsTable():
 	def setSelectedSourceFields(self, sourcefields = []):
 		self.selected_sourcefields = []
 		if len(sourcefields) <= 0:
-			for fieldname in fieldnames:
+			for fieldname in self.fieldnames:
 				self.selected_sourcefields.append(fieldname)
 		
 		else:
 			for sourcefield in sourcefields:
-				if sourcefield in fieldnames:
+				if sourcefield in self.fieldnames:
 					self.selected_sourcefields.append(sourcefield)
 			if 'PartAccessionNumber' not in self.selected_sourcefields:
 				self.selected_sourcefields.insert(0, 'PartAccessionNumber')

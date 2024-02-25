@@ -3,14 +3,11 @@ import logging.config
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('elastic_queries')
 
-import json
-import math
-
 import pudb
 
-from ElasticSearch.FieldDefinitions import fieldnames, fielddefinitions
+from ElasticSearch.QueryConstructor.QuerySorter import QuerySorter
 
-class BucketAggregations():
+class BucketAggregations(QuerySorter):
 	def __init__(self, users_project_ids = [], source_fields = [], size = 10, sort_alphanum = False, sort_dir = 'asc'):
 		self.users_project_ids = users_project_ids
 		self.source_fields = source_fields
@@ -20,31 +17,28 @@ class BucketAggregations():
 		
 		self.sortstring = None
 		
-		self.aggs_fields = {}
-		self.nested_aggs_fields = {}
-		self.nested_restricted_aggs_fields = {}
-		self.restricted_aggs_fields = {}
+		QuerySorter.__init__(self, source_fields)
+		self.sort_queries_by_definitions()
+		self.setSubFiltersInNestedAggregations()
+
+
+	def setSubFiltersInNestedAggregations(self):
+		# when the nested objects should be filtered by a value, e. g. the parent taxa by rank
+		#pudb.set_trace()
+		self.subfilters = {}
+		for field in self.nested_fields:
+			if 'sub_filters' in self.nested_fields[field]:
+				for sub_filter_element in self.nested_fields[field]['sub_filters']:
+					if field not in self.subfilters:
+						self.subfilters[field] = {}
+					
+					if sub_filter_element[0] not in self.subfilters[field]:
+						self.subfilters[field][sub_filter_element[0]] = []
+					
+					self.subfilters[field][sub_filter_element[0]].append(sub_filter_element[1])
 		
-		self.read_field_definitions()
-
-
-	def read_field_definitions(self):
-		if len(self.source_fields) > 0:
-			pass
-		else:
-			self.source_fields = fieldnames
-				
-		for fieldname in self.source_fields:
-			if fieldname in fielddefinitions:
-				if 'buckets' in fielddefinitions[fieldname] and 'path' in fielddefinitions[fieldname]['buckets'] and 'withholdflag' in fielddefinitions[fieldname]['buckets']:
-					self.nested_restricted_aggs_fields[fieldname] = fielddefinitions[fieldname]['buckets']
-				elif 'buckets' in fielddefinitions[fieldname] and 'path' in fielddefinitions[fieldname]['buckets'] and 'withholdflag' not in fielddefinitions[fieldname]['buckets']:
-					self.nested_aggs_fields[fieldname] = fielddefinitions[fieldname]['buckets']
-				elif 'buckets' in fielddefinitions[fieldname] and 'withholdflag' in fielddefinitions[fieldname]['buckets']:
-					self.restricted_aggs_fields[fieldname] = fielddefinitions[fieldname]['buckets']
-				elif 'buckets' in fielddefinitions[fieldname]:
-					self.aggs_fields[fieldname] = fielddefinitions[fieldname]['buckets']
 		return
+		
 
 
 	def getAggregationsQuery(self):
@@ -71,8 +65,8 @@ class BucketAggregations():
 
 	def setAggregationsQuery(self):
 		
-		for field in self.aggs_fields:
-			self.aggs_query[field] = {'terms': {'field': self.aggs_fields[field]['field_query'], 'size': self.size}}
+		for field in self.simple_fields:
+			self.aggs_query[field] = {'terms': {'field': self.simple_fields[field]['field_query'], 'size': self.size}}
 			sorting_dict = self.getSorting()
 			if len(sorting_dict) > 0:
 				self.aggs_query[field]['terms']['order'] = sorting_dict
@@ -81,29 +75,46 @@ class BucketAggregations():
 
 
 	def setNestedAggregationsQuery(self):
-		for field in self.nested_aggs_fields:
+		for field in self.nested_fields:
 			self.aggs_query[field] = {
 				'nested': {
-					'path': self.nested_aggs_fields[field]['path']
+					'path': self.nested_fields[field]['path']
 				},
 				'aggs': {
 					'buckets': {
-						'terms': {'field': self.nested_aggs_fields[field]['field_query'], 'size': self.size}
+						'aggs': {
+							'buckets': {
+								'terms': {'field': self.nested_fields[field]['field_query'], 'size': self.size}
+							}
+						},
+						'filter': {
+							'bool': {
+								'must': []
+							}
+						}
 					}
 				}
 			}
+			
+			
+			if field in self.subfilters:
+				terms_sub_filter = {
+					'terms': self.subfilters[field]
+				}
+				self.aggs_query[field]['aggs']['buckets']['filter']['bool']['must'].append(terms_sub_filter)
+			
 			sorting_dict = self.getSorting()
 			if len(sorting_dict) > 0:
-				self.aggs_query[field]['aggs']['buckets']['terms']['order'] = sorting_dict
+				self.aggs_query[field]['aggs']['buckets']['aggs']['buckets']['terms']['order'] = sorting_dict
 		return
 
 
 	def setNestedRestrictedAggregationsQuery(self):
 		
-		for field in self.nested_restricted_aggs_fields:
+		for field in self.nested_restricted_fields:
 			self.aggs_query[field] = {
 				'nested': {
-					'path': self.nested_restricted_aggs_fields[field]['path']
+					'path': self.nested_restricted_fields[field]['path']
 				},
 				'aggs': {
 					'buckets': {
@@ -111,20 +122,28 @@ class BucketAggregations():
 							'bool': {
 								'should': [
 									# need to use the DB_ProjectID within the path for nested objects otherwise the filter fails
-									{"terms": {"{0}.DB_ProjectID".format(self.nested_restricted_aggs_fields[field]['path']): self.users_project_ids}},
-									{"term": {self.nested_restricted_aggs_fields[field]['withholdflag']: "false"}}
+									{"terms": {"{0}.DB_ProjectID".format(self.nested_restricted_fields[field]['path']): self.users_project_ids}},
+									{"term": {self.nested_restricted_fields[field]['withholdflag']: "false"}}
 								],
 								"minimum_should_match": 1
 							}
 						},
 						'aggs': {
 							'buckets': {
-								'terms': {'field': self.nested_restricted_aggs_fields[field]['field_query'], 'size': self.size}
+								'terms': {'field': self.nested_restricted_fields[field]['field_query'], 'size': self.size}
 							}
 						}
 					}
 				}
 			}
+			
+			if field in self.subfilters:
+				if 'must' not in self.aggs_query[field]['aggs']['buckets']['filter']['bool']:
+					self.aggs_query[field]['aggs']['buckets']['filter']['bool']['must'] = []
+				terms_sub_filter = {
+					'terms': self.subfilters[field]
+				}
+				self.aggs_query[field]['aggs']['buckets']['filter']['bool']['must'].append(terms_sub_filter)
 			
 			sorting_dict = self.getSorting()
 			if len(sorting_dict) > 0:
@@ -134,20 +153,20 @@ class BucketAggregations():
 
 	def setRestrictedAggregationsQuery(self):
 		
-		for field in self.restricted_aggs_fields:
+		for field in self.simple_restricted_fields:
 			self.aggs_query[field] = {
 				'filter': {
 					'bool': {
 						'should': [
 							{"terms": {"Projects.DB_ProjectID": self.users_project_ids}},
-							{"term": {self.restricted_aggs_fields[field]['withholdflag']: "false"}}
+							{"term": {self.simple_restricted_fields[field]['withholdflag']: "false"}}
 						],
 						"minimum_should_match": 1
 					}
 				},
 				'aggs': {
 					'buckets': {
-						'terms': {'field': self.restricted_aggs_fields[field]['field_query'], 'size': self.size}
+						'terms': {'field': self.simple_restricted_fields[field]['field_query'], 'size': self.size}
 					}
 				}
 			}
