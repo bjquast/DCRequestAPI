@@ -13,6 +13,25 @@ class TermFilterQueries(QuerySorter):
 		
 		QuerySorter.__init__(self, source_fields)
 		self.sort_queries_by_definitions()
+		self.setSubFilters()
+
+
+	def setSubFilters(self):
+		# when the nested objects should be filtered by a value, e. g. the parent taxa by rank
+		#pudb.set_trace()
+		self.subfilters = {}
+		for field in self.nested_fields:
+			if 'sub_filters' in self.nested_fields[field]:
+				for sub_filter_element in self.nested_fields[field]['sub_filters']:
+					if field not in self.subfilters:
+						self.subfilters[field] = {}
+					
+					if sub_filter_element[0] not in self.subfilters[field]:
+						self.subfilters[field][sub_filter_element[0]] = []
+					
+					self.subfilters[field][sub_filter_element[0]].append(sub_filter_element[1])
+		
+		return
 
 
 
@@ -103,15 +122,28 @@ class TermFilterQueries(QuerySorter):
 				"nested": {
 					"path": self.nested_fields[filter_key]['path'],
 					"query": {
-						"term": {
-							self.nested_fields[filter_key]['field_query']: {
-								"value": filter_value, 
-								"case_insensitive": "true"
-							}
+						"bool": {
+							"must": [
+								{
+									"term": {
+										self.nested_fields[filter_key]['field_query']: {
+											"value": filter_value, 
+											"case_insensitive": "true"
+										}
+									}
+								}
+							],
+							"filter": []
 						}
 					}
 				}
 			}
+			
+			if filter_key in self.subfilters:
+				terms_sub_filter = {
+					'terms': self.subfilters[filter_key]
+				}
+				termquery['nested']['query']['bool']['filter'].append(terms_sub_filter)
 		
 			self.term_queries[filter_key].append(termquery)
 		
@@ -143,11 +175,18 @@ class TermFilterQueries(QuerySorter):
 								{"terms": {"{0}.DB_ProjectID".format(self.nested_restricted_fields[filter_key]['path']): self.users_project_ids}},
 								{"term": {self.nested_restricted_fields[filter_key]['withholdflag']: "false"}}
 							],
-							"minimum_should_match": 1
+							"minimum_should_match": 1,
+							"filter": []
 						}
 					}
 				}
 			}
+			
+			if filter_key in self.subfilters:
+				terms_sub_filter = {
+					'terms': self.subfilters[filter_key]
+				}
+				termquery['nested']['query']['bool']['filter'].append(terms_sub_filter)
 			
 			self.term_queries[filter_key].append(termquery)
 		

@@ -22,7 +22,7 @@ class MatchQuery(QuerySorter):
 		simple_multi_match = {
 			'multi_match': {
 				'query': self.query_string, 
-				'fields': [fieldname for fieldname in self.simple_fields]
+				'fields': [self.simple_fields[fieldname]['field_query'] for fieldname in self.simple_fields]
 			}
 		}
 		self.should_queries.append(simple_multi_match)
@@ -30,7 +30,6 @@ class MatchQuery(QuerySorter):
 
 
 	def appendNestedMatchQueries(self):
-		
 		for fieldname in self.nested_fields:
 			query = {
 				'nested': {
@@ -40,7 +39,7 @@ class MatchQuery(QuerySorter):
 							'must': [
 								{
 									'match': {
-										fieldname: self.query_string
+										self.nested_fields[fieldname]['field_query']: self.query_string
 									}
 								}
 							]
@@ -60,7 +59,7 @@ class MatchQuery(QuerySorter):
 					'must': [
 						{
 							'match': {
-								fieldname: self.query_string
+								self.simple_restricted_fields[fieldname]['field_query']: self.query_string
 							}
 						}
 					],
@@ -91,7 +90,7 @@ class MatchQuery(QuerySorter):
 							'must': [
 								{
 									'match': {
-										fieldname: self.query_string
+										self.nested_restricted_fields[fieldname]['field_query']: self.query_string
 									}
 								}
 							],
