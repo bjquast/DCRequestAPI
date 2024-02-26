@@ -6,20 +6,46 @@ from ElasticSearch.FieldDefinitions import FieldDefinitions
 class IUPartsTable():
 	def __init__(self):
 		self.coldefs = {}
+		self.bucketdefs = {}
 		self.default_sourcefields = []
 		self.selected_sourcefields = []
 		self.required_sourcefields = ['StableIdentifierURL', ]
 		
+		self.default_bucketfields = []
+		self.selected_bucketfields = []
+		
 		fielddefs = FieldDefinitions()
 		self.fieldnames = fielddefs.fieldnames
+		self.bucketfields = fielddefs.bucketfields
 		self.fielddefinitions = fielddefs.fielddefinitions
 		
 		self.readFieldDefinitions()
+		self.readBucketDefinitions()
 		#self.setSourceFields()
 
 
-	def readFieldDefinitions(self):
+	def readBucketDefinitions(self):
+		for bucketfield in self.bucketfields:
+			if bucketfield in self.fielddefinitions:
+				self.bucketdefs[bucketfield] = self.fielddefinitions[bucketfield]['names']
+				self.default_bucketfields.append(bucketfield)
+				self.selected_bucketfields.append(bucketfield)
+
+
+	def setSelectedBucketFields(self, bucketfields = []):
+		self.selected_bucketfields = []
+		if len(bucketfields) <= 0:
+			for bucketfield in self.bucketfields:
+				self.selected_bucketfields.append(bucketfield)
 		
+		else:
+			for bucketfield in bucketfields:
+				if bucketfield in self.bucketfields:
+					self.selected_bucketfields.append(bucketfield)
+		return
+
+
+	def readFieldDefinitions(self):
 		for fieldname in self.fieldnames:
 			if fieldname in self.fielddefinitions:
 				self.coldefs[fieldname] = self.fielddefinitions[fieldname]['names']

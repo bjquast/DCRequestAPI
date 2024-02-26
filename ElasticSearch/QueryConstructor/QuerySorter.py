@@ -9,25 +9,19 @@ from ElasticSearch.FieldDefinitions import FieldDefinitions # fieldnames, fieldd
 
 
 class QuerySorter():
-	def __init__(self, source_fields = []):
+	def __init__(self, fielddefinitions, source_fields):
 		self.source_fields = source_fields
 		
 		self.nested_fields = {}
 		self.nested_restricted_fields = {}
 		self.simple_fields = {}
 		self.simple_restricted_fields = {}
-
-		fielddefs = FieldDefinitions()
-		self.fieldnames = fielddefs.fieldnames
-		self.fielddefinitions = fielddefs.fielddefinitions
+		
+		self.fielddefinitions = fielddefinitions
 
 
 
 	def sort_queries_by_definitions(self):
-		if len(self.source_fields) > 0:
-			pass
-		else:
-			self.source_fields = self.fieldnames
 		
 		for fieldname in self.source_fields:
 			if fieldname in self.fielddefinitions:

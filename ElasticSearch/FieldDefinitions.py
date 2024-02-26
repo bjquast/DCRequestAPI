@@ -9,6 +9,33 @@ class FieldDefinitions():
 
 
 	def setFieldNames(self):
+		self.bucketfields = [
+			'LastIdentificationCache',
+			'VernacularTerms',
+			'MatchedRankedParentTaxa.Phylum',
+			'MatchedRankedParentTaxa.Subphylum',
+			'MatchedRankedParentTaxa.Class',
+			'MatchedRankedParentTaxa.Subclass',
+			'MatchedRankedParentTaxa.Order',
+			'MatchedRankedParentTaxa.Suborder',
+			'MatchedRankedParentTaxa.Family',
+			'MatchedRankedParentTaxa.Subfamily',
+			'MatchedRankedParentTaxa.Genus',
+			'MatchedRankedParentTaxa.Subgenus',
+			'TypeStatus',
+			'CountryCache',
+			'CollectingMethod',
+			'CollectionAgents.CollectorsName',
+			'MaterialCategory',
+			'LifeStage',
+			'Gender',
+			'NumberOfUnits',
+			'Barcodes.Methods.region',
+			'CollectionName',
+			'Projects.Project',
+			'DatabaseAccronym',
+		]
+		
 		self.fieldnames = [
 			'PartAccessionNumber',
 			#'StableIdentifierURL',
@@ -18,14 +45,6 @@ class FieldDefinitions():
 			'OrderCache',
 			#'MatchedTaxon',
 			'MatchedParentTaxa',
-			'MatchedRankedParentTaxa.Phylum',
-			'MatchedRankedParentTaxa.Subphylum',
-			'MatchedRankedParentTaxa.Class',
-			'MatchedRankedParentTaxa.Subclass',
-			'MatchedRankedParentTaxa.Order',
-			'MatchedRankedParentTaxa.Suborder',
-			'MatchedRankedParentTaxa.Family',
-			'MatchedRankedParentTaxa.Subfamily',
 			'TypeStatus',
 			'MaterialCategory',
 			'LocalityVerbatim',
@@ -267,7 +286,7 @@ class FieldDefinitions():
 			'fam.': {'en': 'Family'}, 
 			'subfam.': {'en': 'Subfamily'}, 
 			'gen.': {'en': 'Genus'}, 
-			'subgen.': {'en': 'Subgenus'}
+			'subgen.': {'en': 'Subgenus'},
 		}
 		
 		

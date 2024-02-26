@@ -5,19 +5,26 @@ logger = logging.getLogger('elastic_queries')
 
 import pudb
 
+from ElasticSearch.FieldDefinitions import FieldDefinitions
 from ElasticSearch.QueryConstructor.QuerySorter import QuerySorter
+
 
 class BucketAggregations(QuerySorter):
 	def __init__(self, users_project_ids = [], source_fields = [], size = 10, sort_alphanum = False, sort_dir = 'asc'):
+		#pudb.set_trace()
+		
 		self.users_project_ids = users_project_ids
 		self.source_fields = source_fields
 		self.size = size
 		self.sort_alphanum = sort_alphanum
 		self.sort_dir = sort_dir.lower()
-		
 		self.sortstring = None
 		
-		QuerySorter.__init__(self, source_fields)
+		fielddefs = FieldDefinitions()
+		if len(self.source_fields) <= 0:
+			self.source_fields = fielddefs.bucketfields
+		
+		QuerySorter.__init__(self, fielddefs.fielddefinitions, self.source_fields)
 		self.sort_queries_by_definitions()
 		self.setSubFiltersInNestedAggregations()
 
@@ -175,3 +182,6 @@ class BucketAggregations(QuerySorter):
 				self.aggs_query[field]['aggs']['buckets']['terms']['order'] = sorting_dict
 		return
 
+
+	def getBucketSize(self):
+		return self.size

@@ -62,12 +62,17 @@ class IUPartsListView():
 		if len(self.search_params['result_table_columns']) > 0:
 			iupartstable.setSelectedSourceFields(self.search_params['result_table_columns'])
 		
-		selected_sourcefields = iupartstable.getSelectedSourceFields()
-		#default_sourcefields = iupartstable.getDefaultSourceFields()
+		selected_sourcefields = iupartstable.selected_sourcefields
+		#default_sourcefields = iupartstable.default_sourcefields
+		selected_bucketfields = iupartstable.selected_bucketfields
+		#default_bucketfields = iupartstable.default_bucketfields
+		
 		coldefs = iupartstable.coldefs
+		bucketdefs = iupartstable.bucketdefs
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
 		es_searcher.setSourceFields(selected_sourcefields)
+		es_searcher.setBucketFields(selected_bucketfields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
 		#aggregations = es_searcher.getParsedAggregations()
 		#iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs])
@@ -113,13 +118,18 @@ class IUPartsListView():
 		if len(self.search_params['result_table_columns']) > 0:
 			iupartstable.setSelectedSourceFields(self.search_params['result_table_columns'])
 		
-		selected_sourcefields = iupartstable.getSelectedSourceFields()
-		default_sourcefields = iupartstable.getDefaultSourceFields()
+		selected_sourcefields = iupartstable.selected_sourcefields
+		default_sourcefields = iupartstable.default_sourcefields
+		selected_bucketfields = iupartstable.selected_bucketfields
+		default_bucketfields = iupartstable.default_bucketfields
+		
 		coldefs = iupartstable.coldefs
+		bucketdefs = iupartstable.bucketdefs
 		
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
 		es_searcher.setSourceFields(selected_sourcefields)
+		es_searcher.setBucketFields(selected_bucketfields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
 		aggregations = es_searcher.getParsedAggregations()
 		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs])
@@ -136,8 +146,11 @@ class IUPartsListView():
 			'iupartslist': iupartslist,
 			'aggregations': aggregations,
 			'coldefs': coldefs,
+			'bucketdefs': bucketdefs,
 			'default_sourcefields': default_sourcefields,
 			'selected_sourcefields': selected_sourcefields, 
+			'default_bucketfields': default_bucketfields,
+			'selected_bucketfields': selected_bucketfields, 
 			'open_filter_selectors': self.search_params['open_filter_selectors'],
 			'authenticated_user': self.uid,
 			'messages': self.messages

@@ -19,57 +19,58 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 <body>
 	<div metal:use-macro="load: DCRequestAPI:templates/header_macro.pt"></div>
 
-<div class="flex-space-between">
-	<div metal:use-macro="load: ./search_macro.pt"></div>
-	<div metal:use-macro="load: ./preferences_macro.pt"></div>
-</div>
+	<form id="search_form" action="${request.application_url}/list" method="GET" >
+	</form>
 
-<div id="buckets-overlay-slot"></div>
-
-<div id="filter-and-resulttable" class="flex-wrapped-row">
-	<div metal:use-macro="load: DCRequestAPI:templates/filters_macro.pt" id="filter_macro"></div>
-
-	<div id="results_iuparts">
-		<div tal:condition="python: len(iupartslist) <= 0">
-			<h3>No specimen found</h3>
-		</div>
-		<div tal:condition="python: len(iupartslist) > 0 and resultnum > 0">
-			<p>Number of specimens: ${resultnum}</p>
-		</div>
-
-		<div metal:use-macro="load: DCRequestAPI:templates/paging_macro.pt"></div>
-		<div metal:use-macro="load: DCRequestAPI:templates/sorting_macro.pt"></div>
-
-		<div tal:condition="python: len(iupartslist) > 0" class="listview">
-			<table>
-				<thead>
-					<th tal:repeat="columnkey selected_sourcefields">${coldefs[columnkey]['en']}</th>
-				</thead>
-				<tbody>
-					<tr tal:repeat="iuparts iupartslist">
-						
-						<td tal:repeat="columnkey selected_sourcefields">
-							<block tal:condition="python: columnkey == 'PartAccessionNumber'">
-								${structure:iuparts['PartAccessionNumber'][0]}
-							</block>
-							
-							<block tal:condition="python: columnkey == 'StableIdentifierURL'">
-								${structure:iuparts['StableIdentifierURL'][0]}
-							</block>
-							
-							<block tal:condition="python: columnkey not in ['PartAccessionNumber', 'StableIdentifierURL']" tal:repeat="iupfield iuparts[columnkey]">
-								${iupfield}
-							</block>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+	<div class="flex-space-between">
+		<div metal:use-macro="load: ./search_macro.pt"></div>
+		<div metal:use-macro="load: ./preferences_macro.pt"></div>
 	</div>
 
-</div>
+	<div id="buckets-overlay-slot"></div>
 
+	<div id="filter-and-resulttable" class="flex-wrapped-row">
+		<div metal:use-macro="load: DCRequestAPI:templates/filters_macro.pt" id="filter_macro"></div>
 
+		<div id="results_iuparts">
+			<div tal:condition="python: len(iupartslist) <= 0">
+				<h3>No specimen found</h3>
+			</div>
+			<div tal:condition="python: len(iupartslist) > 0 and resultnum > 0">
+				<p>Number of specimens: ${resultnum}</p>
+			</div>
+
+			<div metal:use-macro="load: DCRequestAPI:templates/paging_macro.pt"></div>
+			<div metal:use-macro="load: DCRequestAPI:templates/sorting_macro.pt"></div>
+
+			<div tal:condition="python: len(iupartslist) > 0" class="listview">
+				<table>
+					<thead>
+						<th tal:repeat="columnkey selected_sourcefields">${coldefs[columnkey]['en']}</th>
+					</thead>
+					<tbody>
+						<tr tal:repeat="iuparts iupartslist">
+							
+							<td tal:repeat="columnkey selected_sourcefields">
+								<block tal:condition="python: columnkey == 'PartAccessionNumber'">
+									${structure:iuparts['PartAccessionNumber'][0]}
+								</block>
+								
+								<block tal:condition="python: columnkey == 'StableIdentifierURL'">
+									${structure:iuparts['StableIdentifierURL'][0]}
+								</block>
+								
+								<block tal:condition="python: columnkey not in ['PartAccessionNumber', 'StableIdentifierURL']" tal:repeat="iupfield iuparts[columnkey]">
+									${iupfield}
+								</block>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
 
 
 </body>

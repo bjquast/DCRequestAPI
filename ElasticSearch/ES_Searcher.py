@@ -27,6 +27,7 @@ class ES_Searcher():
 		
 		self.index = 'iuparts'
 		self.source_fields = []
+		self.bucket_fields = []
 		
 		self.pagesize = 1000
 		self.start = 0
@@ -102,6 +103,10 @@ class ES_Searcher():
 		'''
 
 
+	def setBucketFields(self, bucket_fields = []):
+		self.bucket_fields = list(bucket_fields)
+
+
 	def addUserLimitation(self):
 		# prepare the query as a subquery to the must-queries, so that it is guarantied that it is AND connected. 
 		# this is in contrast to should filters where the addition of other should filters might disable the AND connection
@@ -131,7 +136,7 @@ class ES_Searcher():
 		for param in self.search_params:
 			
 			if param == 'term_filters':
-				filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids, source_fields = self.source_fields).getTermFilterQueries(self.search_params['term_filters'])
+				filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids, source_fields = self.bucket_fields).getTermFilterQueries(self.search_params['term_filters'])
 				self.query['bool']["filter"].extend(filter_queries)
 			
 			if param == 'match_query':
@@ -187,7 +192,7 @@ class ES_Searcher():
 		#self.queryConstructor is set in the derived classes
 		self.setQuery()
 		
-		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = self.source_fields)
+		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids)
 		aggs = buckets_query.getAggregationsQuery()
 		
 		#logger.debug(self.sort)
