@@ -1,20 +1,19 @@
 .listview {
 	overflow: auto;
 	height: 100%;
-	width: 97%;
+	width: 100%;
 }
 
 .listview table {
 	width: 100%;
 	overflow: auto;
-	margin: 0 1em 1em 1em;
 	border-collapse: collapse;
 }
 
 .listview th {
 	position: sticky;
 	top: 0px;
-	padding:1em;
+	vertical-align: top;
 	border-bottom: 1px solid #ddd;
 	background-color: white;
 }

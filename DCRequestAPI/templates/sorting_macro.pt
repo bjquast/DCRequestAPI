@@ -1,17 +1,16 @@
 
 
 <div class="flex-start">
-	<div class="flexitem-align-center">
+	<div class="flexitem-align-center hidden">
 		<span tal:condition="python: len(coldefs) > 0">
 			<label for="sort_col_selector">Sort results by: </label> 
 			<select id="sort_col_selector" form="search_form" name="sorting_col">
-				<option value="relevance">Relevance</option>
 				<option tal:repeat="sorting_col coldefs" 
 				value="${sorting_col}" tal:attributes="selected 'selected' if 'sorting_col' in search_params and sorting_col == search_params['sorting_col'] else None">${coldefs[sorting_col]['en']}</option>
 			</select>
 		</span>
 	</div>
-	<div class="flexitem-align-center">
+	<div class="flexitem-align-center hidden">
 		<span>
 			<label for="sort_dir_selector">Sort direction: </label>
 			<select id="sort_dir_selector" form="search_form" name="sorting_dir">

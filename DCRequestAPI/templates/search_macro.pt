@@ -1,19 +1,16 @@
 	
 <div>
-	<fieldset>
-		<legend>Search</legend>
-		<div id="searchbox">
-			<span tal:condition="python: 'match_query' not in search_params or search_params['match_query'] is None or search_params['match_query'] == ''">
-				<input id="match_query_input" form="search_form" type="text" name="match_query"/>
-				<input form="search_form" type="submit" value="Search"/>
-			</span>
-			<span tal:condition="python: 'match_query' in search_params and search_params['match_query'] is not None and len(search_params['match_query']) > 0">
-				<input id="match_query_input" form="search_form" type="text" name="match_query" value="${search_params['match_query']}"/>
-				<input form="search_form" type="submit" value="Search"/>
-			</span>
-			
-			<!--<span class="smallparagraph" rel="tooltip">Search terms separated by a white space will be connected by an AND operator, terms separated by a semi-colon will be connected by an or OR operator.</span>-->
-		</div>
-	</fieldset>
+	<div id="searchbox">
+		<span tal:condition="python: 'match_query' not in search_params or search_params['match_query'] is None or search_params['match_query'] == ''">
+			<input id="match_query_input" form="search_form" type="text" name="match_query"/>
+			<input form="search_form" type="submit" value="Search"/>
+		</span>
+		<span tal:condition="python: 'match_query' in search_params and search_params['match_query'] is not None and len(search_params['match_query']) > 0">
+			<input id="match_query_input" form="search_form" type="text" name="match_query" value="${search_params['match_query']}"/>
+			<input form="search_form" type="submit" value="Search"/>
+		</span>
+		
+		<!--<span class="smallparagraph" rel="tooltip">Search terms separated by a white space will be connected by an AND operator, terms separated by a semi-colon will be connected by an or OR operator.</span>-->
+	</div>
 </div>
 	

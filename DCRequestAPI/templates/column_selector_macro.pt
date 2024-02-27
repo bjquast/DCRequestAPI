@@ -1,0 +1,18 @@
+
+
+<div class="flex">
+	<div>
+		<div>
+			<details id="column_preferences">
+				<summary class="clickable">Select Columns</summary>
+				<ul class="ul-no-bullet">
+					<li tal:repeat="columnkey default_sourcefields">
+						<input id="table_col_checkbox_${columnkey}" type="checkbox" form="search_form" name="result_table_columns" value="${columnkey}" tal:attributes="checked 'checked' if columnkey in selected_sourcefields else None">
+						<label for="table_col_checkbox_${columnkey}">${coldefs[columnkey]['en']}</label>
+					</li>
+				</ul>
+			</details>
+		</div>
+	</div>
+</div>
+

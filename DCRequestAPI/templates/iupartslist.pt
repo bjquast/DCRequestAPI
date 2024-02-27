@@ -22,11 +22,6 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 	<form id="search_form" action="${request.application_url}/list" method="GET" >
 	</form>
 
-	<div class="flex-space-between">
-		<div metal:use-macro="load: ./search_macro.pt"></div>
-		<div metal:use-macro="load: ./preferences_macro.pt"></div>
-	</div>
-
 	<div id="buckets-overlay-slot"></div>
 
 	<div id="filter-and-resulttable" class="flex-wrapped-row">
@@ -36,17 +31,36 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 			<div tal:condition="python: len(iupartslist) <= 0">
 				<h3>No specimen found</h3>
 			</div>
-			<div tal:condition="python: len(iupartslist) > 0 and resultnum > 0">
-				<p>Number of specimens: ${resultnum}</p>
+			
+			<div class="flex-space-between">
+				<div>
+					<div tal:condition="python: len(iupartslist) > 0 and resultnum > 0">
+						<span>Number of specimens: ${resultnum}</span>
+					</div>
+					<div metal:use-macro="load: DCRequestAPI:templates/paging_macro.pt"></div>
+				</div>
+				<div metal:use-macro="load: ./column_selector_macro.pt"></div>
 			</div>
-
-			<div metal:use-macro="load: DCRequestAPI:templates/paging_macro.pt"></div>
-			<div metal:use-macro="load: DCRequestAPI:templates/sorting_macro.pt"></div>
+			
+			<div class="flex-space-between">
+				<div metal:use-macro="load: DCRequestAPI:templates/sorting_macro.pt"></div>
+				<div metal:use-macro="load: ./search_macro.pt"></div>
+			</div>
 
 			<div tal:condition="python: len(iupartslist) > 0" class="listview">
 				<table>
 					<thead>
-						<th tal:repeat="columnkey selected_sourcefields">${coldefs[columnkey]['en']}</th>
+						<th tal:repeat="columnkey selected_sourcefields" class="column_header column_sort_selector" data-columnkey="${columnkey}" tal:attributes="data-sorting_dir search_params['sorting_dir'] if 'sorting_dir' in search_params else ''">
+							<div class="flex-start-nowrap">
+								<div>${coldefs[columnkey]['en']} </div>
+								<div>
+									<img tal:condition="python: 'sorting_col' in search_params and search_params['sorting_col'] == columnkey and 'sorting_dir' in search_params and search_params['sorting_dir'] == 'asc'" class="sort_button" src="./static/buttons/sort_by_column_asc.png">
+									<img tal:condition="python: 'sorting_col' in search_params and search_params['sorting_col'] == columnkey and 'sorting_dir' in search_params and search_params['sorting_dir'] == 'desc'" class="sort_button" src="./static/buttons/sort_by_column_desc.png">
+									<img tal:condition="python: 'sorting_col' not in search_params or search_params and search_params['sorting_col'] != columnkey" class="sort_button" src="./static/buttons/sort_by_column.png">
+									
+								</div>
+							</div>
+						</th>
 					</thead>
 					<tbody>
 						<tr tal:repeat="iuparts iupartslist">

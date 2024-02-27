@@ -133,16 +133,22 @@ input{
 
 .flex {
 	display: flex;
-	margin-right: 1em;
-}
-
-.flex div {
-	margin-right: 1em;
 }
 
 .flex-start {
 	display: flex;
 	justify-content: flex-start;
+	margin-bottom: 1em;
+}
+
+.flex-start-nowrap {
+	display: flex;
+	justify-content: flex-start;
+	flex-wrap: nowrap;
+}
+
+.flex-start-nowrap div {
+	margin-right: 1em;
 	margin-bottom: 1em;
 }
 
@@ -194,6 +200,7 @@ input{
 	width: 40%;
 	height: 60vh;
 	flex-grow: 8;
+	margin-right: 1em;
 }
 
 

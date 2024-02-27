@@ -10,6 +10,9 @@ class FieldDefinitions():
 
 	def setFieldNames(self):
 		self.bucketfields = [
+			'DatabaseAccronym',
+			'CollectionName',
+			'Projects.Project',
 			'LastIdentificationCache',
 			'VernacularTerms',
 			'MatchedRankedParentTaxa.Phylum',
@@ -31,9 +34,6 @@ class FieldDefinitions():
 			'Gender',
 			'NumberOfUnits',
 			'Barcodes.Methods.region',
-			'CollectionName',
-			'Projects.Project',
-			'DatabaseAccronym',
 		]
 		
 		self.fieldnames = [
@@ -41,8 +41,8 @@ class FieldDefinitions():
 			#'StableIdentifierURL',
 			'LastIdentificationCache',
 			'VernacularTerms',
-			'FamilyCache',
-			'OrderCache',
+			#'FamilyCache',
+			#'OrderCache',
 			#'MatchedTaxon',
 			'MatchedParentTaxa',
 			'TypeStatus',
