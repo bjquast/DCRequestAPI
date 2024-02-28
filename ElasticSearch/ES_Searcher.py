@@ -69,7 +69,7 @@ class ES_Searcher():
 
 	def setSorting(self):
 		#pudb.set_trace()
-		self.sort = [{"_score":{"order":"desc"}}, {"PartAccessionNumber.keyword_lc":{"order":"asc"}}]
+		self.sort = [{"PartAccessionNumber.keyword_lc":{"order":"asc"}}]
 		
 		if 'sorting_col' in self.search_params and 'sorting_dir' not in self.search_params:
 			self.search_params['sorting_dir'] = 'asc'
@@ -270,6 +270,20 @@ class ES_Searcher():
 		self.parseRawAggregations()
 		return self.aggregations
 
+
+	def getLastUpdated(self):
+		sort = [{"LastUpdated":{"order":"desc"}}]
+		source_fields = ["LastUpdated", "_id", "PartAccessionNumber"]
+		response = self.client.search(index=self.index, size=1, sort=sort, source=source_fields)
+		
+		docs = [doc for doc in response['hits']['hits']]
+		
+		if len(docs) != 1:
+			return None
+		else: 
+			lastupdated = docs[0]['_source']['LastUpdated']
+		
+		return lastupdated
 
 
 if __name__ == "__main__":

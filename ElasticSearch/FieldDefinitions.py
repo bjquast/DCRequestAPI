@@ -11,6 +11,7 @@ class FieldDefinitions():
 	def setFieldNames(self):
 		self.bucketfields = [
 			'DatabaseAccronym',
+			#'ParentCollections.CollectionName',
 			'CollectionName',
 			'Projects.Project',
 			'LastIdentificationCache',
@@ -138,7 +139,7 @@ class FieldDefinitions():
 			},
 			
 			'MaterialCategory': {
-				'names': {'en': 'Specimen type'},
+				'names': {'en': 'Material category'},
 				'buckets': {
 					'field_query': 'MaterialCategory',
 					'withholdflag': 'PartWithhold',
@@ -232,6 +233,14 @@ class FieldDefinitions():
 				'names': {'en': 'Collection'},
 				'buckets': {
 					'field_query': 'CollectionName',
+				},
+			},
+			
+			'ParentCollections.CollectionName': {
+				'names': {'en': 'Collections'},
+				'buckets': {
+					'field_query': 'ParentCollections.CollectionName',
+					'path': 'ParentCollections',
 				},
 			},
 			

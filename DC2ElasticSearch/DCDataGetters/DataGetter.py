@@ -8,7 +8,7 @@ log_query = logging.getLogger('query')
 from DBConnectors.MSSQLConnector import MSSQLConnector
 
 class DataGetter():
-	def __init__(self, dc_params):
+	def __init__(self, dc_params, last_updated = None):
 		
 		self.dc_con = MSSQLConnector(dc_params['connectionstring'])
 		self.server_url = dc_params['server_url']
@@ -18,6 +18,8 @@ class DataGetter():
 		
 		self.cur = self.dc_con.getCursor()
 		self.con = self.dc_con.getConnection()
+		
+		self.last_updated = last_updated
 		
 		self.pagesize = 10000
 
@@ -55,7 +57,18 @@ class DataGetter():
 		return
 
 
-	def fill_ids_temptable(self):
+	def fill_ids_temptable(self, last_updated = None):
+		if last_updated is not None:
+			self.last_updated = last_updated
+		
+		params = []
+		last_update_clause = ""
+		
+		if self.last_updated is not None:
+			
+			last_update_clause = "WHERE cs.LogUpdatedWhen > ?"
+			params.append(self.last_updated)
+		
 		query = """
 		INSERT INTO [#temp_iu_part_ids]
 		([idshash], [DatabaseURI], [DatabaseID], [DatabaseAccronym], [CollectionSpecimenID], [IdentificationUnitID], [SpecimenPartID], [SpecimenAccessionNumber], [PartAccessionNumber])
@@ -79,16 +92,17 @@ class DataGetter():
 		ON iup.CollectionSpecimenID = iu.CollectionSpecimenID AND iup.IdentificationUnitID = iu.IdentificationUnitID 
 		LEFT JOIN CollectionSpecimenPart csp 
 		ON csp.CollectionSpecimenID = iup.CollectionSpecimenID AND csp.SpecimenPartID = iup.SpecimenPartID 
-		 -- WHERE iup.SpecimenPartID IS NOT NULL
+		{4}
 		 -- for development
 		 -- WHERE cs.AccessionNumber = 'ZFMK-TIS-46'
 		 -- WHERE cs.CollectionSpecimenID = 14
 		ORDER BY [CollectionSpecimenID], [IdentificationUnitID], [SpecimenPartID]
-		;""".format(self.server_url, self.database_name, self.database_id, self.accronym)
+		;""".format(self.server_url, self.database_name, self.database_id, self.accronym, last_update_clause)
 		
-		log_query.info(query)
+		log_query.debug(query)
+		log_query.debug(params)
 		
-		self.cur.execute(query)
+		self.cur.execute(query, params)
 		self.cur.commit()
 		
 		query = """

@@ -50,7 +50,7 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 			<div tal:condition="python: len(iupartslist) > 0" class="listview">
 				<table>
 					<thead>
-						<th tal:repeat="columnkey selected_sourcefields" class="column_header column_sort_selector" data-columnkey="${columnkey}" tal:attributes="data-sorting_dir search_params['sorting_dir'] if 'sorting_dir' in search_params else ''">
+						<th tal:repeat="columnkey selected_sourcefields" class="column_header column_sort_selector clickable" data-columnkey="${columnkey}" tal:attributes="data-sorting_dir search_params['sorting_dir'] if 'sorting_dir' in search_params else ''">
 							<div class="flex-start-nowrap">
 								<div>${coldefs[columnkey]['en']} </div>
 								<div>

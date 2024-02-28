@@ -106,7 +106,38 @@ class ES_Indexer():
 		return
 
 
+	def yieldIDsToDelete(self, deleted_ids):
+		actions_dict = {}
+		for deleted_id in deleted_ids:
+			actions_dict[deleted_id] = {
+				'_op_type': 'delete',
+				'_id': deleted_id
+			}
+			yield actions_dict[deleted_id]
 
+
+	def bulkDelete(self, deleted_ids, page):
+		doc_count = len(deleted_ids)
+		
+		self.successes, self.fails = 0, 0
+		
+		for ok, response in streaming_bulk(client=self.client, index=self.index, actions=self.yieldIDsToDelete(deleted_ids), yield_ok=True, raise_on_error=False, request_timeout=60):
+			if not ok:
+				self.fails += 1
+				es_logger.info(response)
+			else:
+				self.successes += 1
+		
+		if self.fails > 0:
+			es_logger.info('>>> Delete failed! Tried to delete {0} docs of {1} into {2}, {3} failed updates. Page {4} <<<'.format(self.successes, doc_count, self.index, self.fails, page))
+		else:
+			es_logger.info('>>> Deleted {0} docs of {1} into {2}. Page {3} <<<'.format(self.successes, doc_count, self.index, page))
+		
+		self.client.indices.refresh(index=self.index)
+		return
+
+
+'''
 	def yieldUpdateData(self, datadict, fieldname):
 		actions_dict = {}
 		for key in datadict.keys():
@@ -140,9 +171,10 @@ class ES_Indexer():
 		
 		self.client.indices.refresh(index=self.index)
 		return
-		
-		
-		
+'''
+
+
+
 
 
 
