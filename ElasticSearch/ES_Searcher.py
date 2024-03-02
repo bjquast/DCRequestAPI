@@ -140,7 +140,8 @@ class ES_Searcher():
 				self.query['bool']["filter"].extend(filter_queries)
 			
 			if param == 'match_query':
-				match_query = MatchQuery(users_project_ids = self.users_project_ids, source_fields = self.source_fields).getMatchQuery(self.search_params['match_query'])
+				#match_query = MatchQuery(users_project_ids = self.users_project_ids, source_fields = self.source_fields).getMatchQuery(self.search_params['match_query'])
+				match_query = MatchQuery(users_project_ids = self.users_project_ids).getMatchQuery(self.search_params['match_query'])
 				if match_query is not None:
 					self.query['bool']['must'].append(match_query)
 		
