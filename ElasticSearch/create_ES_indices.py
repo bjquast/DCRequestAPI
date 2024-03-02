@@ -1,6 +1,9 @@
 import argparse
 import pudb
 
+import threading
+import queue
+
 #from ElasticSearch.ES_Indexer import ES_Indexer
 
 import logging, logging.config
@@ -25,6 +28,50 @@ from DC2ElasticSearch.DCDataGetters.IdentificationUnitAnalyses import Identifica
 from DC2ElasticSearch.TaxaMatcher.TaxaMatcher import TaxaMatcher
 
 
+es_queue = queue.Queue()
+
+
+def es_worker():
+	es_indexer = ES_Indexer()
+	while True:
+		data_page = es_queue.get()
+		
+		if len(data_page.iuparts_dict) > 0:
+			es_indexer.bulkIndex(data_page.iuparts_dict, data_page.page)
+		if len(data_page.collections_dict) > 0:
+			es_indexer.bulkUpdateDocs(data_page.collections_dict, 'Collections', data_page.page)
+		if len(data_page.projects_dict) > 0:
+			es_indexer.bulkUpdateDocs(data_page.projects_dict, 'Projects', data_page.page)
+		if len(data_page.identifications_dict) > 0:
+			es_indexer.bulkUpdateDocs(data_page.identifications_dict, 'Identifications', data_page.page)
+		if len(data_page.collectors_dict) > 0:
+			es_indexer.bulkUpdateDocs(data_page.collectors_dict, 'CollectionAgents', data_page.page)
+		if len(data_page.images_dict) > 0:
+		
+			es_indexer.bulkUpdateDocs(data_page.images_dict, 'Images', data_page.page)
+		if len(data_page.barcode_analyses_dict) > 0:
+			es_indexer.bulkUpdateDocs(data_page.barcode_analyses_dict, 'Barcodes', data_page.page)
+		if len(data_page.fogs_analyses_dict) > 0:
+			es_indexer.bulkUpdateDocs(data_page.fogs_analyses_dict, 'FOGS', data_page.page)
+		if len(data_page.mam_analyses_dict) > 0:
+			es_indexer.bulkUpdateDocs(data_page.mam_analyses_dict, 'MAM_Measurements', data_page.page)
+		if len(data_page.matchedtaxa_dict) > 0:
+			es_indexer.bulkUpdateDocs(data_page.matchedtaxa_dict, 'MatchedTaxa', data_page.page)
+		
+		es_queue.task_done()
+		
+	return
+
+
+threading.Thread(target=es_worker, daemon=True).start()
+
+class DataPage():
+	""" a class that holds the data of each page requested from the database """ 
+	def __init__(self):
+		pass
+
+
+
 class IUPartsIndexer():
 	def __init__(self, es_indexer, dc_params, last_updated = None):
 		self.es_indexer = es_indexer
@@ -36,7 +83,11 @@ class IUPartsIndexer():
 		self.data_getter.fill_ids_temptable()
 		
 		self.setDataGetters()
-		self.index()
+		self.submitDataPages()
+		
+		logger.info('No more remaining data pages')
+		# add None to queue to signal all items have been send
+		es_queue.join()
 
 
 	def setDataGetters(self):
@@ -60,20 +111,26 @@ class IUPartsIndexer():
 		self.taxamatcher = TaxaMatcher()
 
 
-	def index(self):
+	def submitDataPages(self):
 		for i in range(1, self.data_getter.max_page + 1):
 			
-			iuparts_dict = self.indexIUParts(i)
-			self.updateCollections(i)
-			self.updateProjects(i)
-			self.updateIdentifications(i)
-			self.updateCollectors(i)
-			self.updateCollectionSpecimenImages(i)
-			self.updateBarcodes(i)
-			self.updateFOGS(i)
-			self.updateMamMeasurements(i)
+			data_page = DataPage()
+			data_page.iuparts_dict = self.iuparts.get_data_page(i)
+			data_page.collections_dict = self.collections.get_data_page(i)
+			data_page.projects_dict = self.projects.get_data_page(i)
+			data_page.identifications_dict = self.identifications.get_data_page(i)
+			data_page.collectors_dict = self.collectors.get_data_page(i)
+			data_page.images_dict = self.images.get_data_page(i)
+			data_page.barcode_analyses_dict = self.barcode_analyses.get_data_page(i)
+			data_page.fogs_analyses_dict = self.fogs_analyses.get_data_page(i)
+			data_page.mam_analyses_dict = self.mam_analyses.get_data_page(i)
+			data_page.matchedtaxa_dict = self.getMatchedTaxa(data_page.iuparts_dict, i)
 			
-			self.updateMatchedTaxa(iuparts_dict, i)
+			data_page.page = i
+			
+			es_queue.put(data_page)
+		
+		return
 
 
 	def setBarcodeAMPFilterIDS(self):
@@ -116,62 +173,7 @@ class IUPartsIndexer():
 		}
 
 
-	def indexIUParts(self, i):
-		iuparts_dict = self.iuparts.get_data_page(i)
-		if len(iuparts_dict) > 0:
-			self.es_indexer.bulkIndex(iuparts_dict, i)
-		return iuparts_dict
-
-
-	def updateCollections(self, i):
-		collections_dict = self.collections.get_data_page(i)
-		if len(collections_dict) > 0:
-			self.es_indexer.bulkUpdateDocs(collections_dict, 'Collections', i)
-
-
-	def updateProjects(self, i):
-		projects_dict = self.projects.get_data_page(i)
-		if len(projects_dict) > 0:
-			self.es_indexer.bulkUpdateDocs(projects_dict, 'Projects', i)
-
-
-	def updateIdentifications(self, i):
-		identifications_dict = self.identifications.get_data_page(i)
-		if len(identifications_dict) > 0:
-			self.es_indexer.bulkUpdateDocs(identifications_dict, 'Identifications', i)
-
-
-	def updateCollectors(self, i):
-		collectors_dict = self.collectors.get_data_page(i)
-		if len(collectors_dict) > 0:
-			self.es_indexer.bulkUpdateDocs(collectors_dict, 'CollectionAgents', i)
-
-
-	def updateCollectionSpecimenImages(self, i):
-		images_dict = self.images.get_data_page(i)
-		if len(images_dict) > 0:
-			self.es_indexer.bulkUpdateDocs(images_dict, 'Images', i)
-
-
-	def updateBarcodes(self, i):
-		analyses_dict = self.barcode_analyses.get_data_page(i)
-		if len(analyses_dict) > 0:
-			self.es_indexer.bulkUpdateDocs(analyses_dict, 'Barcodes', i)
-
-
-	def updateFOGS(self, i):
-		analyses_dict = self.fogs_analyses.get_data_page(i)
-		if len(analyses_dict) > 0:
-			self.es_indexer.bulkUpdateDocs(analyses_dict, 'FOGS', i)
-
-
-	def updateMamMeasurements(self, i):
-		analyses_dict = self.mam_analyses.get_data_page(i)
-		if len(analyses_dict) > 0:
-			self.es_indexer.bulkUpdateDocs(analyses_dict, 'MAM_Measurements', i)
-
-
-	def updateMatchedTaxa(self, iuparts_dict, i):
+	def getMatchedTaxa(self, iuparts_dict, i):
 		self.taxamatcher.createSpecimenTempTable()
 		valuelists = []
 		for idshash in iuparts_dict:
@@ -189,7 +191,7 @@ class IUPartsIndexer():
 		self.taxamatcher.matchTaxa()
 		
 		matchedtaxa_dict = self.taxamatcher.getMatchedTaxaDict()
-		self.es_indexer.bulkUpdateDocs(matchedtaxa_dict, 'MatchedTaxa', i)
+		return matchedtaxa_dict
 
 
 
@@ -206,6 +208,7 @@ if __name__ == "__main__":
 	for dc_params in dc_databases.databases:
 		iuparts_indexer = IUPartsIndexer(es_indexer, dc_params)
 	
+	logger.info('indexing completed')
 	exit(0)
 
 
