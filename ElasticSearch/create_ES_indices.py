@@ -17,13 +17,13 @@ from DC2ElasticSearch.DCDataGetters.DC_Connections import DC_Connections
 from DC2ElasticSearch.DCDataGetters.DataGetter import DataGetter
 
 
-from DC2ElasticSearch.DCDataGetters.IdentificationUnitParts import IdentificationUnitParts
-from DC2ElasticSearch.DCDataGetters.Collections import Collections
-from DC2ElasticSearch.DCDataGetters.Projects import Projects
-from DC2ElasticSearch.DCDataGetters.Identifications import Identifications
-from DC2ElasticSearch.DCDataGetters.CollectionAgents import CollectionAgents
-from DC2ElasticSearch.DCDataGetters.CollectionSpecimenImages import CollectionSpecimenImages
-from DC2ElasticSearch.DCDataGetters.IdentificationUnitAnalyses import IdentificationUnitAnalyses
+from DC2ElasticSearch.DCDataGetters.IdentificationUnitParts import IdentificationUnitPartsPage
+from DC2ElasticSearch.DCDataGetters.Collections import CollectionsPage, CollectionRelationsTable
+from DC2ElasticSearch.DCDataGetters.Projects import ProjectsPage
+from DC2ElasticSearch.DCDataGetters.Identifications import IdentificationsPage
+from DC2ElasticSearch.DCDataGetters.CollectionAgents import CollectionAgentsPage
+from DC2ElasticSearch.DCDataGetters.CollectionSpecimenImages import CollectionSpecimenImagesPage
+from DC2ElasticSearch.DCDataGetters.IdentificationUnitAnalyses import IdentificationUnitAnalysesPage, IUAnalysesAMPFilterTable
 
 from DC2ElasticSearch.TaxaMatcher.TaxaMatcher import TaxaMatcher
 
@@ -65,10 +65,47 @@ def es_worker():
 
 threading.Thread(target=es_worker, daemon=True).start()
 
+
 class DataPage():
 	""" a class that holds the data of each page requested from the database """ 
-	def __init__(self):
-		pass
+	def __init__(self, data_getter, page):
+		self.data_getter = data_getter
+		self.page = page
+		
+		self.iuparts_dict = IdentificationUnitPartsPage(self.data_getter, self.page).get_data_page()
+		self.collections_dict = CollectionsPage(self.data_getter, self.page).get_data_page()
+		self.projects_dict = ProjectsPage(self.data_getter, self.page).get_data_page()
+		self.identifications_dict = IdentificationsPage(self.data_getter, self.page).get_data_page()
+		self.collectors_dict = CollectionAgentsPage(self.data_getter, self.page).get_data_page()
+		self.images_dict = CollectionSpecimenImagesPage(self.data_getter, self.page).get_data_page()
+		self.barcode_analyses_dict = IdentificationUnitAnalysesPage(self.data_getter, 'Barcodes', self.page).get_data_page()
+		self.fogs_analyses_dict = IdentificationUnitAnalysesPage(self.data_getter, 'FOGS', self.page).get_data_page()
+		self.mam_analyses_dict = IdentificationUnitAnalysesPage(self.data_getter, 'MAM_Measurements', self.page).get_data_page()
+		
+		self.taxamatcher = TaxaMatcher()
+		self.matchedtaxa_dict = self.getMatchedTaxa(self.iuparts_dict)
+		
+
+
+	def getMatchedTaxa(self, iuparts_dict):
+		self.taxamatcher.createSpecimenTempTable()
+		valuelists = []
+		for idshash in iuparts_dict:
+			valuelists.append([
+				iuparts_dict[idshash]['_id'],
+				iuparts_dict[idshash]['LastIdentificationCache'],
+				iuparts_dict[idshash]['FamilyCache'],
+				iuparts_dict[idshash]['OrderCache'],
+				iuparts_dict[idshash]['TaxonomicGroup'],
+				iuparts_dict[idshash]['TaxonNameURI'],
+				iuparts_dict[idshash]['TaxonNameURI_sha'],
+				iuparts_dict[idshash]['PartAccessionNumber'],
+			])
+		self.taxamatcher.fillSpecimenTempTable(valuelists)
+		self.taxamatcher.matchTaxa()
+		
+		matchedtaxa_dict = self.taxamatcher.getMatchedTaxaDict()
+		return matchedtaxa_dict
 
 
 
@@ -82,55 +119,25 @@ class IUPartsIndexer():
 		self.data_getter.create_ids_temptable()
 		self.data_getter.fill_ids_temptable()
 		
-		self.setDataGetters()
-		self.submitDataPages()
+		self.prepareGlobalTempTables()
+		
+		self.threaded_iu_getters = ThreadedIUPartGetters(self.data_getter, self.data_getter.max_page)
+		self.threaded_iu_getters.runGetterThreads()
 		
 		logger.info('No more remaining data pages')
 		# add None to queue to signal all items have been send
 		es_queue.join()
 
 
-	def setDataGetters(self):
-		
-		self.iuparts = IdentificationUnitParts(self.data_getter)
-		self.collections = Collections(self.data_getter)
-		self.projects = Projects(self.data_getter)
-		self.identifications = Identifications(self.data_getter)
-		self.collectors = CollectionAgents(self.data_getter)
-		self.images = CollectionSpecimenImages(self.data_getter)
-		
+	def prepareGlobalTempTables(self):
 		self.setBarcodeAMPFilterIDS()
-		self.barcode_analyses = IdentificationUnitAnalyses(self.data_getter, self.barcode_amp_filter_ids, 'Barcodes')
+		barcode_amp_temptable = IUAnalysesAMPFilterTable(self.data_getter, self.barcode_amp_filter_ids, 'Barcodes')
 		
 		self.setFOGSAMPFilterIDS()
-		self.fogs_analyses = IdentificationUnitAnalyses(self.data_getter, self.fogs_amp_filter_ids, 'FOGS')
+		fogs_amp_temptable = IUAnalysesAMPFilterTable(self.data_getter, self.fogs_amp_filter_ids, 'FOGS')
 		
 		self.setMamAMPFilterIDS()
-		self.mam_analyses = IdentificationUnitAnalyses(self.data_getter, self.mam_measurements_amp_filter_ids, 'MAM_Measurements')
-		
-		self.taxamatcher = TaxaMatcher()
-
-
-	def submitDataPages(self):
-		for i in range(1, self.data_getter.max_page + 1):
-			
-			data_page = DataPage()
-			data_page.iuparts_dict = self.iuparts.get_data_page(i)
-			data_page.collections_dict = self.collections.get_data_page(i)
-			data_page.projects_dict = self.projects.get_data_page(i)
-			data_page.identifications_dict = self.identifications.get_data_page(i)
-			data_page.collectors_dict = self.collectors.get_data_page(i)
-			data_page.images_dict = self.images.get_data_page(i)
-			data_page.barcode_analyses_dict = self.barcode_analyses.get_data_page(i)
-			data_page.fogs_analyses_dict = self.fogs_analyses.get_data_page(i)
-			data_page.mam_analyses_dict = self.mam_analyses.get_data_page(i)
-			data_page.matchedtaxa_dict = self.getMatchedTaxa(data_page.iuparts_dict, i)
-			
-			data_page.page = i
-			
-			es_queue.put(data_page)
-		
-		return
+		mam_amp_temptable = IUAnalysesAMPFilterTable(self.data_getter, self.mam_measurements_amp_filter_ids, 'MAM_Measurements')
 
 
 	def setBarcodeAMPFilterIDS(self):
@@ -173,25 +180,51 @@ class IUPartsIndexer():
 		}
 
 
-	def getMatchedTaxa(self, iuparts_dict, i):
-		self.taxamatcher.createSpecimenTempTable()
-		valuelists = []
-		for idshash in iuparts_dict:
-			valuelists.append([
-				iuparts_dict[idshash]['_id'],
-				iuparts_dict[idshash]['LastIdentificationCache'],
-				iuparts_dict[idshash]['FamilyCache'],
-				iuparts_dict[idshash]['OrderCache'],
-				iuparts_dict[idshash]['TaxonomicGroup'],
-				iuparts_dict[idshash]['TaxonNameURI'],
-				iuparts_dict[idshash]['TaxonNameURI_sha'],
-				iuparts_dict[idshash]['PartAccessionNumber'],
-			])
-		self.taxamatcher.fillSpecimenTempTable(valuelists)
-		self.taxamatcher.matchTaxa()
+class ThreadedIUPartGetters():
+	def __init__(self, data_getter, max_page):
+		self.data_getter = data_getter
+		self.max_page = max_page
+		self.page = 0
 		
-		matchedtaxa_dict = self.taxamatcher.getMatchedTaxaDict()
-		return matchedtaxa_dict
+		self.lock = threading.Lock()
+		pass
+
+
+	def runGetterThreads(self, thread_num = 4):
+		threadpool = []
+		for num in range(int(thread_num)):
+			threadpool.append(threading.Thread(target = self.getterThread, args = [num]))
+		
+		for thread in threadpool:
+			# set thread as daemon to guarantee that it is terminated when the program exits i. e. to prevent zombies
+			thread.setDaemon(True)
+			thread.start()
+		
+		for thread in threadpool:
+			thread.join()
+		
+		return
+
+
+	def getterThread(self, num = 0):
+		while True:
+			self.lock.acquire()
+			self.page = self.page + 1
+			if self.page > self.max_page:
+				self.lock.release()
+				break
+			else:
+				self.lock.release()
+			
+			data_page = DataPage(self.data_getter, self.page)
+			
+			self.lock.acquire()
+			es_queue.put(data_page)
+			self.lock.release()
+		return
+
+
+
 
 
 
@@ -210,6 +243,10 @@ if __name__ == "__main__":
 	
 	logger.info('indexing completed')
 	exit(0)
+
+
+
+
 
 
 

@@ -6,18 +6,19 @@ logger = logging.getLogger('elastic_indexer')
 log_query = logging.getLogger('query')
 
 
-class CollectionAgents():
-	def __init__(self, datagetter):
+class CollectionAgentsPage():
+	def __init__(self, datagetter, page):
 		self.datagetter = datagetter
+		self.page = page
 		
 		self.cur = self.datagetter.cur
 		self.con = self.datagetter.con
 
 
-	def get_data_page(self, page_num):
-		if page_num <= self.datagetter.max_page:
-			startrow = (page_num - 1) * self.datagetter.pagesize + 1
-			lastrow = page_num * self.datagetter.pagesize
+	def get_data_page(self):
+		if self.page <= self.datagetter.max_page:
+			startrow = (self.page - 1) * self.datagetter.pagesize + 1
+			lastrow = self.page * self.datagetter.pagesize
 			
 			
 			query = """

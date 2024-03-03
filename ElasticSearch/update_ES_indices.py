@@ -25,6 +25,7 @@ from DC2ElasticSearch.DCDataGetters.IdentificationUnitAnalyses import Identifica
 
 from DC2ElasticSearch.TaxaMatcher.TaxaMatcher import TaxaMatcher
 
+# obviously it imports the global variables and functions too, so it can use the es_queue
 from ElasticSearch.create_ES_indices import IUPartsIndexer
 
 

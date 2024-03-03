@@ -5,15 +5,12 @@ logger = logging.getLogger('elastic_indexer')
 log_query = logging.getLogger('query')
 
 
-class Collections():
+class CollectionRelationsTable():
 	def __init__(self, datagetter):
 		self.datagetter = datagetter
 		
 		self.cur = self.datagetter.cur
 		self.con = self.datagetter.con
-		
-		self.createTempCollectionRelationsTable()
-		self.fillTempCollectionRelationsTable()
 
 
 	def createTempCollectionRelationsTable(self):
@@ -117,20 +114,26 @@ class Collections():
 	'''
 
 
+class CollectionsPage():
+	def __init__(self, datagetter, page):
+		self.datagetter = datagetter
+		self.page = page
+		
+		self.cur = self.datagetter.cur
+		self.con = self.datagetter.con
 
-	def get_data_page(self, page_num):
-		if page_num <= self.datagetter.max_page:
-			startrow = (page_num - 1) * self.datagetter.pagesize + 1
-			lastrow = page_num * self.datagetter.pagesize
+
+	def get_data_page(self):
+		if self.page <= self.datagetter.max_page:
+			startrow = (self.page - 1) * self.datagetter.pagesize + 1
+			lastrow = self.page * self.datagetter.pagesize
+			
+			# create individual temp tables for each page request, so that the requests can be done in parallel
+			# with one connection to the [#temp_iu_part_ids] table but individual tables for the get request on each page
+			temptable = '[#temp_collection_{0}]'.format(self.page)
 			
 			query = """
-			DROP TABLE IF EXISTS [#temp_collection]
-			;"""
-			self.cur.execute(query)
-			self.con.commit()
-			
-			query = """
-			CREATE TABLE [#temp_collection] (
+			CREATE TABLE {0} (
 				[rownumber] INT,
 				[_id] NVARCHAR(255) NOT NULL,
 				[CollectionID] INT,
@@ -139,14 +142,14 @@ class Collections():
 				INDEX [idx_id] ([_id]),
 				INDEX [idx_CollectionID] ([CollectionID])
 			)
-			;"""
+			;""".format(temptable)
 			
 			self.cur.execute(query)
 			self.con.commit()
 			
 			
 			query = """
-			INSERT INTO [#temp_collection]
+			INSERT INTO {0}
 			([rownumber], [_id], [CollectionID], [CollectionName], [CollectionAcronym])
 			SELECT 
 			[rownumber],
@@ -165,7 +168,7 @@ class Collections():
 				ON c_cs.[CollectionID] = csp.[CollectionID]
 			WHERE idstemp.[rownumber] BETWEEN ? AND ?
 			ORDER BY [rownumber]
-			"""
+			;""".format(temptable)
 			
 			self.cur.execute(query, [startrow, lastrow])
 			self.con.commit()
@@ -176,7 +179,7 @@ class Collections():
 			tc.[_id], 
 			tc.[CollectionID], tc.[CollectionName], tc.[CollectionAcronym],
 			c.[CollectionID] AS ParentCollectionID, c.[CollectionName] AS ParentCollectionName, tl.[TreeLevel]
-			FROM [#temp_collection] tc
+			FROM {0} tc
 			INNER JOIN [#temp_collection_relations] tcr
 				ON tc.[CollectionID] = tcr.[DescendantID]
 			INNER JOIN [Collection] c
@@ -188,7 +191,7 @@ class Collections():
 			) tl
 				ON tl.[DescendantID] = c.[CollectionID]
 			ORDER BY tc.[rownumber], tl.[TreeLevel]
-			;"""
+			;""".format(temptable)
 			
 			self.cur.execute(query)
 			
@@ -196,6 +199,12 @@ class Collections():
 			
 			self.rows = self.cur.fetchall()
 			self.rows2dict()
+			
+			query = """
+			DROP TABLE {0}
+			;""".format(temptable)
+			self.cur.execute(query)
+			self.con.commit()
 			
 			return self.collections_dict
 
