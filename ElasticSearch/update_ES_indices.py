@@ -36,8 +36,9 @@ if __name__ == "__main__":
 	dc_databases = DC_Connections()
 	dc_databases.read_connectionparams()
 	
-	#last_updated = es_searcher.getLastUpdated()
-	last_updated = '2024-02-20 17:44:46'
+	last_updated = es_searcher.getLastUpdated()
+	# for testing
+	#last_updated = '2024-02-20 17:44:46'
 	
 	if last_updated is None:
 		raise ValueError('Last update time could not be determined, check if index has been filled before')
