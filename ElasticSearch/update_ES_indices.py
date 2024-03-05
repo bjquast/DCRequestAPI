@@ -26,7 +26,7 @@ class UpdateES_Index:
 		self.es_searcher = ES_Searcher()
 		self.last_updated = self.es_searcher.getLastUpdated()
 		# for testing
-		#self.last_updated = '2024-02-20 17:44:46'
+		self.last_updated = '2024-02-20 17:44:46'
 		
 		self.skip_taxa_db = self.config.getboolean('taxamergerdb', 'skip_taxa_db', fallback = False)
 		

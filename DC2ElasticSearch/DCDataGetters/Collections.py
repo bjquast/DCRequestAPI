@@ -5,7 +5,7 @@ logger = logging.getLogger('elastic_indexer')
 log_query = logging.getLogger('query')
 
 
-class Collections():
+class CollectionRelationsTempTable():
 	def __init__(self, datagetter):
 		self.datagetter = datagetter
 		
@@ -116,6 +116,13 @@ class Collections():
 		self.con.commit()
 	'''
 
+
+class Collections():
+	def __init__(self, datagetter):
+		self.datagetter = datagetter
+		
+		self.cur = self.datagetter.cur
+		self.con = self.datagetter.con
 
 
 	def get_data_page(self, page_num):

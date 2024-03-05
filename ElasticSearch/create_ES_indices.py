@@ -16,7 +16,7 @@ from ElasticSearch.ES_Indexer import ES_Indexer
 from DC2ElasticSearch.DCDataGetters.DC_Connections import DC_Connections
 from DC2ElasticSearch.DCDataGetters.DataGetter import DataGetter
 from DC2ElasticSearch.DCDataGetters.IdentificationUnitParts import IdentificationUnitParts
-from DC2ElasticSearch.DCDataGetters.Collections import Collections
+from DC2ElasticSearch.DCDataGetters.Collections import Collections, CollectionRelationsTempTable
 from DC2ElasticSearch.DCDataGetters.Projects import Projects
 from DC2ElasticSearch.DCDataGetters.Identifications import Identifications
 from DC2ElasticSearch.DCDataGetters.CollectionAgents import CollectionAgents
@@ -147,6 +147,9 @@ class IUPartsIndexer():
 		self.data_getter.create_ids_temptable()
 		self.data_getter.fill_ids_temptable()
 		
+		# create the CollectionRelationsTempTable that is used to add hierarchy levels to the collections
+		CollectionRelationsTempTable(self.data_getter)
+		
 		self.es_queue = queue.Queue()
 		threading.Thread(target=self.es_worker, daemon=True).start()
 		
@@ -193,12 +196,6 @@ class IUPartsIndexer():
 			data_page = DataPage(self.data_getter, i, skip_taxa_db = self.skip_taxa_db)
 			self.es_queue.put(data_page)
 		return
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
