@@ -58,7 +58,7 @@ class Collections():
 		while count > 0:
 			#pudb.set_trace()
 			# set the parent relations
-			logger.info("Fill taxa_relation_table pathlength {0}, with {1} possible childs".format(pathlength, count))
+			logger.info("Fill collection relation_table pathlength {0}, with {1} possible childs".format(pathlength, count))
 			query = """
 			INSERT INTO [#temp_collection_relations] ([AncestorID], [DescendantID], [PathLength])
 			SELECT c2.[CollectionID], tr.[DescendantID], tr.[PathLength] + 1

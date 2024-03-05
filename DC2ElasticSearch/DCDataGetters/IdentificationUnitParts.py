@@ -32,7 +32,7 @@ class IdentificationUnitParts():
 			idstemp.[SpecimenAccessionNumber], 
 			idstemp.[PartAccessionNumber],
 			CONCAT_WS('/', REPLACE(dbo.StableIdentifierBase(), 'http:', 'https:'), idstemp.[CollectionSpecimenID], idstemp.[IdentificationUnitID], idstemp.[SpecimenPartID]) AS [StableIdentifierURL],
-			CONVERT (NVARCHAR, cs.[LogupdatedWhen], 120) AS [LastUpdated],
+			CONVERT (NVARCHAR, cs.[LogUpdatedWhen], 121) AS [LastUpdated],
 			CONVERT(NVARCHAR, cs.[AccessionDate], 120) AS [AccessionDate], 
 			cs.[DepositorsName], 
 			cs.[DataWithholdingReason] AS SpecimenWithholdingReason, 
@@ -42,12 +42,12 @@ class IdentificationUnitParts():
 				ELSE 'true'
 			END AS SpecimenWithhold,
 			cs.Version AS SpecimenVersion,
-			CONVERT(NVARCHAR, cs.LogCreatedWhen, 120) AS SpecimenCreatedWhen,
+			CONVERT(NVARCHAR, cs.LogCreatedWhen, 121) AS SpecimenCreatedWhen,
 			cs.LogCreatedBy AS SpecimenCreatedBy,
-			CONVERT(NVARCHAR, cs.LogUpdatedWhen, 120) AS SpecimenUpdatedWhen,
+			CONVERT(NVARCHAR, cs.LogUpdatedWhen, 121) AS SpecimenUpdatedWhen,
 			cs.LogUpdatedBy AS SpecimenUpdatedBy,
 			csp.PreparationMethod,
-			csp.PreparationDate,
+			CONVERT(NVARCHAR, csp.PreparationDate, 120) AS PreparationDate,
 			csp.MaterialCategory,
 			csp.StorageLocation,
 			csp.StorageContainer,
@@ -67,7 +67,7 @@ class IdentificationUnitParts():
 			ce.HabitatDescription,
 			ce.CollectingMethod,
 			ce.CountryCache,
-			ce.CollectionDate,
+			CONVERT(NVARCHAR, ce.CollectionDate, 120) AS CollectionDate,
 			ce.[DataWithholdingReason] AS EventWithholdingReason,
 			CASE 
 				WHEN ce.[DataWithholdingReason] = '' THEN 'false'

@@ -66,7 +66,7 @@ class DataGetter():
 		
 		if self.last_updated is not None:
 			
-			last_update_clause = "WHERE cs.LogUpdatedWhen > ?"
+			last_update_clause = "WHERE cs.LogUpdatedWhen > CONVERT(DATETIME, ?, 121)"
 			params.append(self.last_updated)
 		
 		query = """
@@ -99,8 +99,8 @@ class DataGetter():
 		ORDER BY [CollectionSpecimenID], [IdentificationUnitID], [SpecimenPartID]
 		;""".format(self.server_url, self.database_name, self.database_id, self.accronym, last_update_clause)
 		
-		log_query.debug(query)
-		log_query.debug(params)
+		log_query.info(query)
+		log_query.info(params)
 		
 		self.cur.execute(query, params)
 		self.cur.commit()

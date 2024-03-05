@@ -1,10 +1,12 @@
 import argparse
 import pudb
 
+from configparser import ConfigParser
+
 import threading
 import queue
 
-#from ElasticSearch.ES_Indexer import ES_Indexer
+
 
 import logging, logging.config
 
@@ -73,10 +75,11 @@ class DataPage():
 
 
 class IUPartsIndexer():
-	def __init__(self, es_indexer, dc_params, last_updated = None):
+	def __init__(self, es_indexer, dc_params, last_updated = None, skip_taxa_db = False):
 		self.es_indexer = es_indexer
 		self.dc_params = dc_params
 		self.last_updated = last_updated
+		self.skip_taxa_db = skip_taxa_db
 		
 		self.data_getter = DataGetter(self.dc_params, last_updated)
 		self.data_getter.create_ids_temptable()
@@ -108,7 +111,8 @@ class IUPartsIndexer():
 		self.setMamAMPFilterIDS()
 		self.mam_analyses = IdentificationUnitAnalyses(self.data_getter, self.mam_measurements_amp_filter_ids, 'MAM_Measurements')
 		
-		self.taxamatcher = TaxaMatcher()
+		if not self.skip_taxa_db:
+			self.taxamatcher = TaxaMatcher()
 
 
 	def submitDataPages(self):
@@ -124,7 +128,12 @@ class IUPartsIndexer():
 			data_page.barcode_analyses_dict = self.barcode_analyses.get_data_page(i)
 			data_page.fogs_analyses_dict = self.fogs_analyses.get_data_page(i)
 			data_page.mam_analyses_dict = self.mam_analyses.get_data_page(i)
-			data_page.matchedtaxa_dict = self.getMatchedTaxa(data_page.iuparts_dict, i)
+			
+			if not self.skip_taxa_db:
+				data_page.matchedtaxa_dict = self.getMatchedTaxa(data_page.iuparts_dict, i)
+			else:
+				data_page.matchedtaxa_dict = {}
+			
 			
 			data_page.page = i
 			
@@ -198,6 +207,10 @@ class IUPartsIndexer():
 if __name__ == "__main__":
 	#pudb.set_trace()
 	
+	config = ConfigParser(allow_no_value=True)
+	config.read('./config.ini')
+	skip_taxa_db = config.getboolean('taxamergerdb', 'skip_taxa_db', fallback = False)
+	
 	es_indexer = ES_Indexer()
 	es_indexer.deleteIndex()
 	es_indexer.createIndex()
@@ -206,7 +219,7 @@ if __name__ == "__main__":
 	dc_databases.read_connectionparams()
 	
 	for dc_params in dc_databases.databases:
-		iuparts_indexer = IUPartsIndexer(es_indexer, dc_params)
+		iuparts_indexer = IUPartsIndexer(es_indexer, dc_params, last_updated = None, skip_taxa_db = skip_taxa_db)
 	
 	logger.info('indexing completed')
 	exit(0)
