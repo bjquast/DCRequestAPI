@@ -7,18 +7,6 @@ from ElasticSearch.ES_Searcher import ES_Searcher
 
 from DC2ElasticSearch.DCDataGetters.DC_Connections import DC_Connections
 from DC2ElasticSearch.DCDataGetters.DataGetter import DataGetter
-
-
-from DC2ElasticSearch.DCDataGetters.IdentificationUnitParts import IdentificationUnitParts
-from DC2ElasticSearch.DCDataGetters.Collections import Collections
-from DC2ElasticSearch.DCDataGetters.Projects import Projects
-from DC2ElasticSearch.DCDataGetters.Identifications import Identifications
-from DC2ElasticSearch.DCDataGetters.CollectionAgents import CollectionAgents
-from DC2ElasticSearch.DCDataGetters.CollectionSpecimenImages import CollectionSpecimenImages
-from DC2ElasticSearch.DCDataGetters.IdentificationUnitAnalyses import IdentificationUnitAnalyses
-
-from DC2ElasticSearch.TaxaMatcher.TaxaMatcher import TaxaMatcher
-
 from ElasticSearch.create_ES_indices import IUPartsIndexer
 
 logging.config.fileConfig('logging.conf')
@@ -38,7 +26,7 @@ class UpdateES_Index:
 		self.es_searcher = ES_Searcher()
 		self.last_updated = self.es_searcher.getLastUpdated()
 		# for testing
-		self.last_updated = '2024-02-20 17:44:46'
+		#self.last_updated = '2024-02-20 17:44:46'
 		
 		self.skip_taxa_db = self.config.getboolean('taxamergerdb', 'skip_taxa_db', fallback = False)
 		
