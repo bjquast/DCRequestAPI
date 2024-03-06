@@ -1,5 +1,6 @@
 
 import pudb
+import math
 
 import logging, logging.config
 logger = logging.getLogger('elastic_indexer')
@@ -8,7 +9,7 @@ log_query = logging.getLogger('query')
 from DBConnectors.MSSQLConnector import MSSQLConnector
 
 class DataGetter():
-	def __init__(self, dc_params, last_updated = None):
+	def __init__(self, dc_params):
 		
 		self.dc_con = MSSQLConnector(dc_params['connectionstring'])
 		self.server_url = dc_params['server_url']
@@ -19,9 +20,6 @@ class DataGetter():
 		self.cur = self.dc_con.getCursor()
 		self.con = self.dc_con.getConnection()
 		
-		self.last_updated = last_updated
-		
-		self.pagesize = 10000
 
 
 	def create_ids_temptable(self):
@@ -57,17 +55,9 @@ class DataGetter():
 		return
 
 
-	def fill_ids_temptable(self, last_updated = None):
-		if last_updated is not None:
-			self.last_updated = last_updated
+	def fill_ids_temptable(self, first_cs_id, last_cs_id):
 		
 		params = []
-		last_update_clause = ""
-		
-		if self.last_updated is not None:
-			
-			last_update_clause = "WHERE cs.LogUpdatedWhen > ?"
-			params.append(self.last_updated)
 		
 		query = """
 		INSERT INTO [#temp_iu_part_ids]
@@ -92,17 +82,17 @@ class DataGetter():
 		ON iup.CollectionSpecimenID = iu.CollectionSpecimenID AND iup.IdentificationUnitID = iu.IdentificationUnitID 
 		LEFT JOIN CollectionSpecimenPart csp 
 		ON csp.CollectionSpecimenID = iup.CollectionSpecimenID AND csp.SpecimenPartID = iup.SpecimenPartID 
-		{4}
+		WHERE cs.CollectionSpecimenID BETWEEN ? AND ?
 		 -- for development
 		 -- WHERE cs.AccessionNumber = 'ZFMK-TIS-46'
 		 -- WHERE cs.CollectionSpecimenID = 14
 		ORDER BY [CollectionSpecimenID], [IdentificationUnitID], [SpecimenPartID]
-		;""".format(self.server_url, self.database_name, self.database_id, self.accronym, last_update_clause)
+		;""".format(self.server_url, self.database_name, self.database_id, self.accronym)
 		
-		log_query.debug(query)
-		log_query.debug(params)
+		log_query.info(query)
+		log_query.info([first_cs_id, last_cs_id])
 		
-		self.cur.execute(query, params)
+		self.cur.execute(query, [first_cs_id, last_cs_id])
 		self.cur.commit()
 		
 		query = """
@@ -114,10 +104,10 @@ class DataGetter():
 		self.cur.execute(query)
 		self.cur.commit()
 		
-		self.set_max_page()
+		#self.set_max_page()
 		return
 
-
+	'''
 	def set_max_page(self):
 		query = """
 		SELECT COUNT(idshash) FROM [#temp_iu_part_ids]
@@ -127,7 +117,7 @@ class DataGetter():
 		row = self.cur.fetchone()
 		self.rownumber = row[0]
 		
-		self.max_page = int(self.rownumber / self.pagesize) +1
+		self.max_page = math.ceil(self.rownumber / self.pagesize)
 		return
 
 
@@ -210,5 +200,6 @@ class DataGetter():
 		row = self.cur.fetchone()
 		self.rownumber = row[0]
 		
-		self.max_page_to_delete = int(self.rownumber / self.pagesize) +1
+		self.max_page_to_delete = math.ceil(self.rownumber / self.pagesize)
 		return
+	'''

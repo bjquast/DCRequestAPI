@@ -6,71 +6,64 @@ logger = logging.getLogger('elastic_indexer')
 log_query = logging.getLogger('query')
 
 
-class CollectionAgentsPage():
-	def __init__(self, datagetter, page):
+class CollectionAgents():
+	def __init__(self, datagetter):
 		self.datagetter = datagetter
-		self.page = page
 		
 		self.cur = self.datagetter.cur
 		self.con = self.datagetter.con
 
 
 	def get_data_page(self):
-		if self.page <= self.datagetter.max_page:
-			startrow = (self.page - 1) * self.datagetter.pagesize + 1
-			lastrow = self.page * self.datagetter.pagesize
-			
-			
-			query = """
-			SELECT DISTINCT
-			[rownumber],
-			idstemp.[idshash] AS [_id],
-			ca.CollectorsName,
-			ca.CollectorsAgentURI,
-			ca.CollectorsSequence,
-			ca.CollectorsNumber AS CollectorsSpecimenFieldNumber,
-			ca.DataWithholdingReason AS CollectorsWithholdingReason,
-			CASE 
-				WHEN ca.[DataWithholdingReason] = '' THEN 'false'
-				WHEN ca.[DataWithholdingReason] IS NULL THEN 'false'
-				ELSE 'true'
-			END AS CollectorsWithhold
-			FROM [#temp_iu_part_ids] idstemp
-			INNER JOIN IdentificationUnit iu 
-			ON iu.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND iu.[IdentificationUnitID] = idstemp.[IdentificationUnitID]
-			INNER JOIN [CollectionAgent] ca
-			ON ca.[CollectionSpecimenID] = iu.[CollectionSpecimenID]
-			WHERE idstemp.[rownumber] BETWEEN ? AND ?
-			ORDER BY idstemp.[idshash], ca.[CollectorsSequence]
-			;"""
-			self.cur.execute(query, [startrow,lastrow])
-			#self.columns = [column[0] for column in self.cur.description]
-			
-			self.rows = self.cur.fetchall()
-			self.rows2dict()
-			
-			# select the ProjectIDs for each Collector of a Specimen
-			query = """
-			SELECT DISTINCT
-			[rownumber],
-			idstemp.[idshash] AS [_id],
-			CONCAT(idstemp.[DatabaseID], '_', cp.[ProjectID]) AS [DB_ProjectID],
-			cp.[ProjectID]
-			FROM [#temp_iu_part_ids] idstemp
-			INNER JOIN IdentificationUnit iu 
-			ON iu.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND iu.[IdentificationUnitID] = idstemp.[IdentificationUnitID]
-			LEFT JOIN [CollectionProject] cp
-			ON cp.CollectionSpecimenID = iu.CollectionSpecimenID
-			WHERE idstemp.[rownumber] BETWEEN ? AND ?
-			ORDER BY idstemp.[idshash]
-			;"""
-			
-			self.cur.execute(query, [startrow,lastrow])
-			self.rows = self.cur.fetchall()
-			
-			self.addProjectIDs()
-			
-			return self.collectors_dict
+		
+		query = """
+		SELECT DISTINCT
+		[rownumber],
+		idstemp.[idshash] AS [_id],
+		ca.CollectorsName,
+		ca.CollectorsAgentURI,
+		ca.CollectorsSequence,
+		ca.CollectorsNumber AS CollectorsSpecimenFieldNumber,
+		ca.DataWithholdingReason AS CollectorsWithholdingReason,
+		CASE 
+			WHEN ca.[DataWithholdingReason] = '' THEN 'false'
+			WHEN ca.[DataWithholdingReason] IS NULL THEN 'false'
+			ELSE 'true'
+		END AS CollectorsWithhold
+		FROM [#temp_iu_part_ids] idstemp
+		INNER JOIN IdentificationUnit iu 
+		ON iu.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND iu.[IdentificationUnitID] = idstemp.[IdentificationUnitID]
+		INNER JOIN [CollectionAgent] ca
+		ON ca.[CollectionSpecimenID] = iu.[CollectionSpecimenID]
+		ORDER BY idstemp.[idshash], ca.[CollectorsSequence]
+		;"""
+		self.cur.execute(query)
+		#self.columns = [column[0] for column in self.cur.description]
+		
+		self.rows = self.cur.fetchall()
+		self.rows2dict()
+		
+		# select the ProjectIDs for each Collector of a Specimen
+		query = """
+		SELECT DISTINCT
+		[rownumber],
+		idstemp.[idshash] AS [_id],
+		CONCAT(idstemp.[DatabaseID], '_', cp.[ProjectID]) AS [DB_ProjectID],
+		cp.[ProjectID]
+		FROM [#temp_iu_part_ids] idstemp
+		INNER JOIN IdentificationUnit iu 
+		ON iu.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND iu.[IdentificationUnitID] = idstemp.[IdentificationUnitID]
+		LEFT JOIN [CollectionProject] cp
+		ON cp.CollectionSpecimenID = iu.CollectionSpecimenID
+		ORDER BY idstemp.[idshash]
+		;"""
+		
+		self.cur.execute(query)
+		self.rows = self.cur.fetchall()
+		
+		self.addProjectIDs()
+		
+		return self.collectors_dict
 
 
 	def addProjectIDs(self):

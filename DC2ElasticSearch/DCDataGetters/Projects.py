@@ -6,47 +6,41 @@ logger = logging.getLogger('elastic_indexer')
 log_query = logging.getLogger('query')
 
 
-class ProjectsPage():
-	def __init__(self, datagetter, page):
+class Projects():
+	def __init__(self, datagetter):
 		self.datagetter = datagetter
-		self.page = page
 		
 		self.cur = self.datagetter.cur
 		self.con = self.datagetter.con
 
 
 	def get_data_page(self):
-		if self.page <= self.datagetter.max_page:
-			startrow = (self.page - 1) * self.datagetter.pagesize + 1
-			lastrow = self.page * self.datagetter.pagesize
-			
-			
-			query = """
-			SELECT 
-			[rownumber],
-			idstemp.[idshash] AS [_id],
-			CONCAT(idstemp.[DatabaseID], '_', pp.[ProjectID]) AS [DB_ProjectID],
-			pp.[ProjectID],
-			pp.[Project],
-			pp.[ProjectURI]
-			FROM [#temp_iu_part_ids] idstemp
-			INNER JOIN CollectionSpecimen cs 
-			ON cs.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID]
-			LEFT JOIN [CollectionProject] cp
-			ON cp.CollectionSpecimenID = cs.CollectionSpecimenID
-			LEFT JOIN [ProjectProxy] pp
-			ON pp.ProjectID = cp.ProjectID
-			WHERE idstemp.[rownumber] BETWEEN ? AND ?
-			ORDER BY [rownumber]
-			;"""
-			self.cur.execute(query, [startrow,lastrow])
-			self.columns = [column[0] for column in self.cur.description]
-			
-			self.rows = self.cur.fetchall()
-			self.rows2dict()
-			
-			
-			return self.projects_dict
+		
+		query = """
+		SELECT 
+		[rownumber],
+		idstemp.[idshash] AS [_id],
+		CONCAT(idstemp.[DatabaseID], '_', pp.[ProjectID]) AS [DB_ProjectID],
+		pp.[ProjectID],
+		pp.[Project],
+		pp.[ProjectURI]
+		FROM [#temp_iu_part_ids] idstemp
+		INNER JOIN CollectionSpecimen cs 
+		ON cs.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID]
+		LEFT JOIN [CollectionProject] cp
+		ON cp.CollectionSpecimenID = cs.CollectionSpecimenID
+		LEFT JOIN [ProjectProxy] pp
+		ON pp.ProjectID = cp.ProjectID
+		ORDER BY [rownumber]
+		;"""
+		self.cur.execute(query)
+		self.columns = [column[0] for column in self.cur.description]
+		
+		self.rows = self.cur.fetchall()
+		self.rows2dict()
+		
+		
+		return self.projects_dict
 
 
 	def rows2dict(self):

@@ -6,7 +6,7 @@ logger = logging.getLogger('elastic_indexer')
 log_query = logging.getLogger('query')
 
 
-class IUAnalysesAMPFilterTable():
+class IdentificationUnitAnalyses():
 	def __init__(self, datagetter, amp_ids, fieldname):
 		self.datagetter = datagetter
 		
@@ -15,24 +15,6 @@ class IUAnalysesAMPFilterTable():
 		
 		self.cur = self.datagetter.cur
 		self.con = self.datagetter.con
-		
-		self.amp_filter_temptable = '[#temp_amp_filter_{0}]'.format(self.fieldname)
-
-
-	def set_amp_filter_lists(self):
-		self.amp_lists = []
-		
-		for analysis_id in self.amp_ids:
-			if len(self.amp_ids[analysis_id]) <= 0:
-				self.amp_lists.append((analysis_id, None, None))
-			else:
-				for method_id in self.amp_ids[analysis_id]:
-					if len(self.amp_ids[analysis_id][method_id]) <= 0:
-						self.amp_lists.append((analysis_id, method_id, None))
-					else:
-						for parameter_id in self.amp_ids[analysis_id][method_id]:
-							self.amp_lists.append((analysis_id, method_id, parameter_id))
-		return
 
 
 	def create_amp_filter_temptable(self):
@@ -43,19 +25,15 @@ class IUAnalysesAMPFilterTable():
 		# it is needed because the MethodIDs and ParameterIDs are not guarantied to be unique
 		# for different analyses and methods
 		
-		# create individual temp tables for each analysis type, so that the requests can be done in parallel
-		# with one connection to the [#temp_iu_part_ids] table but individual tables for each analysis type
 		
-		'''
 		query = """
-		DROP TABLE IF EXISTS {0}
-		;""".format(self.amp_filter_temptable)
+		DROP TABLE IF EXISTS [#temp_amp_filter]
+		;"""
 		self.cur.execute(query)
 		self.con.commit()
-		'''
 		
 		query = """
-		CREATE TABLE {0} (
+		CREATE TABLE [#temp_amp_filter] (
 			[AnalysisID] INT NOT NULL,
 			[MethodID] INT,
 			[ParameterID] INT,
@@ -63,7 +41,7 @@ class IUAnalysesAMPFilterTable():
 			INDEX [idx_MethodID] ([MethodID]),
 			INDEX [idx_ParameterID] ([ParameterID])
 		)
-		;""".format(self.amp_filter_temptable)
+		;"""
 		self.cur.execute(query)
 		self.con.commit()
 		
@@ -73,49 +51,28 @@ class IUAnalysesAMPFilterTable():
 			values.extend(amp_list)
 		
 		query = """
-		INSERT INTO {0} (
+		INSERT INTO [#temp_amp_filter] (
 			[AnalysisID],
 			[MethodID],
 			[ParameterID]
 		)
-		VALUES {1}
-		;""".format(self.amp_filter_temptable, ', '.join(placeholders))
+		VALUES {0}
+		;""".format(', '.join(placeholders))
 		self.cur.execute(query, values)
 		self.con.commit()
 		
 		return
 
 
-class IdentificationUnitAnalysesPage():
-	def __init__(self, datagetter, fieldname, page):
-		self.datagetter = datagetter
-		self.fieldname = fieldname
-		self.page = page
-		
-		self.cur = self.datagetter.cur
-		self.con = self.datagetter.con
-		
-		self.analysis_ids_temptable = '[#temp_analysis_ids_{0}]'.format(self.page)
-		self.method_ids_temptable = '[#temp_method_ids_{0}]'.format(self.page)
-		self.parameter_ids_temptable = '[#temp_parameter_ids_{0}]'.format(self.page)
-		
-		self.amp_filter_temptable = '[#temp_amp_filter_{0}]'.format(self.fieldname)
-		
-		
-
 	def create_analyses_temptable(self):
-		'''
 		query = """
-		DROP TABLE IF EXISTS {0}
-		;""".format(self.analysis_ids_temptable)
+		DROP TABLE IF EXISTS [#temp_analysis_ids]
+		;"""
 		self.cur.execute(query)
 		self.con.commit()
-		'''
-		
-		
 		
 		query = """
-		CREATE TABLE {0} (
+		CREATE TABLE [#temp_analysis_ids] (
 			[analysis_pk] INT IDENTITY PRIMARY KEY,
 			[idshash] NVARCHAR(255) NOT NULL,
 			[CollectionSpecimenID] INT NOT NULL,
@@ -128,13 +85,12 @@ class IdentificationUnitAnalysesPage():
 			INDEX [idx_AnalysisID] ([AnalysisID]),
 			INDEX [idx_AnalysisNumber] ([AnalysisNumber])
 		)
-		;""".format(self.analysis_ids_temptable)
-		
+		;"""
 		self.cur.execute(query)
 		self.con.commit()
 		
 		query = """
-		INSERT INTO {0} (
+		INSERT INTO [#temp_analysis_ids] (
 			[idshash],
 			[CollectionSpecimenID],
 			[IdentificationUnitID],
@@ -151,27 +107,24 @@ class IdentificationUnitAnalysesPage():
 		FROM [#temp_iu_part_ids] idstemp
 		INNER JOIN [IdentificationUnitAnalysis] iua
 			ON (idstemp.CollectionSpecimenID = iua.CollectionSpecimenID AND idstemp.IdentificationUnitID = iua.IdentificationUnitID)
-		INNER JOIN {1} amp_filter
+		INNER JOIN [#temp_amp_filter] amp_filter
 		ON amp_filter.AnalysisID = iua.AnalysisID
-		WHERE idstemp.[rownumber] BETWEEN ? AND ?
 		ORDER BY idstemp.[idshash]
-		;""".format(self.analysis_ids_temptable, self.amp_filter_temptable)
+		;"""
 		
-		self.cur.execute(query, [self.startrow, self.lastrow])
+		self.cur.execute(query)
 		self.con.commit()
 
 
 	def create_methods_temptable(self):
-		'''
 		query = """
-		DROP TABLE IF EXISTS {0}
-		;""".format(self.method_ids_temptable)
+		DROP TABLE IF EXISTS [#temp_method_ids]
+		;"""
 		self.cur.execute(query)
 		self.con.commit()
-		'''
 		
 		query = """
-		CREATE TABLE {0} (
+		CREATE TABLE [#temp_method_ids] (
 			[method_pk] INT IDENTITY PRIMARY KEY,
 			[analysis_pk] INT NOT NULL,
 			[idshash] NVARCHAR(255) NOT NULL,
@@ -190,12 +143,12 @@ class IdentificationUnitAnalysesPage():
 			INDEX [idx_MethodID] ([MethodID]),
 			INDEX [idx_MethodMarker] ([MethodMarker])
 		)
-		;""".format(self.method_ids_temptable)
+		;"""
 		self.cur.execute(query)
 		self.con.commit()
 		
 		query = """
-		INSERT INTO {0} (
+		INSERT INTO [#temp_method_ids] (
 			[analysis_pk],
 			[idshash],
 			[CollectionSpecimenID],
@@ -215,7 +168,7 @@ class IdentificationUnitAnalysesPage():
 		a_temp.AnalysisNumber,
 		iuam.MethodID,
 		iuam.MethodMarker
-		FROM {1} a_temp
+		FROM [#temp_analysis_ids] a_temp
 		INNER JOIN [IdentificationUnitAnalysisMethod] iuam
 		ON (
 			a_temp.CollectionSpecimenID = iuam.CollectionSpecimenID 
@@ -223,12 +176,12 @@ class IdentificationUnitAnalysesPage():
 			AND a_temp.AnalysisID = iuam.AnalysisID
 			AND a_temp.AnalysisNumber = iuam.AnalysisNumber COLLATE DATABASE_DEFAULT
 		)
-		INNER JOIN {2} amp_filter
+		INNER JOIN [#temp_amp_filter] amp_filter
 		ON (
 			amp_filter.AnalysisID = iuam.AnalysisID
 			AND amp_filter.MethodID = iuam.MethodID
 		)
-		;""".format(self.method_ids_temptable, self.analysis_ids_temptable, self.amp_filter_temptable)
+		;"""
 		
 		self.cur.execute(query)
 		self.con.commit()
@@ -252,7 +205,7 @@ class IdentificationUnitAnalysesPage():
 		a.Description AS AnalysisDescription,
 		a.MeasurementUnit,
 		a.Notes AS AnalysisTypeNotes
-		FROM {0} a_temp
+		FROM [#temp_analysis_ids] a_temp
 		INNER JOIN [IdentificationUnitAnalysis] iua
 		ON (
 			a_temp.CollectionSpecimenID = iua.CollectionSpecimenID 
@@ -263,7 +216,7 @@ class IdentificationUnitAnalysesPage():
 		INNER JOIN [Analysis] a
 		ON iua.AnalysisID = a.AnalysisID
 		ORDER BY analysis_pk, a_temp.[idshash], iua.AnalysisID, iua.AnalysisNumber
-		;""".format(self.analysis_ids_temptable)
+		;"""
 		
 		log_query.debug(query)
 		
@@ -311,8 +264,8 @@ class IdentificationUnitAnalysesPage():
 		m.DisplayText AS MethodDisplay,
 		m.Description AS MethodDescription,
 		m.Notes AS MethodTypeNotes
-		FROM {0} m_temp
-		INNER JOIN {1} a_temp
+		FROM [#temp_method_ids] m_temp
+		INNER JOIN [#temp_analysis_ids] a_temp
 		ON a_temp.analysis_pk = m_temp.analysis_pk
 		INNER JOIN [IdentificationUnitAnalysisMethod] iuam
 		ON (
@@ -331,7 +284,7 @@ class IdentificationUnitAnalysesPage():
 		INNER JOIN [Method] m
 		ON mfa.MethodID = m.MethodID
 		ORDER BY m_temp.[idshash], iuam.AnalysisID, iuam.AnalysisNumber, iuam.MethodID, iuam.MethodMarker
-		;""".format(self.method_ids_temptable, self.analysis_ids_temptable)
+		;"""
 		
 		log_query.info(query)
 		
@@ -380,8 +333,8 @@ class IdentificationUnitAnalysesPage():
 		p.DisplayText AS ParameterDisplay -- ,
 		 -- p.Description AS ParameterDescription,
 		 -- p.Notes AS ParameterNotes
-		FROM {0} m_temp
-		INNER JOIN {1} a_temp
+		FROM [#temp_method_ids] m_temp
+		INNER JOIN [#temp_analysis_ids] a_temp
 		ON m_temp.analysis_pk = a_temp.analysis_pk
 		INNER JOIN [IdentificationUnitAnalysisMethodParameter] iuamp
 		ON (
@@ -392,7 +345,7 @@ class IdentificationUnitAnalysesPage():
 			AND m_temp.MethodID = iuamp.MethodID
 			AND m_temp.MethodMarker = iuamp.MethodMarker COLLATE DATABASE_DEFAULT
 		)
-		INNER JOIN {2} amp_filter
+		INNER JOIN [#temp_amp_filter] amp_filter
 		ON (
 			amp_filter.AnalysisID = iuamp.AnalysisID
 			AND amp_filter.MethodID = iuamp.MethodID
@@ -403,7 +356,7 @@ class IdentificationUnitAnalysesPage():
 			p.MethodID = iuamp.MethodID
 			AND p.ParameterID = iuamp.ParameterID
 		)
-		;""".format(self.method_ids_temptable, self.analysis_ids_temptable, self.amp_filter_temptable)
+		;"""
 		
 		log_query.info(query)
 		
@@ -473,26 +426,40 @@ class IdentificationUnitAnalysesPage():
 		return
 
 
+	def set_amp_filter_lists(self):
+		self.amp_lists = []
+		
+		for analysis_id in self.amp_ids:
+			if len(self.amp_ids[analysis_id]) <= 0:
+				self.amp_lists.append((analysis_id, None, None))
+			else:
+				for method_id in self.amp_ids[analysis_id]:
+					if len(self.amp_ids[analysis_id][method_id]) <= 0:
+						self.amp_lists.append((analysis_id, method_id, None))
+					else:
+						for parameter_id in self.amp_ids[analysis_id][method_id]:
+							self.amp_lists.append((analysis_id, method_id, parameter_id))
+		return
 
 
 
-
-	def get_data_page(self, analysis_name):
-		if self.page <= self.datagetter.max_page:
-			self.startrow = (self.page - 1) * self.datagetter.pagesize + 1
-			self.lastrow = self.page * self.datagetter.pagesize
-			
-			self.create_analyses_temptable()
-			self.create_methods_temptable()
-			
-			self.set_analyses()
-			self.set_methods()
-			
-			self.set_parameters()
-			
-			self.set_iuanalyses_dict()
-			
-			return self.iuanalyses_dict
+	def get_data_page(self):
+		
+		# about 40 parameters per method in barcoding is too much, so it must be filtered by amp_ids
+		self.set_amp_filter_lists()
+		self.create_amp_filter_temptable()
+		
+		self.create_analyses_temptable()
+		self.create_methods_temptable()
+		
+		self.set_analyses()
+		self.set_methods()
+		
+		self.set_parameters()
+		
+		self.set_iuanalyses_dict()
+		
+		return self.iuanalyses_dict
 
 
 

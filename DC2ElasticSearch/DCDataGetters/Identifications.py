@@ -6,48 +6,42 @@ logger = logging.getLogger('elastic_indexer')
 log_query = logging.getLogger('query')
 
 
-class IdentificationsPage():
-	def __init__(self, datagetter, page):
+class Identifications():
+	def __init__(self, datagetter):
 		self.datagetter = datagetter
-		self.page = page
 		
 		self.cur = self.datagetter.cur
 		self.con = self.datagetter.con
 
 
 	def get_data_page(self):
-		if self.page <= self.datagetter.max_page:
-			startrow = (self.page - 1) * self.datagetter.pagesize + 1
-			lastrow = self.page * self.datagetter.pagesize
-			
-			
-			query = """
-			SELECT DISTINCT
-			[rownumber],
-			idstemp.[idshash] AS [_id],
-			i.IdentificationSequence AS IdentificationSequenceID,
-			CONVERT(NVARCHAR, i.IdentificationDate, 120) AS [IdentificationDate],
-			i.TaxonomicName,
-			i.VernacularTerm,
-			i.NameURI AS TaxonNameURI,
-			i.TypeStatus,
-			i.TypeNotes
-			FROM [#temp_iu_part_ids] idstemp
-			INNER JOIN IdentificationUnit iu 
-			ON iu.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND iu.[IdentificationUnitID] = idstemp.[IdentificationUnitID]
-			INNER JOIN [Identification] i
-			ON i.[CollectionSpecimenID] = iu.[CollectionSpecimenID] AND i.[IdentificationUnitID] = iu.[IdentificationUnitID]
-			WHERE idstemp.[rownumber] BETWEEN ? AND ?
-			ORDER BY [rownumber], i.[IdentificationSequence]
-			;"""
-			self.cur.execute(query, [startrow,lastrow])
-			#self.columns = [column[0] for column in self.cur.description]
-			
-			self.rows = self.cur.fetchall()
-			self.rows2dicts()
-			
-			
-			return self.identifications_dict
+		
+		query = """
+		SELECT DISTINCT
+		[rownumber],
+		idstemp.[idshash] AS [_id],
+		i.IdentificationSequence AS IdentificationSequenceID,
+		CONVERT(NVARCHAR, i.IdentificationDate, 120) AS [IdentificationDate],
+		i.TaxonomicName,
+		i.VernacularTerm,
+		i.NameURI AS TaxonNameURI,
+		i.TypeStatus,
+		i.TypeNotes
+		FROM [#temp_iu_part_ids] idstemp
+		INNER JOIN IdentificationUnit iu 
+		ON iu.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND iu.[IdentificationUnitID] = idstemp.[IdentificationUnitID]
+		INNER JOIN [Identification] i
+		ON i.[CollectionSpecimenID] = iu.[CollectionSpecimenID] AND i.[IdentificationUnitID] = iu.[IdentificationUnitID]
+		ORDER BY [rownumber], i.[IdentificationSequence]
+		;"""
+		self.cur.execute(query)
+		#self.columns = [column[0] for column in self.cur.description]
+		
+		self.rows = self.cur.fetchall()
+		self.rows2dicts()
+		
+		
+		return self.identifications_dict
 
 
 	def rows2dicts(self):
