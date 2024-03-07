@@ -89,7 +89,7 @@ class TaxaMatchTable():
 
 	def createTempTable(self):
 		query = """
-		DROP -- TEMPORARY 
+		DROP TEMPORARY 
 		TABLE IF EXISTS taxonmatcher;
 		;"""
 		querylog.debug(query)
@@ -97,7 +97,7 @@ class TaxaMatchTable():
 		self.con.commit()
 		
 		query = """
-		CREATE -- TEMPORARY 
+		CREATE TEMPORARY 
 		TABLE taxonmatcher
 		(
 		`specimen_id` varchar(255),
@@ -192,18 +192,33 @@ class TaxaMatchTable():
 	
 	def matchScientificNameInFamily(self):
 		query = """
+		DROP TEMPORARY TABLE IF EXISTS temp_single_names
+		;"""
+		querylog.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
+		CREATE TEMPORARY TABLE temp_single_names
+		SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
+		FROM taxonmatcher tm
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.authorship = mt.author AND tm.family_name = mt.familyCache)
+		GROUP BY specimen_id
+		;""".format(self.taxamergetable)
+		
+		querylog.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
 		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.authorship = mt.author AND tm.family_name = mt.familyCache)
 		 -- prevent that a scientificName is taken that occurs more than once
-		INNER JOIN (SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
-			FROM taxonmatcher tm
-			INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.authorship = mt.author AND tm.family_name = mt.familyCache)
-			GROUP BY specimen_id
-			) tc 
-		ON tc.specimen_id = tm.specimen_id
-		WHERE tm.taxon_name != '' AND tm.authorship != '' AND tc.matchcount = 1
+		INNER JOIN temp_single_names tsn
+		ON tsn.specimen_id = tm.specimen_id
+		WHERE tm.taxon_name != '' AND tm.authorship != '' AND tsn.matchcount = 1
 		;
 		""".format(self.taxamergetable)
 		querylog.debug(query)
@@ -216,18 +231,33 @@ class TaxaMatchTable():
 	
 	def matchScientificNameInRegnum(self):
 		query = """
+		DROP TEMPORARY TABLE IF EXISTS temp_single_names
+		;"""
+		querylog.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
+		CREATE TEMPORARY TABLE temp_single_names
+		SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
+		FROM taxonmatcher tm
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.authorship = mt.author AND tm.regnum_name = mt.regnumCache)
+		GROUP BY specimen_id
+		;""".format(self.taxamergetable)
+		
+		querylog.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
 		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.authorship = mt.author AND tm.regnum_name = mt.regnumCache)
 		 -- prevent that a scientificName is taken that occurs more than once
-		INNER JOIN (SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
-			FROM taxonmatcher tm
-			INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.authorship = mt.author AND tm.regnum_name = mt.regnumCache)
-			GROUP BY specimen_id
-			) tc 
-		ON tc.specimen_id = tm.specimen_id
-		WHERE tm.taxon_name != '' AND tm.authorship != '' AND tc.matchcount = 1
+		INNER JOIN temp_single_names tsn 
+		ON tsn.specimen_id = tm.specimen_id
+		WHERE tm.taxon_name != '' AND tm.authorship != '' AND tsn.matchcount = 1
 		;
 		""".format(self.taxamergetable)
 		#querylog.debug(query)
@@ -240,18 +270,33 @@ class TaxaMatchTable():
 	
 	def matchScientificNameInOrderAndRegnum(self):
 		query = """
+		DROP TEMPORARY TABLE IF EXISTS temp_single_names
+		;"""
+		querylog.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
+		CREATE TEMPORARY TABLE temp_single_names
+		SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
+		FROM taxonmatcher tm
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.authorship = mt.author AND tm.order_name = mt.OrderCache AND tm.regnum_name = mt.regnumCache)
+		GROUP BY specimen_id
+		;""".format(self.taxamergetable)
+		
+		querylog.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
 		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.authorship = mt.author AND tm.order_name = mt.OrderCache AND tm.regnum_name = mt.regnumCache)
 		 -- prevent that a scientificName is taken that occurs more than once
-		INNER JOIN (SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
-			FROM taxonmatcher tm
-			INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.authorship = mt.author AND tm.order_name = mt.OrderCache AND tm.regnum_name = mt.regnumCache)
-			GROUP BY specimen_id
-			) tc 
-		ON tc.specimen_id = tm.specimen_id
-		WHERE tm.taxon_name != '' AND tm.authorship != '' AND tc.matchcount = 1
+		INNER JOIN temp_single_names tsn
+		ON tsn.specimen_id = tm.specimen_id
+		WHERE tm.taxon_name != '' AND tm.authorship != '' AND tsn.matchcount = 1
 		;
 		""".format(self.taxamergetable)
 		querylog.debug(query)
@@ -264,18 +309,33 @@ class TaxaMatchTable():
 
 	def matchTaxonNameInRegnum(self):
 		query = """
+		DROP TEMPORARY TABLE IF EXISTS temp_single_names
+		;"""
+		querylog.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
+		CREATE TEMPORARY TABLE temp_single_names
+		SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
+		FROM taxonmatcher tm
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.regnum_name = mt.regnumCache)
+		GROUP BY specimen_id
+		;""".format(self.taxamergetable)
+		
+		querylog.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
 		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.regnum_name = mt.regnumCache)
 		 -- prevent that a taxon is taken that occurs more than once
-		INNER JOIN (SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
-			FROM taxonmatcher tm
-			INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.regnum_name = mt.regnumCache)
-			GROUP BY specimen_id
-			) tc 
-		ON tc.specimen_id = tm.specimen_id
-		WHERE tm.taxon_name != '' AND tc.matchcount = 1
+		INNER JOIN temp_single_names tsn 
+		ON tsn.specimen_id = tm.specimen_id
+		WHERE tm.taxon_name != '' AND tsn.matchcount = 1
 		;
 		""".format(self.taxamergetable)
 		#querylog.debug(query)
@@ -288,18 +348,33 @@ class TaxaMatchTable():
 
 	def matchTaxonNameInOrderAndRegnum(self):
 		query = """
+		DROP TEMPORARY TABLE IF EXISTS temp_single_names
+		;"""
+		querylog.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
+		CREATE TEMPORARY TABLE temp_single_names
+		SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
+		FROM taxonmatcher tm
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.order_name = mt.OrderCache AND tm.regnum_name = mt.regnumCache)
+		GROUP BY specimen_id
+		;""".format(self.taxamergetable)
+		
+		querylog.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
 		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.order_name = mt.OrderCache AND tm.regnum_name = mt.regnumCache)
 		 -- prevent that a taxon is taken that occurs more than once
-		INNER JOIN (SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
-			FROM taxonmatcher tm
-			INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.order_name = mt.OrderCache AND tm.regnum_name = mt.regnumCache)
-			GROUP BY specimen_id
-			) tc 
-		ON tc.specimen_id = tm.specimen_id
-		WHERE tm.taxon_name != '' AND tc.matchcount = 1
+		INNER JOIN temp_single_names tsn
+		ON tsn.specimen_id = tm.specimen_id
+		WHERE tm.taxon_name != '' AND tsn.matchcount = 1
 		;
 		""".format(self.taxamergetable)
 		querylog.debug(query)
@@ -312,18 +387,33 @@ class TaxaMatchTable():
 
 	def matchTaxonNameInFamily(self):
 		query = """
+		DROP TEMPORARY TABLE IF EXISTS temp_single_names
+		;"""
+		querylog.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
+		CREATE TEMPORARY TABLE temp_single_names
+		SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
+		FROM taxonmatcher tm
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.`taxon` AND tm.family_name = mt.familyCache)
+		GROUP BY specimen_id
+		;""".format(self.taxamergetable)
+		
+		querylog.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
 		INNER JOIN {0} mt ON (tm.taxon_name = mt.`taxon` AND tm.family_name = mt.familyCache)
 		 -- prevent that a taxon_name is taken that occurs more than once
-		INNER JOIN (SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
-			FROM taxonmatcher tm
-			INNER JOIN {0} mt ON (tm.taxon_name = mt.`taxon` AND tm.family_name = mt.familyCache)
-			GROUP BY specimen_id
-			) tc
-		ON tc.specimen_id = tm.specimen_id
-		WHERE tm.taxon_name != '' AND tc.matchcount = 1
+		INNER JOIN temp_single_names tsn
+		ON tsn.specimen_id = tm.specimen_id
+		WHERE tm.taxon_name != '' AND tsn.matchcount = 1
 		;
 		""".format(self.taxamergetable)
 		querylog.debug(query)
@@ -336,20 +426,35 @@ class TaxaMatchTable():
 
 	def matchSynonymInFamily(self):
 		query = """
+		DROP TEMPORARY TABLE IF EXISTS temp_single_names
+		;"""
+		querylog.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
+		CREATE TEMPORARY TABLE temp_single_names
+		SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
+		FROM taxonmatcher tm
+		INNER JOIN {0} st ON (tm.`taxon_name` = st.`taxon`)
+		INNER JOIN {1} mt ON (st.syn_taxon_id = mt.id AND tm.family_name = mt.familyCache)
+		GROUP BY specimen_id
+		;""".format(self.synonymsmergetable, self.taxamergetable)
+		
+		querylog.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
 		INNER JOIN {0} st ON (tm.`taxon_name` = st.`taxon`)
 		INNER JOIN {1} mt ON (st.syn_taxon_id = mt.id AND tm.family_name = mt.familyCache)
 		 -- prevent that a taxon name is taken that occurs more than once
-		INNER JOIN (SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
-			FROM taxonmatcher tm
-			INNER JOIN {0} st ON (tm.`taxon_name` = st.`taxon`)
-			INNER JOIN {1} mt ON (st.syn_taxon_id = mt.id AND tm.family_name = mt.familyCache)
-			GROUP BY specimen_id
-			) tc 
-		ON tc.specimen_id = tm.specimen_id
-		WHERE tm.taxon_name != '' AND tc.matchcount = 1
+		INNER JOIN temp_single_names tsn 
+		ON tsn.specimen_id = tm.specimen_id
+		WHERE tm.taxon_name != '' AND tsn.matchcount = 1
 		;
 		""".format(self.synonymsmergetable, self.taxamergetable)
 		querylog.debug(query)
