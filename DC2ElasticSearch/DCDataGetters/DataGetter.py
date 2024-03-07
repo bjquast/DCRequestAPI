@@ -1,5 +1,6 @@
 
 import pudb
+import math
 
 import logging, logging.config
 logger = logging.getLogger('elastic_indexer')
@@ -127,7 +128,7 @@ class DataGetter():
 		row = self.cur.fetchone()
 		self.rownumber = row[0]
 		
-		self.max_page = int(self.rownumber / self.pagesize) +1
+		self.max_page = math.ceil(self.rownumber / self.pagesize)
 		return
 
 
@@ -210,5 +211,5 @@ class DataGetter():
 		row = self.cur.fetchone()
 		self.rownumber = row[0]
 		
-		self.max_page_to_delete = int(self.rownumber / self.pagesize) +1
+		self.max_page_to_delete = math.ceil(self.rownumber / self.pagesize)
 		return
