@@ -28,13 +28,11 @@ from DC2ElasticSearch.TaxaMatcher.TaxaMatcher import TaxaMatcher
 
 class DataPage():
 	""" a class that holds the data of each page requested from the database """ 
-	def __init__(self, data_getter, page, skip_taxa_db = False):
+	def __init__(self, data_getter, skip_taxa_db = False):
 		self.data_getter = data_getter
-		self.page = page
 		self.skip_taxa_db = skip_taxa_db
 		
 		self.setDataGetters()
-		self.setDataPage()
 
 
 	def setDataGetters(self):
@@ -58,16 +56,20 @@ class DataPage():
 			self.taxamatcher = TaxaMatcher()
 
 
-	def setDataPage(self):
-		self.iuparts_dict = self.iuparts.get_data_page(self.page)
-		self.collections_dict = self.collections.get_data_page(self.page)
-		self.projects_dict = self.projects.get_data_page(self.page)
-		self.identifications_dict = self.identifications.get_data_page(self.page)
-		self.collectors_dict = self.collectors.get_data_page(self.page)
-		self.images_dict = self.images.get_data_page(self.page)
-		self.barcode_analyses_dict = self.barcode_analyses.get_data_page(self.page)
-		self.fogs_analyses_dict = self.fogs_analyses.get_data_page(self.page)
-		self.mam_analyses_dict = self.mam_analyses.get_data_page(self.page)
+	def setDataPage(self, page):
+		self.page = page
+		self.data_getter.create_iupart_ids_temptable()
+		self.data_getter.fill_iupart_ids_temptable(self.page)
+		
+		self.iuparts_dict = self.iuparts.get_data_page()
+		self.collections_dict = self.collections.get_data_page()
+		self.projects_dict = self.projects.get_data_page()
+		self.identifications_dict = self.identifications.get_data_page()
+		self.collectors_dict = self.collectors.get_data_page()
+		self.images_dict = self.images.get_data_page()
+		self.barcode_analyses_dict = self.barcode_analyses.get_data_page()
+		self.fogs_analyses_dict = self.fogs_analyses.get_data_page()
+		self.mam_analyses_dict = self.mam_analyses.get_data_page()
 		
 		if not self.skip_taxa_db:
 			self.matchedtaxa_dict = self.getMatchedTaxa(self.iuparts_dict)
@@ -137,64 +139,145 @@ class DataPage():
 
 
 class IUPartsIndexer():
-	def __init__(self, es_indexer, dc_params, last_updated = None, skip_taxa_db = False):
+	def __init__(self, es_indexer, dc_params, last_updated = None, skip_taxa_db = False, multi_threaded_getter = False):
 		self.es_indexer = es_indexer
 		self.dc_params = dc_params
 		self.last_updated = last_updated
 		self.skip_taxa_db = skip_taxa_db
-		
-		self.data_getter = DataGetter(self.dc_params, last_updated)
-		self.data_getter.create_ids_temptable()
-		self.data_getter.fill_ids_temptable()
-		
-		# create the CollectionRelationsTempTable that is used to add hierarchy levels to the collections
-		CollectionRelationsTempTable(self.data_getter)
+		self.multi_threaded_getter = multi_threaded_getter
 		
 		self.es_queue = queue.Queue()
 		threading.Thread(target=self.es_worker, daemon=True).start()
 		
-		self.submitDataPages()
+		if self.multi_threaded_getter is True:
+			self.runSubmissionThreads()
+			
+		else:
+			self.submitDataPages()
 		
 		logger.info('No more remaining data pages')
 		# add None to queue to signal all items have been send
 		self.es_queue.join()
 
 
+	def es_submission(self, data_page):
+		if len(data_page.iuparts_dict) > 0:
+			self.es_indexer.bulkIndex(data_page.iuparts_dict, data_page.page)
+		if len(data_page.collections_dict) > 0:
+			self.es_indexer.bulkUpdateDocs(data_page.collections_dict, 'Collections', data_page.page)
+		if len(data_page.projects_dict) > 0:
+			self.es_indexer.bulkUpdateDocs(data_page.projects_dict, 'Projects', data_page.page)
+		if len(data_page.identifications_dict) > 0:
+			self.es_indexer.bulkUpdateDocs(data_page.identifications_dict, 'Identifications', data_page.page)
+		if len(data_page.collectors_dict) > 0:
+			self.es_indexer.bulkUpdateDocs(data_page.collectors_dict, 'CollectionAgents', data_page.page)
+		if len(data_page.images_dict) > 0:
+		
+			self.es_indexer.bulkUpdateDocs(data_page.images_dict, 'Images', data_page.page)
+		if len(data_page.barcode_analyses_dict) > 0:
+			self.es_indexer.bulkUpdateDocs(data_page.barcode_analyses_dict, 'Barcodes', data_page.page)
+		if len(data_page.fogs_analyses_dict) > 0:
+			self.es_indexer.bulkUpdateDocs(data_page.fogs_analyses_dict, 'FOGS', data_page.page)
+		if len(data_page.mam_analyses_dict) > 0:
+			self.es_indexer.bulkUpdateDocs(data_page.mam_analyses_dict, 'MAM_Measurements', data_page.page)
+		if len(data_page.matchedtaxa_dict) > 0:
+			self.es_indexer.bulkUpdateDocs(data_page.matchedtaxa_dict, 'MatchedTaxa', data_page.page)
+		
+		return
+
+
 	def es_worker(self):
 		while True:
 			data_page = self.es_queue.get()
-			
-			if len(data_page.iuparts_dict) > 0:
-				self.es_indexer.bulkIndex(data_page.iuparts_dict, data_page.page)
-			if len(data_page.collections_dict) > 0:
-				self.es_indexer.bulkUpdateDocs(data_page.collections_dict, 'Collections', data_page.page)
-			if len(data_page.projects_dict) > 0:
-				self.es_indexer.bulkUpdateDocs(data_page.projects_dict, 'Projects', data_page.page)
-			if len(data_page.identifications_dict) > 0:
-				self.es_indexer.bulkUpdateDocs(data_page.identifications_dict, 'Identifications', data_page.page)
-			if len(data_page.collectors_dict) > 0:
-				self.es_indexer.bulkUpdateDocs(data_page.collectors_dict, 'CollectionAgents', data_page.page)
-			if len(data_page.images_dict) > 0:
-			
-				self.es_indexer.bulkUpdateDocs(data_page.images_dict, 'Images', data_page.page)
-			if len(data_page.barcode_analyses_dict) > 0:
-				self.es_indexer.bulkUpdateDocs(data_page.barcode_analyses_dict, 'Barcodes', data_page.page)
-			if len(data_page.fogs_analyses_dict) > 0:
-				self.es_indexer.bulkUpdateDocs(data_page.fogs_analyses_dict, 'FOGS', data_page.page)
-			if len(data_page.mam_analyses_dict) > 0:
-				self.es_indexer.bulkUpdateDocs(data_page.mam_analyses_dict, 'MAM_Measurements', data_page.page)
-			if len(data_page.matchedtaxa_dict) > 0:
-				self.es_indexer.bulkUpdateDocs(data_page.matchedtaxa_dict, 'MatchedTaxa', data_page.page)
-			
+			self.es_submission(data_page)
+			del data_page
 			self.es_queue.task_done()
 			
 		return
 
 
 	def submitDataPages(self):
-		for i in range(1, self.data_getter.max_page + 1):
-			data_page = DataPage(self.data_getter, i, skip_taxa_db = self.skip_taxa_db)
+		#pudb.set_trace()
+		data_getter = DataGetter(self.dc_params, self.last_updated)
+		data_getter.create_cs_ids_temptable()
+		data_getter.fill_cs_ids_temptable(self.last_updated)
+		
+		# create the CollectionRelationsTempTable that is used to add hierarchy levels to the collections
+		CollectionRelationsTempTable(data_getter)
+		
+		for i in range(1, data_getter.max_page + 1):
+			data_page = DataPage(data_getter, skip_taxa_db = self.skip_taxa_db)
+			data_page.setDataPage(i)
 			self.es_queue.put(data_page)
+		return
+
+
+	def runSubmissionThreads(self, thread_num = 4):
+		self.lock = threading.Lock()
+		self.exc_info = None
+		self.exc_log_info = None
+		threadpool = []
+		
+		for i in range(int(thread_num)):
+			data_getter = DataGetter(self.dc_params, self.last_updated)
+			
+			skip_taxa_db = bool(self.skip_taxa_db)
+			threadpool.append(threading.Thread(target = self.threadedPageSubmission, args = [i, data_getter, skip_taxa_db]))
+		
+		for thread in threadpool:
+			# set thread as daemon to guarantee that it is terminated when the program exits i. e. to prevent zombies
+			thread.daemon = True
+			thread.start()
+		
+		for thread in threadpool:
+			thread.join()
+			if self.exc_info:
+				logger.info(self.exc_log_info)
+				raise self.exc_info[1].with_traceback(self.exc_info[2])
+				
+		
+		return
+
+
+	def threadedPageSubmission(self, thread_num, data_getter, skip_taxa_db):
+		self.page_num = 1
+		
+		data_getter.create_cs_ids_temptable()
+		data_getter.fill_cs_ids_temptable(self.last_updated)
+		
+		# create the CollectionRelationsTempTable that is used to add hierarchy levels to the collections
+		CollectionRelationsTempTable(data_getter)
+		
+		while True:
+			self.lock.acquire()
+			if self.page_num <= data_getter.max_page:
+				current_page = self.page_num
+				self.page_num = self.page_num +1
+				self.lock.release()
+			else:
+				self.lock.release()
+				break
+			
+			try:
+				logger.info('################# thread number {0}'.format(thread_num))
+				logger.info('################# page number {0}'.format(current_page))
+				
+				data_page = DataPage(data_getter, skip_taxa_db = skip_taxa_db)
+				data_page.setDataPage(current_page)
+				
+				self.es_submission(data_page)
+				#self.es_queue.put(data_page)
+			except Exception as e:
+				self.lock.acquire()
+				import sys
+				self.exc_info = sys.exc_info()
+				self.page_num = data_getter.max_page +1
+				self.exc_log_info = '######### Exception occured in thread number {0}, page {1}'.format(thread_num, current_page)
+				
+				logger.info('######### Exception occured in thread number {0}, page {1}'.format(thread_num, current_page))
+				self.lock.release()
+				break
+			
 		return
 
 
@@ -204,6 +287,7 @@ if __name__ == "__main__":
 	config = ConfigParser(allow_no_value=True)
 	config.read('./config.ini')
 	skip_taxa_db = config.getboolean('taxamergerdb', 'skip_taxa_db', fallback = False)
+	multi_threaded_getter = config.getboolean('default', 'multi_threaded_getter', fallback = False)
 	
 	es_indexer = ES_Indexer()
 	es_indexer.deleteIndex()
@@ -213,7 +297,7 @@ if __name__ == "__main__":
 	dc_databases.read_connectionparams()
 	
 	for dc_params in dc_databases.databases:
-		iuparts_indexer = IUPartsIndexer(es_indexer, dc_params, last_updated = None, skip_taxa_db = skip_taxa_db)
+		iuparts_indexer = IUPartsIndexer(es_indexer, dc_params, last_updated = None, skip_taxa_db = skip_taxa_db, multi_threaded_getter = multi_threaded_getter)
 	
 	logger.info('indexing completed')
 	exit(0)

@@ -125,86 +125,82 @@ class Collections():
 		self.con = self.datagetter.con
 
 
-	def get_data_page(self, page_num):
-		if page_num <= self.datagetter.max_page:
-			startrow = (page_num - 1) * self.datagetter.pagesize + 1
-			lastrow = page_num * self.datagetter.pagesize
-			
-			query = """
-			DROP TABLE IF EXISTS [#temp_collection]
-			;"""
-			self.cur.execute(query)
-			self.con.commit()
-			
-			query = """
-			CREATE TABLE [#temp_collection] (
-				[rownumber] INT,
-				[_id] NVARCHAR(255) NOT NULL,
-				[CollectionID] INT,
-				[CollectionName] NVARCHAR(255),
-				[CollectionAcronym] NVARCHAR(10),
-				INDEX [idx_id] ([_id]),
-				INDEX [idx_CollectionID] ([CollectionID])
-			)
-			;"""
-			
-			self.cur.execute(query)
-			self.con.commit()
-			
-			
-			query = """
-			INSERT INTO [#temp_collection]
-			([rownumber], [_id], [CollectionID], [CollectionName], [CollectionAcronym])
-			SELECT 
-			[rownumber],
-			idstemp.[idshash] AS [_id],
-			COALESCE(c_csp.[CollectionID], c_cs.[CollectionID]) AS [CollectionID],
-			COALESCE(c_csp.[CollectionName], c_cs.[CollectionName]) AS [CollectionName],
-			COALESCE(c_csp.[CollectionAcronym], c_cs.[CollectionAcronym]) AS [CollectionAcronym]
-			FROM [#temp_iu_part_ids] idstemp
-			INNER JOIN CollectionSpecimen cs 
-				ON cs.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID]
-			LEFT JOIN CollectionSpecimenPart csp 
-				ON csp.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND csp.[SpecimenPartID] = idstemp.[SpecimenPartID]
-			LEFT JOIN [Collection] c_csp
-				ON c_csp.[CollectionID] = csp.[CollectionID]
-			LEFT JOIN [Collection] c_cs
-				ON c_cs.[CollectionID] = csp.[CollectionID]
-			WHERE idstemp.[rownumber] BETWEEN ? AND ?
-			ORDER BY [rownumber]
-			"""
-			
-			self.cur.execute(query, [startrow, lastrow])
-			self.con.commit()
-			
-			query = """
-			SELECT 
-			tc.[rownumber],
-			tc.[_id], 
-			tc.[CollectionID], tc.[CollectionName], tc.[CollectionAcronym],
-			c.[CollectionID] AS ParentCollectionID, c.[CollectionName] AS ParentCollectionName, tl.[TreeLevel]
-			FROM [#temp_collection] tc
-			INNER JOIN [#temp_collection_relations] tcr
-				ON tc.[CollectionID] = tcr.[DescendantID]
-			INNER JOIN [Collection] c
-				ON c.[CollectionID] = tcr.[AncestorID]
-			INNER JOIN (
-				SELECT MAX(tcr.PathLength) AS TreeLevel, tcr.[DescendantID]
-				FROM [#temp_collection_relations] tcr
-				GROUP BY tcr.[DescendantID]
-			) tl
-				ON tl.[DescendantID] = c.[CollectionID]
-			ORDER BY tc.[rownumber], tl.[TreeLevel]
-			;"""
-			
-			self.cur.execute(query)
-			
-			# self.columns = [column[0] for column in self.cur.description]
-			
-			self.rows = self.cur.fetchall()
-			self.rows2dict()
-			
-			return self.collections_dict
+	def get_data_page(self):
+		
+		query = """
+		DROP TABLE IF EXISTS [#temp_collection]
+		;"""
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
+		CREATE TABLE [#temp_collection] (
+			[rownumber] INT,
+			[_id] NVARCHAR(255) NOT NULL,
+			[CollectionID] INT,
+			[CollectionName] NVARCHAR(255),
+			[CollectionAcronym] NVARCHAR(10),
+			INDEX [idx_id] ([_id]),
+			INDEX [idx_CollectionID] ([CollectionID])
+		)
+		;"""
+		
+		self.cur.execute(query)
+		self.con.commit()
+		
+		
+		query = """
+		INSERT INTO [#temp_collection]
+		([rownumber], [_id], [CollectionID], [CollectionName], [CollectionAcronym])
+		SELECT 
+		[rownumber],
+		idstemp.[idshash] AS [_id],
+		COALESCE(c_csp.[CollectionID], c_cs.[CollectionID]) AS [CollectionID],
+		COALESCE(c_csp.[CollectionName], c_cs.[CollectionName]) AS [CollectionName],
+		COALESCE(c_csp.[CollectionAcronym], c_cs.[CollectionAcronym]) AS [CollectionAcronym]
+		FROM [#temp_iu_part_ids] idstemp
+		INNER JOIN CollectionSpecimen cs 
+			ON cs.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID]
+		LEFT JOIN CollectionSpecimenPart csp 
+			ON csp.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND csp.[SpecimenPartID] = idstemp.[SpecimenPartID]
+		LEFT JOIN [Collection] c_csp
+			ON c_csp.[CollectionID] = csp.[CollectionID]
+		LEFT JOIN [Collection] c_cs
+			ON c_cs.[CollectionID] = csp.[CollectionID]
+		ORDER BY [rownumber]
+		"""
+		
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
+		SELECT 
+		tc.[rownumber],
+		tc.[_id], 
+		tc.[CollectionID], tc.[CollectionName], tc.[CollectionAcronym],
+		c.[CollectionID] AS ParentCollectionID, c.[CollectionName] AS ParentCollectionName, tl.[TreeLevel]
+		FROM [#temp_collection] tc
+		INNER JOIN [#temp_collection_relations] tcr
+			ON tc.[CollectionID] = tcr.[DescendantID]
+		INNER JOIN [Collection] c
+			ON c.[CollectionID] = tcr.[AncestorID]
+		INNER JOIN (
+			SELECT MAX(tcr.PathLength) AS TreeLevel, tcr.[DescendantID]
+			FROM [#temp_collection_relations] tcr
+			GROUP BY tcr.[DescendantID]
+		) tl
+			ON tl.[DescendantID] = c.[CollectionID]
+		ORDER BY tc.[rownumber], tl.[TreeLevel]
+		;"""
+		
+		self.cur.execute(query)
+		
+		# self.columns = [column[0] for column in self.cur.description]
+		
+		self.rows = self.cur.fetchall()
+		self.rows2dict()
+		
+		return self.collections_dict
 
 
 	def rows2dict(self):

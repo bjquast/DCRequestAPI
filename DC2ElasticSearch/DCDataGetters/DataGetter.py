@@ -25,7 +25,56 @@ class DataGetter():
 		self.pagesize = 10000
 
 
-	def create_ids_temptable(self):
+	def create_cs_ids_temptable(self):
+		query = """
+		DROP TABLE IF EXISTS [#temp_cs_ids]
+		;"""
+		self.cur.execute(query)
+		self.con.commit()
+		
+		query = """
+		CREATE TABLE [#temp_cs_ids] (
+		[rownumber] INT IDENTITY PRIMARY KEY, -- set an IDENTITY column that can be used for paging,
+		[CollectionSpecimenID] INT,
+		INDEX [idx_CollectionSpecimenID] ([CollectionSpecimenID])
+		)
+		;"""
+		self.cur.execute(query)
+		self.con.commit()
+		return
+
+
+	def fill_cs_ids_temptable(self, last_updated = None):
+		if last_updated is not None:
+			self.last_updated = last_updated
+		
+		params = []
+		last_update_clause = ""
+		
+		if self.last_updated is not None:
+			last_update_clause = "WHERE LogUpdatedWhen > CONVERT(DATETIME, ?, 121)"
+			params.append(self.last_updated)
+		
+		query = """
+		INSERT INTO [#temp_cs_ids] ([CollectionSpecimenID])
+		SELECT 
+		 -- TOP 100000
+		[CollectionSpecimenID]
+		FROM [CollectionSpecimen]
+		 -- important to order, so that the rownumbers can be used to get the min and max [CollectionSpecimenID] for each page
+		ORDER BY [CollectionSpecimenID]
+		{0}
+		;""".format(last_update_clause)
+		
+		self.cur.execute(query, params)
+		self.con.commit()
+		
+		self.set_max_page()
+		return
+
+
+
+	def create_iupart_ids_temptable(self):
 		query = """
 		DROP TABLE IF EXISTS [#temp_iu_part_ids]
 		;"""
@@ -58,70 +107,61 @@ class DataGetter():
 		return
 
 
-	def fill_ids_temptable(self, last_updated = None):
-		if last_updated is not None:
-			self.last_updated = last_updated
-		
-		params = []
-		last_update_clause = ""
-		
-		if self.last_updated is not None:
+	def fill_iupart_ids_temptable(self, page_num):
+		if page_num <= self.max_page:
+			startrow = (page_num - 1) * self.pagesize + 1
+			lastrow = page_num * self.pagesize
 			
-			last_update_clause = "WHERE cs.LogUpdatedWhen > CONVERT(DATETIME, ?, 121)"
-			params.append(self.last_updated)
+			query = """
+			INSERT INTO [#temp_iu_part_ids]
+			([idshash], [DatabaseURI], [DatabaseID], [DatabaseAccronym], [CollectionSpecimenID], [IdentificationUnitID], [SpecimenPartID], [SpecimenAccessionNumber], [PartAccessionNumber])
+			SELECT 
+			 -- for development
+			 -- TOP 20000
+			CONVERT(VARCHAR(256), HASHBYTES(
+				'SHA2_256', CONCAT('{0}/{1}', '_', 
+				cs.CollectionSpecimenID, '_', iu.IdentificationUnitID, '_', csp.SpecimenPartID)), 2
+			) AS idshash,
+			'{0}/{1}' AS DatabaseURI,
+			'{2}' AS DatabaseID,
+			'{3}' AS DatabaseAccronym,
+			cs.CollectionSpecimenID, iu.IdentificationUnitID, csp.SpecimenPartID,
+			cs.AccessionNumber AS SpecimenAccessionNumber,
+			COALESCE(csp.AccessionNumber, cs.AccessionNumber) AS PartAccessionNumber
+			FROM IdentificationUnit iu 
+			INNER JOIN CollectionSpecimen cs 
+			ON iu.CollectionSpecimenID = cs.CollectionSpecimenID 
+			INNER JOIN [#temp_cs_ids] temp_cs
+			ON temp_cs.CollectionSpecimenID = cs.CollectionSpecimenID
+			LEFT JOIN IdentificationUnitInPart iup
+			ON iup.CollectionSpecimenID = iu.CollectionSpecimenID AND iup.IdentificationUnitID = iu.IdentificationUnitID 
+			LEFT JOIN CollectionSpecimenPart csp 
+			ON csp.CollectionSpecimenID = iup.CollectionSpecimenID AND csp.SpecimenPartID = iup.SpecimenPartID
+			WHERE temp_cs.[rownumber] BETWEEN ? AND ?
+			ORDER BY [CollectionSpecimenID], [IdentificationUnitID], [SpecimenPartID]
+			;""".format(self.server_url, self.database_name, self.database_id, self.accronym)
+			
+			log_query.info(query)
+			log_query.info([startrow, lastrow])
+			
+			self.cur.execute(query, [startrow, lastrow])
+			self.cur.commit()
+			
+			query = """
+			UPDATE [#temp_iu_part_ids]
+			SET PartAccessionNumber = SpecimenAccessionNumber
+			WHERE PartAccessionNumber = ''
+			;"""
+			
+			self.cur.execute(query)
+			self.cur.commit()
 		
-		query = """
-		INSERT INTO [#temp_iu_part_ids]
-		([idshash], [DatabaseURI], [DatabaseID], [DatabaseAccronym], [CollectionSpecimenID], [IdentificationUnitID], [SpecimenPartID], [SpecimenAccessionNumber], [PartAccessionNumber])
-		SELECT 
-		 -- for development
-		 -- TOP 20000
-		CONVERT(VARCHAR(256), HASHBYTES(
-			'SHA2_256', CONCAT('{0}/{1}', '_', 
-			cs.CollectionSpecimenID, '_', iu.IdentificationUnitID, '_', csp.SpecimenPartID)), 2
-		) AS idshash,
-		'{0}/{1}' AS DatabaseURI,
-		'{2}' AS DatabaseID,
-		'{3}' AS DatabaseAccronym,
-		cs.CollectionSpecimenID, iu.IdentificationUnitID, csp.SpecimenPartID,
-		cs.AccessionNumber AS SpecimenAccessionNumber,
-		COALESCE(csp.AccessionNumber, cs.AccessionNumber) AS PartAccessionNumber
-		FROM IdentificationUnit iu 
-		INNER JOIN CollectionSpecimen cs 
-		ON iu.CollectionSpecimenID = cs.CollectionSpecimenID 
-		LEFT JOIN IdentificationUnitInPart iup
-		ON iup.CollectionSpecimenID = iu.CollectionSpecimenID AND iup.IdentificationUnitID = iu.IdentificationUnitID 
-		LEFT JOIN CollectionSpecimenPart csp 
-		ON csp.CollectionSpecimenID = iup.CollectionSpecimenID AND csp.SpecimenPartID = iup.SpecimenPartID 
-		{4}
-		 -- for development
-		 -- WHERE cs.AccessionNumber = 'ZFMK-TIS-46'
-		 -- WHERE cs.CollectionSpecimenID = 14
-		ORDER BY [CollectionSpecimenID], [IdentificationUnitID], [SpecimenPartID]
-		;""".format(self.server_url, self.database_name, self.database_id, self.accronym, last_update_clause)
-		
-		log_query.info(query)
-		log_query.info(params)
-		
-		self.cur.execute(query, params)
-		self.cur.commit()
-		
-		query = """
-		UPDATE [#temp_iu_part_ids]
-		SET PartAccessionNumber = SpecimenAccessionNumber
-		WHERE PartAccessionNumber = ''
-		;"""
-		
-		self.cur.execute(query)
-		self.cur.commit()
-		
-		self.set_max_page()
 		return
 
 
 	def set_max_page(self):
 		query = """
-		SELECT COUNT(idshash) FROM [#temp_iu_part_ids]
+		SELECT COUNT(CollectionSpecimenID) FROM [#temp_cs_ids]
 		;"""
 		
 		self.cur.execute(query)

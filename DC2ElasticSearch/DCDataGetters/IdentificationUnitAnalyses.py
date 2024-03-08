@@ -109,11 +109,10 @@ class IdentificationUnitAnalyses():
 			ON (idstemp.CollectionSpecimenID = iua.CollectionSpecimenID AND idstemp.IdentificationUnitID = iua.IdentificationUnitID)
 		INNER JOIN [#temp_amp_filter] amp_filter
 		ON amp_filter.AnalysisID = iua.AnalysisID
-		WHERE idstemp.[rownumber] BETWEEN ? AND ?
 		ORDER BY idstemp.[idshash]
 		;"""
 		
-		self.cur.execute(query, [self.startrow, self.lastrow])
+		self.cur.execute(query)
 		self.con.commit()
 
 
@@ -444,26 +443,23 @@ class IdentificationUnitAnalyses():
 
 
 
-	def get_data_page(self, page_num):
-		if page_num <= self.datagetter.max_page:
-			self.startrow = (page_num - 1) * self.datagetter.pagesize + 1
-			self.lastrow = page_num * self.datagetter.pagesize
-			
-			# about 40 parameters per method in barcoding is too much, so it must be filtered by amp_ids
-			self.set_amp_filter_lists()
-			self.create_amp_filter_temptable()
-			
-			self.create_analyses_temptable()
-			self.create_methods_temptable()
-			
-			self.set_analyses()
-			self.set_methods()
-			
-			self.set_parameters()
-			
-			self.set_iuanalyses_dict()
-			
-			return self.iuanalyses_dict
+	def get_data_page(self):
+		
+		# about 40 parameters per method in barcoding is too much, so it must be filtered by amp_ids
+		self.set_amp_filter_lists()
+		self.create_amp_filter_temptable()
+		
+		self.create_analyses_temptable()
+		self.create_methods_temptable()
+		
+		self.set_analyses()
+		self.set_methods()
+		
+		self.set_parameters()
+		
+		self.set_iuanalyses_dict()
+		
+		return self.iuanalyses_dict
 
 
 

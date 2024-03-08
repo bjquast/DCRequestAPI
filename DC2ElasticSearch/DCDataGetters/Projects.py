@@ -14,38 +14,33 @@ class Projects():
 		self.con = self.datagetter.con
 
 
-	def get_data_page(self, page_num):
-		if page_num <= self.datagetter.max_page:
-			startrow = (page_num - 1) * self.datagetter.pagesize + 1
-			lastrow = page_num * self.datagetter.pagesize
-			
-			
-			query = """
-			SELECT 
-			[rownumber],
-			idstemp.[idshash] AS [_id],
-			CONCAT(idstemp.[DatabaseID], '_', pp.[ProjectID]) AS [DB_ProjectID],
-			pp.[ProjectID],
-			pp.[Project],
-			pp.[ProjectURI]
-			FROM [#temp_iu_part_ids] idstemp
-			INNER JOIN CollectionSpecimen cs 
-			ON cs.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID]
-			LEFT JOIN [CollectionProject] cp
-			ON cp.CollectionSpecimenID = cs.CollectionSpecimenID
-			LEFT JOIN [ProjectProxy] pp
-			ON pp.ProjectID = cp.ProjectID
-			WHERE idstemp.[rownumber] BETWEEN ? AND ?
-			ORDER BY [rownumber]
-			;"""
-			self.cur.execute(query, [startrow,lastrow])
-			self.columns = [column[0] for column in self.cur.description]
-			
-			self.rows = self.cur.fetchall()
-			self.rows2dict()
-			
-			
-			return self.projects_dict
+	def get_data_page(self):
+		
+		query = """
+		SELECT 
+		[rownumber],
+		idstemp.[idshash] AS [_id],
+		CONCAT(idstemp.[DatabaseID], '_', pp.[ProjectID]) AS [DB_ProjectID],
+		pp.[ProjectID],
+		pp.[Project],
+		pp.[ProjectURI]
+		FROM [#temp_iu_part_ids] idstemp
+		INNER JOIN CollectionSpecimen cs 
+		ON cs.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID]
+		LEFT JOIN [CollectionProject] cp
+		ON cp.CollectionSpecimenID = cs.CollectionSpecimenID
+		LEFT JOIN [ProjectProxy] pp
+		ON pp.ProjectID = cp.ProjectID
+		ORDER BY [rownumber]
+		;"""
+		self.cur.execute(query)
+		self.columns = [column[0] for column in self.cur.description]
+		
+		self.rows = self.cur.fetchall()
+		self.rows2dict()
+		
+		
+		return self.projects_dict
 
 
 	def rows2dict(self):
