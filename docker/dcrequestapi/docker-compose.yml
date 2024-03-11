@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   db:
-    hostname: db
+    hostname: ${MYSQL_HOST}
     image: mysql:8
     volumes:
       - ./data/mysql:/var/lib/mysql:delegated
@@ -10,7 +10,7 @@ services:
     env_file:
       - .env
     ports:
-     - ${MYSQL_PORT}:3306
+     - ${MYSQL_PORT_EXPOSED}:${MYSQL_PORT}
 
   dcrequestapi:
     build: ./dcrequestapi
