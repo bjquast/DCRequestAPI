@@ -3,5 +3,5 @@ config.ini
 **/__pycache__/**
 **/*.pyc
 *.egg-info/*
-docker/data/**
+docker/dcrequestapi/data/**
 *.env
