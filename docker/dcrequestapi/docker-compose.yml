@@ -18,7 +18,7 @@ services:
     env_file:
       - .env
     ports:
-      - "6553:6553"
+      - "${PYRAMID_PORT}:${PYRAMID_PORT}"
     depends_on:
       - db
       - es03
