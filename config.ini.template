@@ -1,0 +1,53 @@
+[default]
+multi_threaded_getter = @@MULTI_THREADED_GETTER@@
+
+# the data_source_ sections are needed for import of data into ES
+
+[data_source_DS1]
+# accronym can be set as short name for the database (shown in login form). If it is not set the section name without the prefix data_source_ is used
+# as accronym, so you may change the 'DS1' to something meaningful, but unique
+accronym = @@DS1_ACCRONYM@@
+server   = @@DS1_SERVER@@
+database = @@DS1_DATABASE@@
+port     = @@DS1_PORT@@
+driver   = @@DS1_DRIVER@@
+uid      = @@DS1_UID@@
+password = @@DS1_PASSWORD@@
+
+# add further data sources if you need
+
+[data_source_DS2]
+accronym = @@DS2_ACCRONYM@@
+server   = @@DS2_SERVER@@
+database = @@DS2_DATABASE@@
+port     = @@DS2_PORT@@
+driver   = @@DS2_DRIVER@@
+uid      = @@DS2_UID@@
+password = @@DS2_PASSWORD@@
+
+
+[elasticsearch]
+url = @@ES_URL@@
+user = @@ES_USER@@
+password = @@ELASTIC_PASSWORD@@
+
+
+[authentication_db]
+host = @@MYSQL_HOST@@
+port = @@MYSQL_PORT@@
+user = @@MYSQL_USER@@
+password = @@MYSQL_PASSWORD@@
+database = @@MYSQL_DATABASE@@
+
+# database containing composite tree from 
+# several TaxonNames databases
+# used for matching names
+[taxamergerdb]
+# set true when taxamergerdb is not available
+skip_taxa_db = @@SKIP_TAXA_MERGER_DB@@
+host = @@MYSQL_HOST@@
+user = @@MYSQL_USER@@
+port = @@MYSQL_PORT@@
+password = @@MYSQL_PASSWORD@@
+database = @@TAXA_MERGER_DB@@
+

@@ -1,0 +1,42 @@
+[app:main]
+use = egg:DCRequestAPI
+pyramid.reload_templates = true
+
+[server:main]
+use = egg:waitress#main
+port = @@PYRAMID_PORT@@
+url_scheme = @@URL_SCHEME@@
+url_prefix = @@URL_PREFIX@@
+
+
+# Begin logging configuration
+
+[loggers]
+keys = root, dcrequestapi
+
+[logger_dcrequestapi]
+level = DEBUG
+handlers =
+qualname = dcrequestapi
+
+[handlers]
+keys = console
+
+[formatters]
+keys = generic
+
+[logger_root]
+level = WARN
+handlers = console
+
+[handler_console]
+class = StreamHandler
+args = (sys.stderr,)
+level = NOTSET
+formatter = generic
+
+[formatter_generic]
+format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
+
+# End logging configuration
+
