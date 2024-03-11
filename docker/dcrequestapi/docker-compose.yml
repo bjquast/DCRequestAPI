@@ -10,7 +10,7 @@ services:
     env_file:
       - .env
     ports:
-     - "63310:3306"
+     - ${MYSQL_PORT}:3306
 
   dcrequestapi:
     build: ./dcrequestapi
