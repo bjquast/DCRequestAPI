@@ -3,6 +3,6 @@ config.ini
 **/__pycache__/**
 **/*.pyc
 *.egg-info/*
-docker/dcrequestapi/data/**
+docker/data/**
 **/TaxaMergerDB_Dump/**
 *.env

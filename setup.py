@@ -20,7 +20,8 @@ requires = [
 	'waitress',
 	'requests',
 	'cryptography',
-	'bcrypt'
+	'bcrypt',
+	'redis'
 ]
 
 setup(name='DCRequestAPI',
