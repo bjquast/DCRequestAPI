@@ -4,4 +4,5 @@ config.ini
 **/*.pyc
 *.egg-info/*
 docker/dcrequestapi/data/**
+**/TaxaMergerDB_Dump/**
 *.env
