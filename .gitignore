@@ -4,5 +4,4 @@ config.ini
 **/*.pyc
 *.egg-info/*
 docker/dcrequestapi/data/**
-**/SQLDumps/*.sql
 *.env

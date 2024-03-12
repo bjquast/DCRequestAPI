@@ -17,6 +17,8 @@ services:
     image: dcrequestapi
     env_file:
       - .env
+    volumes:
+      - ./TaxaMergerDB_Dump:/dcrequestapi/TaxaMergerDBSetup/TaxaMergerDB_Dump
     ports:
       - "${PYRAMID_PORT}:${PYRAMID_PORT}"
     depends_on:
