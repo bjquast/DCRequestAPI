@@ -26,15 +26,17 @@ class UpdateES_Index:
 		self.es_searcher = ES_Searcher()
 		self.last_updated = self.es_searcher.getLastUpdated()
 		# for testing
-		self.last_updated = '2024-02-20 17:44:46'
+		#self.last_updated = '2024-03-11 17:44:46'
 		
 		self.skip_taxa_db = self.config.getboolean('taxamergerdb', 'skip_taxa_db', fallback = False)
+		self.multi_threaded_getter = config.getboolean('default', 'multi_threaded_getter', fallback = False)
 		
 		if self.last_updated is None:
 			raise ValueError('Last update time could not be determined, check if index has been filled before')
 
 
 	def update_from_database(self, dc_params:dict, table_name:str|None = None):
+		#pudb.set_trace()
 		data_getter = DataGetter(dc_params, self.last_updated)
 		
 		data_getter.create_deleted_temptable()
@@ -43,7 +45,7 @@ class UpdateES_Index:
 			if len(deleted_ids) > 0:
 				self.es_indexer.bulkDelete(deleted_ids, i)
 		
-		iuparts_indexer = IUPartsIndexer(self.es_indexer, dc_params, last_updated = self.last_updated, skip_taxa_db = self.skip_taxa_db)
+		iuparts_indexer = IUPartsIndexer(self.es_indexer, dc_params, last_updated = self.last_updated, skip_taxa_db = self.skip_taxa_db, multi_threaded_getter = self.multi_threaded_getter)
 		
 		logger.info('update completed')
 
@@ -53,15 +55,14 @@ class UpdateES_Index:
 			self.update_from_database(dc_params)
 
 
-	def update_by_database_name(self, database_name:str, table:str):
-		for dc_params in self.dc_databases.databases:
-			if dc_params['database_name']==database_name:
-				self.update_from_database(dc_params, table)
-		raise FileNotFoundError
-
-
 
 if __name__ == "__main__":
+	config = ConfigParser(allow_no_value=True)
+	config.read('./config.ini')
+	skip_taxa_db = config.getboolean('taxamergerdb', 'skip_taxa_db', fallback = False)
+	multi_threaded_getter = config.getboolean('default', 'multi_threaded_getter', fallback = False)
+	
+	
 	updater = UpdateES_Index()
 	updater.update_es_index()
 	

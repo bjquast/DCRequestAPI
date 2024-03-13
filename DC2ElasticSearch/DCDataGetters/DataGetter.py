@@ -7,15 +7,17 @@ logger = logging.getLogger('elastic_indexer')
 log_query = logging.getLogger('query')
 
 from DBConnectors.MSSQLConnector import MSSQLConnector
+from DC2ElasticSearch.DCDataGetters.CreateChangedSpecimensProcedure import CreateChangedSpecimensProcedure
 
 class DataGetter():
 	def __init__(self, dc_params, last_updated = None):
 		
-		self.dc_con = MSSQLConnector(dc_params['connectionstring'])
-		self.server_url = dc_params['server_url']
-		self.database_name = dc_params['database_name']
-		self.accronym = dc_params['accronym']
-		self.database_id = dc_params['database_id']
+		self.dc_params = dc_params
+		self.dc_con = MSSQLConnector(self.dc_params['connectionstring'])
+		self.server_url = self.dc_params['server_url']
+		self.database_name = self.dc_params['database_name']
+		self.accronym = self.dc_params['accronym']
+		self.database_id = self.dc_params['database_id']
 		
 		self.cur = self.dc_con.getCursor()
 		self.con = self.dc_con.getConnection()
@@ -46,30 +48,74 @@ class DataGetter():
 
 	def fill_cs_ids_temptable(self, last_updated = None):
 		if last_updated is not None:
-			self.last_updated = last_updated
+			self.create_changed_cs_ids_temptable()
+			self.fill_changed_cs_ids_temptable()
+			self.set_max_page()
 		
-		params = []
-		last_update_clause = ""
-		
-		if self.last_updated is not None:
-			last_update_clause = "WHERE LogUpdatedWhen > CONVERT(DATETIME, ?, 121)"
-			params.append(self.last_updated)
-		
+		else:
+			query = """
+			INSERT INTO [#temp_cs_ids] ([CollectionSpecimenID])
+			SELECT 
+			 -- TOP 100000
+			[CollectionSpecimenID]
+			FROM [CollectionSpecimen]
+			 -- important: ORDER BY [CollectionSpecimenID] to have identical rownumbers for each instance of DataGetter
+			 -- when using them as multi threaded datagetters
+			ORDER BY [CollectionSpecimenID]
+			;""".format(last_update_clause)
+			
+			self.cur.execute(query)
+			self.con.commit()
+			
+			self.set_max_page()
+			return
+
+
+
+	def create_changed_cs_ids_temptable(self):
 		query = """
-		INSERT INTO [#temp_cs_ids] ([CollectionSpecimenID])
-		SELECT 
-		 -- TOP 100000
-		[CollectionSpecimenID]
-		FROM [CollectionSpecimen]
-		 -- important to order, so that the rownumbers can be used to get the min and max [CollectionSpecimenID] for each page
-		ORDER BY [CollectionSpecimenID]
-		{0}
-		;""".format(last_update_clause)
-		
-		self.cur.execute(query, params)
+		DROP TABLE IF EXISTS [#ChangedSpecimens]
+		;"""
+		self.cur.execute(query)
 		self.con.commit()
 		
-		self.set_max_page()
+		query = """
+		CREATE TABLE #ChangedSpecimens (
+			RowCounter INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+			CollectionSpecimenID INT NOT NULL
+		);
+		"""
+		
+		self.cur.execute(query)
+		self.con.commit()
+		return
+
+
+	def fill_changed_cs_ids_temptable(self):
+		# create the procedure to get changed specimen ids if it does not exist
+		CreateChangedSpecimensProcedure(self.dc_params)
+		
+		query = """
+		exec [dbo].[procChangesFor_DC_API] ?
+		;"""
+		
+		self.cur.execute(query, [self.last_updated])
+		self.con.commit()
+		
+		# need to copy the data here, otherwise I have to adapt the column names in following code or create an extra method
+		# to fill_iupart_ids_temptable
+		query = """
+		INSERT INTO [#temp_cs_ids] ([CollectionSpecimenID])
+		SELECT DISTINCT [CollectionSpecimenID]
+		FROM #ChangedSpecimens
+		 -- important: ORDER BY [CollectionSpecimenID] to have identical rownumbers for each instance of DataGetter
+		 -- when using them as multi threaded datagetters
+		ORDER BY [CollectionSpecimenID]
+		;"""
+		
+		self.cur.execute(query)
+		self.con.commit()
+		
 		return
 
 

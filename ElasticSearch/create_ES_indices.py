@@ -72,6 +72,7 @@ class DataPage():
 		self.mam_analyses_dict = self.mam_analyses.get_data_page()
 		
 		if not self.skip_taxa_db:
+			logger.info('Match taxa of page {0}'.format(self.page))
 			self.matchedtaxa_dict = self.getMatchedTaxa(self.iuparts_dict)
 		else:
 			self.matchedtaxa_dict = {}
@@ -206,6 +207,7 @@ class IUPartsIndexer():
 		CollectionRelationsTempTable(data_getter)
 		
 		for i in range(1, data_getter.max_page + 1):
+			logger.info('################# getting data from page number {0}'.format(i))
 			data_page = DataPage(data_getter, skip_taxa_db = self.skip_taxa_db)
 			data_page.setDataPage(i)
 			self.es_queue.put(data_page)

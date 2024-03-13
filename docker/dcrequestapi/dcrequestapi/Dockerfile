@@ -13,6 +13,7 @@ RUN ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime \
   python3-pip \
   unixodbc unixodbc-dev \
   tdsodbc \
+  mysql-client \
   git \
   locales \
   language-pack-en-base \
