@@ -76,6 +76,7 @@ class DataGetter():
 		query = """
 		DROP TABLE IF EXISTS [#ChangedSpecimens]
 		;"""
+		log_query.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
 		
@@ -83,9 +84,9 @@ class DataGetter():
 		CREATE TABLE #ChangedSpecimens (
 			RowCounter INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
 			CollectionSpecimenID INT NOT NULL
-		);
-		"""
-		
+		)
+		;"""
+		log_query.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
 		return
@@ -99,6 +100,8 @@ class DataGetter():
 		exec [dbo].[procChangesFor_DC_API] ?
 		;"""
 		
+		log_query.debug(query)
+		log_query.debug(self.last_updated)
 		self.cur.execute(query, [self.last_updated])
 		self.con.commit()
 		
@@ -113,6 +116,7 @@ class DataGetter():
 		ORDER BY [CollectionSpecimenID]
 		;"""
 		
+		log_query.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
 		
@@ -124,6 +128,8 @@ class DataGetter():
 		query = """
 		DROP TABLE IF EXISTS [#temp_iu_part_ids]
 		;"""
+		
+		log_query.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
 		
@@ -148,6 +154,8 @@ class DataGetter():
 		INDEX [idx_PartAccessionNumber] ([PartAccessionNumber])
 		)
 		;"""
+		
+		log_query.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
 		return
@@ -210,6 +218,7 @@ class DataGetter():
 		SELECT COUNT(CollectionSpecimenID) FROM [#temp_cs_ids]
 		;"""
 		
+		log_query.debug(query)
 		self.cur.execute(query)
 		row = self.cur.fetchone()
 		self.rownumber = row[0]
