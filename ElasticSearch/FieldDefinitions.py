@@ -137,7 +137,7 @@ class FieldDefinitions():
 				},
 			},
 			
-			'MatchedTaxaTree.Tree' = {
+			'MatchedTaxaTree.Tree': {
 				'names': {'en': 'Taxonomic Tree'},
 				'buckets': {
 					'field_query': 'MatchedTaxaTree.Taxon',
@@ -146,7 +146,7 @@ class FieldDefinitions():
 					'path': 'MatchedTaxaTree',
 					'root_level': 1 # the level to start the tree or trees (e. g. Animalia, Plantae, Fungi) from
 				}
-			}
+			},
 			
 			'TypeStatus': {
 				'names': {'en': 'Type status'},
