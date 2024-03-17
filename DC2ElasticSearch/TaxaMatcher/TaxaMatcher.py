@@ -260,7 +260,8 @@ class TaxaMatcher():
 		COALESCE(mt.TaxonNameURI, CONCAT('taxamerger_id_', mt.id)) AS TaxonNameURI,
 		mt.TaxonURL,
 		anc.taxon AS ancestor_taxon, anc.`rank` AS ancestor_taxon_rank, 
-		anc.`TaxonNameURI` AS ancestor_taxon_uri, anc.`TaxonURL` AS ancestor_taxon_url, anc.taxon_tree_level -1 AS ancestor_taxon_tree_level,
+		COALESCE(anc.`TaxonNameURI`, CONCAT('taxamerger_id_', anc.id)) AS ancestor_taxon_uri, 
+		anc.`TaxonURL` AS ancestor_taxon_url, anc.taxon_tree_level -1 AS ancestor_taxon_tree_level,
 		COALESCE(p_anc.`TaxonNameURI`, CONCAT('taxamerger_id_', p_anc.id)) AS ancestors_parent_taxon_uri
 		FROM {0} cs
 		INNER JOIN {1} mt

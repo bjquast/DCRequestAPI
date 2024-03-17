@@ -259,14 +259,15 @@ class IUPartsIndexer():
 			if self.page_num <= data_getter.max_page:
 				current_page = self.page_num
 				self.page_num = self.page_num +1
+				# log here to prevent concurrent writing into the log file 
+				logger.info('################# thread number {0}'.format(thread_num))
+				logger.info('################# page number {0}'.format(current_page))
 				self.lock.release()
 			else:
 				self.lock.release()
 				break
 			
 			try:
-				logger.info('################# thread number {0}'.format(thread_num))
-				logger.info('################# page number {0}'.format(current_page))
 				
 				data_page = DataPage(data_getter, skip_taxa_db = skip_taxa_db)
 				data_page.setDataPage(current_page)
