@@ -21,14 +21,11 @@ class TreeQueries(QuerySorter):
 		self.sort_queries_by_definitions()
 
 
-	def appendSimpleRootQuery(self, field):
-		if field not in self.source_fields:
-			return {}
+	def setNestedRootQuery(self, rootlevel = 0):
+		for field in in self.nested_fields:
 		rootquery = {
-			"term": {
-				self.simple_fields[field]['field_query']: {
-					"value": , 
-				}
-			}
+			"""
+			
+			
+			"""
 		}
-		

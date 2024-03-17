@@ -11,21 +11,21 @@ class FieldDefinitions():
 	def setFieldNames(self):
 		self.bucketfields = [
 			'DatabaseAccronym',
-			#'ParentCollections.CollectionName',
+			#'CollectionsTree.CollectionName',
 			'CollectionName',
 			'Projects.Project',
 			'LastIdentificationCache',
 			'VernacularTerms',
-			'MatchedRankedParentTaxa.Phylum',
-			'MatchedRankedParentTaxa.Subphylum',
-			'MatchedRankedParentTaxa.Class',
-			'MatchedRankedParentTaxa.Subclass',
-			'MatchedRankedParentTaxa.Order',
-			'MatchedRankedParentTaxa.Suborder',
-			'MatchedRankedParentTaxa.Family',
-			'MatchedRankedParentTaxa.Subfamily',
-			'MatchedRankedParentTaxa.Genus',
-			'MatchedRankedParentTaxa.Subgenus',
+			'MatchedTaxaTree.Phylum',
+			'MatchedTaxaTree.Subphylum',
+			'MatchedTaxaTree.Class',
+			'MatchedTaxaTree.Subclass',
+			'MatchedTaxaTree.Order',
+			'MatchedTaxaTree.Suborder',
+			'MatchedTaxaTree.Family',
+			'MatchedTaxaTree.Subfamily',
+			'MatchedTaxaTree.Genus',
+			'MatchedTaxaTree.Subgenus',
 			'TypeStatus',
 			'CountryCache',
 			'CollectingMethod',
@@ -70,9 +70,8 @@ class FieldDefinitions():
 		]
 		
 		self.tree_query_fields = [
-			'MatchedParentTaxa',
-			'ParentCollections',
-			'Projects.Project'
+			'MatchedTaxaTree',
+			'CollectionsTree'
 		]
 		
 		return
@@ -243,11 +242,11 @@ class FieldDefinitions():
 				},
 			},
 			
-			'ParentCollections.CollectionName': {
+			'CollectionsTree.CollectionName': {
 				'names': {'en': 'Collections'},
 				'buckets': {
-					'field_query': 'ParentCollections.CollectionName',
-					'path': 'ParentCollections',
+					'field_query': 'CollectionsTree.CollectionName',
+					'path': 'CollectionsTree',
 				},
 			},
 			
@@ -309,13 +308,13 @@ class FieldDefinitions():
 		for rank in ['reg.', 'phyl./div.', 'subphyl./div.', 'cl.', 'subcl.', 'ord.', 'subord.', 'fam.', 'subfam.', 'gen.', 'subgen.']:
 		#for rank in ['Regnum', 'Phylum', 'Subphylum', 'Class', 'Subclass', 'Order', 'Suborder', 'Family', 'Subfamily', 'Genus', 'Subgenus']:
 		
-			self.fielddefinitions['MatchedRankedParentTaxa.{0}'.format(rank_names[rank]['en'])] = {
+			self.fielddefinitions['MatchedTaxaTree.{0}'.format(rank_names[rank]['en'])] = {
 				'names': {'en': rank_names[rank]['en']},
 				'buckets': {
-					'field_query': 'MatchedRankedParentTaxa.Taxon',
+					'field_query': 'MatchedTaxaTree.Taxon',
 					'filter': None,
-					'path': 'MatchedRankedParentTaxa',
-					'sub_filters': [['MatchedRankedParentTaxa.Rank', rank],]
+					'path': 'MatchedTaxaTree',
+					'sub_filters': [['MatchedTaxaTree.Rank', rank],]
 				}
 			}
 		

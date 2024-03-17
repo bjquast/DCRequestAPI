@@ -12,11 +12,11 @@ class CollectionRelationsTempTable():
 		self.cur = self.datagetter.cur
 		self.con = self.datagetter.con
 		
-		self.createTempCollectionRelationsTable()
-		self.fillTempCollectionRelationsTable()
+		self.createCollectionRelationsTempTable()
+		self.fillCollectionRelationsTempTable()
 
 
-	def createTempCollectionRelationsTable(self):
+	def createCollectionRelationsTempTable(self):
 		query = """
 		DROP TABLE IF EXISTS [#temp_collection_relations]
 		;"""
@@ -42,7 +42,7 @@ class CollectionRelationsTempTable():
 		return
 
 
-	def fillTempCollectionRelationsTable(self):
+	def fillCollectionRelationsTempTable(self):
 		query = """
 		INSERT INTO [#temp_collection_relations] ([AncestorID], [DescendantID], [PathLength])
 		SELECT [CollectionID], [CollectionID], 0 FROM [Collection];
@@ -178,7 +178,8 @@ class Collections():
 		tc.[rownumber],
 		tc.[_id], 
 		tc.[CollectionID], tc.[CollectionName], tc.[CollectionAcronym],
-		c.[CollectionID] AS ParentCollectionID, c.[CollectionName] AS ParentCollectionName, tl.[TreeLevel]
+		c.[CollectionID] AS ParentCollectionID, c.[CollectionName] AS ParentCollectionName, tl.[TreeLevel],
+		c.[CollectionParentID]
 		FROM [#temp_collection] tc
 		INNER JOIN [#temp_collection_relations] tcr
 			ON tc.[CollectionID] = tcr.[DescendantID]
@@ -213,13 +214,14 @@ class Collections():
 					'CollectionName': row[3],
 					'CollectionAcronym': row[4]
 				}
-				self.collections_dict[row[1]]['ParentCollections'] = []
+				self.collections_dict[row[1]]['CollectionsTree'] = []
 			
 			parentcollection = {
 				'CollectionID': row[5],
 				'CollectionName': row[6],
-				'TreeLevel': row[7]
+				'TreeLevel': row[7],
+				'ParentCollectionID': row[8]
 			}
-			self.collections_dict[row[1]]['ParentCollections'].append(parentcollection)
+			self.collections_dict[row[1]]['CollectionsTree'].append(parentcollection)
 		
 		return

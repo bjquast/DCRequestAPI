@@ -300,7 +300,7 @@ MappingsDict['iuparts'] = {
 				'CollectorsDataWithholding': {'type': 'text', 'fields': {'keyword': {'type': 'keyword', 'ignore_above': 256}}},
 				'CollectorsWithhold': {'type': 'boolean'},
 				# have to add the ProjectID here as it is the only way to filter nested objects by ProjectID for aggregations?!
-				'ProjectID': {'type': 'long'},
+				'ProjectID': {'type': 'integer'},
 				'DB_ProjectID': {'type': 'keyword'}
 			}
 		},
@@ -313,7 +313,7 @@ MappingsDict['iuparts'] = {
 		'MatchedTaxonURL': {'type': 'keyword'},
 		'MatchedParentTaxa': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		'MatchedParentTaxaURIs': {'type': 'keyword'},
-		'MatchedRankedParentTaxa': {
+		'MatchedTaxaTree': {
 			'type': 'nested',
 			'properties': {
 				'TaxonURI': {'type': 'keyword'},
@@ -326,27 +326,40 @@ MappingsDict['iuparts'] = {
 		},
 		
 		
-		'CollectionID': {'type': 'long'},
+		'CollectionID': {'type': 'integer'},
 		'CollectionName': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		'CollectionAcronym': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		
-		'ParentCollections': {
+		'CollectionsTree': {
 			'type': 'nested',
 			'properties': {
-				'CollectionID': {'type': 'long'},
+				'CollectionID': {'type': 'integer'},
 				'CollectionName': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 				'TreeLevel': {'type': 'integer'},
+				'ParentCollectionID': {'type': 'integer'}
 			}
 		},
 		
+		# keep it as is because it controls the access rights
 		'Projects': {
 			'properties': {
 				'DB_ProjectID': {'type': 'keyword'}, # key combined of database key taken from config.in and ProjectID
-				'ProjectID': {'type': 'long'},
+				'ProjectID': {'type': 'integer'},
 				'Project': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 				'ProjectURI': {'type': 'keyword'},
 			}
 		},
+		
+		# not available, because project structure is stored in DiversityProjects not in ProjectProxy
+		#'ProjectsTree': {
+		#	'type': 'nested',
+		#	'properties': {
+		#		'DB_ProjectID': {'type': 'keyword'},
+		#		'Project': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+		#		'ProjectURI': {'type': 'keyword'},
+		#		'TreeLevel': {'type': 'integer'},
+		#	}
+		#},
 		
 		'Images': {
 			#'type': 'nested',
