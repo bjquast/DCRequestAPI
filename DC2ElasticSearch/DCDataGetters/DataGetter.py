@@ -62,7 +62,7 @@ class DataGetter():
 			 -- important: ORDER BY [CollectionSpecimenID] to have identical rownumbers for each instance of DataGetter
 			 -- when using them as multi threaded datagetters
 			ORDER BY [CollectionSpecimenID]
-			;""".format(last_update_clause)
+			;"""
 			
 			self.cur.execute(query)
 			self.con.commit()

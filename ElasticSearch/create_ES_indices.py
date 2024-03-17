@@ -147,9 +147,6 @@ class IUPartsIndexer():
 		self.skip_taxa_db = skip_taxa_db
 		self.multi_threaded_getter = multi_threaded_getter
 		
-		self.es_queue = queue.Queue()
-		threading.Thread(target=self.es_worker, daemon=True).start()
-		
 		if self.multi_threaded_getter is True:
 			self.runSubmissionThreads()
 			
@@ -157,8 +154,7 @@ class IUPartsIndexer():
 			self.submitDataPages()
 		
 		logger.info('No more remaining data pages')
-		# add None to queue to signal all items have been send
-		self.es_queue.join()
+		
 
 
 	def es_submission(self, data_page):
@@ -187,17 +183,20 @@ class IUPartsIndexer():
 		return
 
 
-	def es_worker(self):
+	def es_worker(self, es_queue):
 		while True:
-			data_page = self.es_queue.get()
+			data_page = es_queue.get()
 			self.es_submission(data_page)
 			del data_page
-			self.es_queue.task_done()
+			es_queue.task_done()
 			
 		return
 
 
 	def submitDataPages(self):
+		es_queue = queue.Queue()
+		threading.Thread(target=self.es_worker, daemon=True, args = [es_queue]).start()
+		
 		#pudb.set_trace()
 		data_getter = DataGetter(self.dc_params, self.last_updated)
 		data_getter.create_cs_ids_temptable()
@@ -210,7 +209,10 @@ class IUPartsIndexer():
 			logger.info('################# getting data from page number {0}'.format(i))
 			data_page = DataPage(data_getter, skip_taxa_db = self.skip_taxa_db)
 			data_page.setDataPage(i)
-			self.es_queue.put(data_page)
+			es_queue.put(data_page)
+		
+		es_queue.join()
+		
 		return
 
 
@@ -221,10 +223,8 @@ class IUPartsIndexer():
 		threadpool = []
 		
 		for i in range(int(thread_num)):
-			data_getter = DataGetter(self.dc_params, self.last_updated)
-			
 			skip_taxa_db = bool(self.skip_taxa_db)
-			threadpool.append(threading.Thread(target = self.threadedPageSubmission, args = [i, data_getter, skip_taxa_db]))
+			threadpool.append(threading.Thread(target = self.threadedPageSubmission, args = [i, skip_taxa_db]))
 		
 		for thread in threadpool:
 			# set thread as daemon to guarantee that it is terminated when the program exits i. e. to prevent zombies
@@ -241,9 +241,13 @@ class IUPartsIndexer():
 		return
 
 
-	def threadedPageSubmission(self, thread_num, data_getter, skip_taxa_db):
+	def threadedPageSubmission(self, thread_num, skip_taxa_db):
 		self.page_num = 1
 		
+		es_queue = queue.Queue()
+		threading.Thread(target=self.es_worker, daemon=True, args = [es_queue]).start()
+		
+		data_getter = DataGetter(self.dc_params, self.last_updated)
 		data_getter.create_cs_ids_temptable()
 		data_getter.fill_cs_ids_temptable(self.last_updated)
 		
@@ -267,8 +271,8 @@ class IUPartsIndexer():
 				data_page = DataPage(data_getter, skip_taxa_db = skip_taxa_db)
 				data_page.setDataPage(current_page)
 				
-				self.es_submission(data_page)
-				#self.es_queue.put(data_page)
+				#self.es_submission(data_page)
+				es_queue.put(data_page)
 			except Exception as e:
 				self.lock.acquire()
 				import sys
@@ -279,7 +283,9 @@ class IUPartsIndexer():
 				logger.info('######### Exception occured in thread number {0}, page {1}'.format(thread_num, current_page))
 				self.lock.release()
 				break
-			
+		
+		es_queue.join()
+		
 		return
 
 

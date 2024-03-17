@@ -1,6 +1,9 @@
 MappingsDict = dict()
 
 #MappingsDict['settings'] = {'index': {'number_of_shards': 3, 'number_of_replicas': 1}}
+
+
+# normalizer to generate lowercase index of keywords
 MappingsDict['settings'] = {
 	'analysis': {
 		'normalizer': {
@@ -12,7 +15,7 @@ MappingsDict['settings'] = {
 }
 
 
-# do not use nested when there is no withholdflag in a sub-structure because it may duplicate the number of hits in aggregations when a term appears more than once in a substructure, e.g. identifications
+# do not use nested when there is no withholdflag in a sub-structure because it may duplicate the number of hits in aggregations when a term appears more than once in a substructure, e.g. identifications?
 
 MappingsDict['iuparts'] = {
 	'properties': {
@@ -309,6 +312,7 @@ MappingsDict['iuparts'] = {
 		'MatchedTaxonURI': {'type': 'keyword'},
 		'MatchedTaxonURL': {'type': 'keyword'},
 		'MatchedParentTaxa': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+		'MatchedParentTaxaURIs': {'type': 'keyword'},
 		'MatchedRankedParentTaxa': {
 			'type': 'nested',
 			'properties': {
@@ -316,7 +320,8 @@ MappingsDict['iuparts'] = {
 				'TaxonURL': {'type': 'keyword'},
 				'Taxon': {'type': 'keyword'},
 				'Rank': {'type': 'keyword'},
-				'TreeLevel': {'type': 'integer'}
+				'TreeLevel': {'type': 'integer'},
+				'ParentTaxonURI': {'type': 'keyword'},
 			}
 		},
 		
@@ -509,3 +514,31 @@ MappingsDict['iuparts'] = {
 		
 	}
 }
+
+
+'''
+# better use the data in the iuparts index? otherwise 5m taxa have to be indexed where only about 100000 are used
+# and the index have to be synced whenever the iuparts index is updated
+MappingsDict['taxonomy'] = {
+	'propperties': {
+		'taxon_id': {'type': 'keyword'}, # is the same as _id in the index
+		'parent_taxon_id': {'type': 'keyword'}, # important for tree generation in ui: find all childs in a tree that have that parent
+		'Taxon': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+		'TaxonAuthor': {'type': 'keyword'},
+		'TaxonRank': {'type': 'keyword'},
+		'TaxonURI': {'type': 'keyword'},
+		'TaxonURL': {'type': 'keyword'},
+		'ParentTaxa': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+		'RankedParentTaxa': {
+			'type': 'nested',
+			'properties': {
+				'TaxonURI': {'type': 'keyword'},
+				'TaxonURL': {'type': 'keyword'},
+				'Taxon': {'type': 'keyword'},
+				'Rank': {'type': 'keyword'},
+				'TreeLevel': {'type': 'integer'}
+			}
+		}
+	}
+}
+'''

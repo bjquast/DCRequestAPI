@@ -68,6 +68,13 @@ class FieldDefinitions():
 			'Barcodes.Methods.region',
 			'DatabaseAccronym',
 		]
+		
+		self.tree_query_fields = [
+			'MatchedParentTaxa',
+			'ParentCollections',
+			'Projects.Project'
+		]
+		
 		return
 
 

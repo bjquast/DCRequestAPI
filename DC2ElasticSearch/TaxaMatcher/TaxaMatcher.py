@@ -257,16 +257,20 @@ class TaxaMatcher():
 		
 		query = """
 		SELECT cs.`_id`, cs.taxon, cs.author, cs.`rank`,
-		mt.TaxonNameURI, mt.TaxonURL,
-		anc.taxon AS parent_taxon, anc.`rank` AS parent_taxon_rank, 
-		anc.`TaxonNameURI` AS parent_taxon_uri, anc.`TaxonURL` AS parent_taxon_url, anc.taxon_tree_level AS TreeLevel
+		COALESCE(mt.TaxonNameURI, CONCAT('taxamerger_id_', mt.id)) AS TaxonNameURI,
+		mt.TaxonURL,
+		anc.taxon AS ancestor_taxon, anc.`rank` AS ancestor_taxon_rank, 
+		anc.`TaxonNameURI` AS ancestor_taxon_uri, anc.`TaxonURL` AS ancestor_taxon_url, anc.taxon_tree_level AS ancestor_taxon_tree_level,
+		p_anc.`TaxonNameURI` AS ancsetors_parent_taxon_uri
 		FROM {0} cs
 		INNER JOIN {1} mt
 		ON mt.id = cs.taxon_id
 		INNER JOIN {2} tr
 		ON (cs.taxon_id = tr.DescendantID)
 		INNER JOIN {1} anc
-		ON (anc.id = tr.AncestorID AND anc.taxon != 'root' AND anc.id != cs.taxon_id)
+		ON (anc.id = tr.AncestorID AND anc.taxon != 'root') -- AND anc.id != cs.taxon_id)
+		INNER JOIN {1} p_anc
+		ON (p_anc.id = anc.parent_id)
 		;""".format(self.specimentable, self.matchingtable.taxamergetable, self.matchingtable.taxarelationtable)
 		self.cur.execute(query)
 		rows = self.cur.fetchall()
@@ -279,11 +283,16 @@ class TaxaMatcher():
 					matched_taxa_dict[row[0]]['MatchedTaxonRank'] = row[3]
 					matched_taxa_dict[row[0]]['MatchedTaxonURI'] = row[4]
 					matched_taxa_dict[row[0]]['MatchedTaxonURL'] = row[5]
+					
 					matched_taxa_dict[row[0]]['MatchedParentTaxa'] = []
+					matched_taxa_dict[row[0]]['MatchedParentTaxaURIs'] = []
 					matched_taxa_dict[row[0]]['MatchedRankedParentTaxa'] = []
 					
 				matched_taxa_dict[row[0]]['MatchedParentTaxa'].append(row[6])
-				matched_taxa_dict[row[0]]['MatchedRankedParentTaxa'].append({'Taxon': row[6], 'Rank': row[7], 'TaxonURI': row[8], 'TaxonURL': row[9], 'TreeLevel': row[10]})
+				matched_taxa_dict[row[0]]['MatchedParentTaxaURIs'].append(row[8])
+				matched_taxa_dict[row[0]]['MatchedRankedParentTaxa'].append({
+					'Taxon': row[6], 'Rank': row[7], 'TaxonURI': row[8],
+					'TaxonURL': row[9], 'TreeLevel': row[10], 'ParentTaxonURI': row[11]})
 		
 		return matched_taxa_dict
 		
