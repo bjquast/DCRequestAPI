@@ -6,63 +6,169 @@ logger = logging.getLogger('elastic_queries')
 import pudb
 
 from ElasticSearch.FieldDefinitions import FieldDefinitions
-from ElasticSearch.QueryConstructor.QuerySorter import QuerySorter
 
-class TreeQueries(QuerySorter):
-	def __init__(self, users_project_ids = [], source_fields = []):
+class TreeQueries():
+	def __init__(self, field, parent_ids = [], users_project_ids = []):
+		self.field = field
+		self.parent_ids = parent_ids
 		self.users_project_ids = users_project_ids
-		self.source_fields = source_fields
-		
 		fielddefs = FieldDefinitions()
-		if len(self.source_fields) <= 0:
-			self.source_fields = fielddefs.tree_query_fields
+		self.fielddefinitions = fielddefs.fielddefinitions
+		self.tree_fields = fielddefs.tree_query_fields
 		
-		QuerySorter.__init__(self, fielddefs.fielddefinitions, self.source_fields)
-		self.sort_queries_by_definitions()
+		self.treequery = {}
+		
+		self.read_buckets_definition()
+		if len(self.parent_ids) <= 0:
+			self.setNestedRootQuery()
+		else:
+			self.setNestedChildsQuery()
+		
 
 
-	def setNestedRootQuery(self, field):
-		for field in in self.nested_fields:
-			rootquery = {
+	def read_buckets_definition(self):
+		self.buckets_definition = None
+		
+		# currently only nested fields without restrictions are implemented
+		if self.field in self.tree_fields and self.field in self.fielddefinitions:
+			if 'buckets' in self.fielddefinitions[self.field] and 'path' in self.fielddefinitions[self.field]['buckets'] and 'withholdflag' not in self.fielddefinitions[self.field]['buckets']:
+				self.buckets_definition = self.fielddefinitions[self.field]['buckets']
+		return
+
+
+	def setNestedRootQuery(self):
+		self.treequery = {}
+		if self.buckets_definition is None:
+			return
+		self.treequery = {
+			self.field: {
+				"nested": {
+					"path": self.buckets_definition['path']
+				}, 
 				"aggs": {
-					"{0}_tree".format(field): {
-						"nested": {
-							"path": self.nested_fields[field]['path']
-						}, 
+					"buckets": {
+						"filter": {
+							"bool": {
+								"must": [
+									{
+										"term": {
+											"{0}.TreeLevel".format(self.buckets_definition['path']): self.buckets_definition['root_level']
+										}
+									}
+								]
+							}
+						},
 						"aggs": {
-							"filter_rank": {
-								"filter": {
-									"bool": {
-										"must": [
+							"composite_buckets": {
+								"composite": {
+									"size": 500,
+									"sources": [
+										{
+											"Value": {
+												"terms": {
+													"field": self.buckets_definition['field_query']
+												}
+											}
+										},
+										{
+											"ItemID": {
+												"terms": {
+													"field": self.buckets_definition['id_field_for_tree']
+												}
+											}
+										},
+										{
+											"ParentID": {
+												"terms": {
+													"field": self.buckets_definition['parent_id_field_for_tree'],
+													"missing_bucket": True
+												}
+											}
+										},
+										{
+											"TreeLevel": {
+												"terms": {
+													"field": "{0}.TreeLevel".format(self.buckets_definition['path'])
+												}
+											}
+										}
+									]
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return
+
+
+
+	def setNestedChildsQuery(self):
+		self.treequery = {}
+		if self.buckets_definition is None:
+			return
+		
+		parent_id_queries = []
+		for parent_id in self.parent_ids:
+			query = {
+				"term": {
+					self.buckets_definition['id_field_for_tree']: parent_id
+				}
+			}
+			
+			parent_id_queries.append(query)
+		
+		if len(parent_id_queries) > 0:
+			self.treequery = {
+				self.field: {
+					"nested": {
+						"path": self.buckets_definition['path']
+					}, 
+					"aggs": {
+						"buckets": {
+							"filter": {
+								"bool": {
+									"should": parent_id_queries,
+									"minimum_should_match": 1
+								}
+							},
+							"aggs": {
+								"composite_buckets": {
+									"composite": {
+										"size": 500,
+										"sources": [
 											{
-												"term": {
-													"{0}.TreeLevel".format(self.nested_fields[field]['path']): self.nested_fields[field]['root_level']
+												"Value": {
+													"terms": {
+														"field": self.buckets_definition['field_query']
+													}
+												}
+											},
+											{
+												"ItemID": {
+													"terms": {
+														"field": self.buckets_definition['id_field_for_tree']
+													}
+												}
+											},
+											{
+												"ParentID": {
+													"terms": {
+														"field": self.buckets_definition['parent_id_field_for_tree'],
+														"missing_bucket": True
+													}
+												}
+											},
+											{
+												"TreeLevel": {
+													"terms": {
+														"field": "{0}.TreeLevel".format(self.buckets_definition['path'])
+													}
 												}
 											}
 										]
-									}
-								},
-								"aggs": {
-									"{0}_tree_buckets".format(field): {
-										"composite": {
-											"size": 500,
-											"sources": [
-												{
-													"Taxon": {
-														"terms": {
-															"field": self.nested_fields[field]['field_query']
-														}
-													}
-												},
-												{
-													"TaxonURI": {
-														"terms": {
-															"field": self.nested_fields[field]['id_field_for_tree']
-														}
-													}
-												}
-											]
-										}
 									}
 								}
 							}
@@ -70,55 +176,9 @@ class TreeQueries(QuerySorter):
 					}
 				}
 			}
+		
+		return
 
 
-
-	def setNestedChildsQuery(self, field, parent_id):
-		for field in in self.nested_fields:
-			rootquery = {
-				"aggs": {
-					"{0}_tree".format(field): {
-						"nested": {
-							"path": self.nested_fields[field]['path']
-						}, 
-						"aggs": {
-							"filter_rank": {
-								"filter": {
-									"bool": {
-										"must": [
-											{
-												"term": {
-													self.nested_fields[field]['id_field_for_tree']: parent_id
-												}
-											}
-										]
-									}
-								},
-								"aggs": {
-									"{0}_tree_buckets".format(field): {
-										"composite": {
-											"size": 500,
-											"sources": [
-												{
-													"Taxon": {
-														"terms": {
-															"field": self.nested_fields[field]['field_query']
-														}
-													}
-												},
-												{
-													"TaxonURI": {
-														"terms": {
-															"field": self.nested_fields[field]['id_field_for_tree']
-														}
-													}
-												}
-											]
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+	def getTreeQuery(self):
+		return self.treequery

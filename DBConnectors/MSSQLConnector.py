@@ -5,8 +5,9 @@ import re
 import pudb
 
 import logging, logging.config
-logger = logging.getLogger(__name__)
-
+logging.config.fileConfig('logging.conf')
+log_error = logging.getLogger('error')
+log_query = logging.getLogger('query')
 
 class MSSQLConnector():
 	def __init__(self, connectionstring = None, config = None, autocommit=False):
@@ -51,7 +52,7 @@ class MSSQLConnector():
 		try:
 			con = pyodbc.connect(self.connectionstring)
 		except pyodbc.Error as e:
-			logger.warn("Error {0}: {1}".format(*e.args))
+			log_error.warn("Error {0}: {1}".format(*e.args))
 			#print("Error {0}: {1}".format(*e.args))
 			raise
 		return con

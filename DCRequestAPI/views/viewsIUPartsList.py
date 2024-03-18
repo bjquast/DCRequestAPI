@@ -1,6 +1,3 @@
-import logging
-log = logging.getLogger(__name__)
-
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
 from pyramid.view import (view_config, view_defaults)

@@ -1,6 +1,7 @@
 import logging
 import logging.config
 
+logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('dwb_authentication')
 logger_query = logging.getLogger('query')
 import bcrypt

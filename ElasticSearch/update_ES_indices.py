@@ -1,6 +1,5 @@
 import pudb
 
-import logging, logging.config
 from configparser import ConfigParser
 from ElasticSearch.ES_Indexer import ES_Indexer
 from ElasticSearch.ES_Searcher import ES_Searcher
@@ -9,6 +8,7 @@ from DC2ElasticSearch.DCDataGetters.DC_Connections import DC_Connections
 from DC2ElasticSearch.DCDataGetters.DataGetter import DataGetter
 from ElasticSearch.create_ES_indices import IUPartsIndexer
 
+import logging, logging.config
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('elastic_indexer')
 

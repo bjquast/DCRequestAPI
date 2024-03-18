@@ -70,7 +70,7 @@ class FieldDefinitions():
 		]
 		
 		self.tree_query_fields = [
-			'MatchedTaxaTree.Tree',
+			'MatchedTaxaTree',
 			'CollectionsTree'
 		]
 		
@@ -137,14 +137,14 @@ class FieldDefinitions():
 				},
 			},
 			
-			'MatchedTaxaTree.Tree': {
+			'MatchedTaxaTree': {
 				'names': {'en': 'Taxonomic Tree'},
 				'buckets': {
 					'field_query': 'MatchedTaxaTree.Taxon',
 					'id_field_for_tree': 'MatchedTaxaTree.TaxonURI',
 					'parent_id_field_for_tree': 'MatchedTaxaTree.ParentTaxonURI',
 					'path': 'MatchedTaxaTree',
-					'root_level': 1 # the level to start the tree or trees (e. g. Animalia, Plantae, Fungi) from
+					'root_level': 0 # the level to start the tree or trees (e. g. Animalia, Plantae, Fungi) from
 				}
 			},
 			
@@ -253,11 +253,14 @@ class FieldDefinitions():
 				},
 			},
 			
-			'CollectionsTree.CollectionName': {
+			'CollectionsTree': {
 				'names': {'en': 'Collections'},
 				'buckets': {
 					'field_query': 'CollectionsTree.CollectionName',
 					'path': 'CollectionsTree',
+					'id_field_for_tree': 'CollectionsTree.CollectionID',
+					'parent_id_field_for_tree': 'CollectionsTree.ParentCollectionID',
+					'root_level': 0 # the level to start the tree or trees
 				},
 			},
 			

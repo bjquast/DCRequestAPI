@@ -15,6 +15,7 @@ from ElasticSearch.WithholdFilters import WithholdFilters
 from ElasticSearch.QueryConstructor.BucketAggregations import BucketAggregations
 from ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
 from ElasticSearch.QueryConstructor.MatchQuery import MatchQuery
+from ElasticSearch.QueryConstructor.TreeQueries import TreeQueries
 
 class ES_Searcher():
 	def __init__(self, search_params = {}, user_id = None, users_project_ids = []):
@@ -158,9 +159,28 @@ class ES_Searcher():
 		self.client.indices.put_settings(index=self.index, body=body)
 
 
-	def singleAggregationSearch(self, aggregation_name, size = 5000):
-		
+	def singleTreeAggregationSearch(self, aggregation_name, parent_ids):
 		#pudb.set_trace()
+		self.setQuery()
+		buckets_query = TreeQueries(aggregation_name, parent_ids = parent_ids, users_project_ids = self.users_project_ids) #, sort_alphanum = True)
+		aggs = buckets_query.getTreeQuery()
+		
+		logger.debug(json.dumps(aggs))
+		logger.debug(json.dumps(self.query))
+		
+		source_fields = False
+		
+		response = self.client.search(index=self.index, query=self.query, source=source_fields, aggs=aggs, size = 0)
+		
+		buckets = []
+		if 'aggregations' in response:
+			self.raw_aggregations = response['aggregations']
+			buckets = self.getBucketListFromCompositeAggregation(self.raw_aggregations[aggregation_name])
+		
+		return buckets
+
+
+	def singleAggregationSearch(self, aggregation_name, size = 5000):
 		
 		self.setQuery()
 		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size, sort_alphanum = True)
@@ -264,6 +284,20 @@ class ES_Searcher():
 				buckets = self.getBucketListFromAggregation(raw_aggregation['buckets'])
 			else:
 				buckets = []
+		return buckets
+
+
+	def getBucketListFromCompositeAggregation(self, raw_aggregation):
+		#pudb.set_trace()
+		buckets = []
+		
+		try:
+			bucket_dicts = [bucket_dict for bucket_dict in raw_aggregation['buckets']['composite_buckets']['buckets']]
+		except:
+			return []
+		
+		for bucket_dict in bucket_dicts:
+			buckets.append([bucket_dict['key']['Value'], bucket_dict['key']['ItemID'], bucket_dict['key']['ParentID'], bucket_dict['key']['TreeLevel'], bucket_dict['doc_count']])
 		return buckets
 
 

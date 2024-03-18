@@ -16,7 +16,7 @@ import pudb
 import json
 
 
-class AggregationView():
+class TreeView():
 	def __init__(self, request):
 		
 		self.request = request
@@ -53,8 +53,8 @@ class AggregationView():
 		self.fielddefinitions = FieldDefinitions().fielddefinitions
 
 
-	@view_config(route_name='aggregation', accept='application/json', renderer="json")
-	def viewAggregationJSON(self):
+	@view_config(route_name='tree_aggregation', accept='application/json', renderer="json")
+	def viewTreeAggregationJSON(self):
 		
 		#pudb.set_trace()
 		
@@ -62,19 +62,22 @@ class AggregationView():
 		# but keep all other search params?
 		# that might be confusing for users
 		
-		if 'aggregation' in self.search_params:
-			agg_key = self.search_params['aggregation']
-			#if agg_key in self.search_params['term_filters']:
-			#	del self.search_params['term_filters'][agg_key]
+		if 'tree' in self.search_params:
+			agg_key = self.search_params['tree']
+		
+		parent_ids = []
+		if 'parent_ids' in self.search_params:
+			parent_ids = self.search_params['parent_ids']
+		
 		
 		if agg_key not in self.fielddefinitions:
 			return {
-				'message': '{0} can is not available as bucket aggregation'.format(agg_key),
+				'message': '{0} is not available as tree aggregation'.format(agg_key),
 				'buckets': {}
 			}
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
-		buckets = es_searcher.singleAggregationSearch(agg_key)
+		buckets = es_searcher.singleTreeAggregationSearch(agg_key, parent_ids)
 		
 		
 		

@@ -1,4 +1,6 @@
-import logging
+import logging, logging.config
+logging.config.fileConfig('logging.conf')
+
 es_logger = logging.getLogger('elastic_queries')
 
 from elasticsearch import Elasticsearch, BadRequestError

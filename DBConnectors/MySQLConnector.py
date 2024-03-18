@@ -4,8 +4,8 @@ import re
 
 import pudb
 import logging, logging.config
-
-logger = logging.getLogger('error')
+logging.config.fileConfig('logging.conf')
+log_error = logging.getLogger('error')
 log_query = logging.getLogger('query')
 
 #from pymysql.constants.CLIENT import MULTI_STATEMENTS
@@ -63,7 +63,7 @@ class MySQLConnector():
 		try:
 			con = pymysql.connect(host=self.config['host'], user=self.config['user'], password=self.config['password'], database=self.config['database'], port=int(self.config['port']), charset=self.config['charset'])
 		except pymysql.Error as e:
-			logger.critical("Error {0}: {1}".format(*e.args))
+			log_error.critical("Error {0}: {1}".format(*e.args))
 			raise
 		return con
 
