@@ -114,7 +114,7 @@ class TreeQueries():
 		for parent_id in self.parent_ids:
 			query = {
 				"term": {
-					self.buckets_definition['id_field_for_tree']: parent_id
+					self.buckets_definition['parent_id_field_for_tree']: parent_id
 				}
 			}
 			
