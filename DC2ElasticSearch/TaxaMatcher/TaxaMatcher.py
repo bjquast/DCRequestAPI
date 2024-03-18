@@ -9,6 +9,7 @@ from configparser import ConfigParser
 import logging
 import logging.config
 
+logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('elastic_indexer')
 log_queries = logging.getLogger('query')
 

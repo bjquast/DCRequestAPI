@@ -6,6 +6,7 @@ import pudb
 import logging
 import logging.config
 
+logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('elastic_indexer')
 querylog = logging.getLogger('query')
 
