@@ -35,7 +35,7 @@ class FieldDefinitions():
 			'Gender',
 			'NumberOfUnits',
 			'Barcodes.Methods.region',
-			'ImageAvailable'
+			'ImageAvailable' # not working with prefix query
 		]
 		
 		self.fieldnames = [
@@ -73,6 +73,27 @@ class FieldDefinitions():
 		self.tree_query_fields = [
 			'MatchedTaxaTree',
 			'CollectionsTree'
+		]
+		
+		self.suggestion_fields = [
+			#'CollectionsTree.CollectionName',
+			'CollectionName',
+			'Projects.Project',
+			'LastIdentificationCache',
+			'MatchedTaxon',
+			'VernacularTerms',
+			'TypeStatus',
+			'MaterialCategory',
+			'LocalityVerbatim',
+			'LocalityDescription',
+			'HabitatDescription',
+			'CountryCache',
+			'CollectingMethod',
+			'CollectionAgents.CollectorsName',
+			'MaterialCategory',
+			'LifeStage',
+			'Gender',
+			'Barcodes.Methods.region',
 		]
 		
 		return

@@ -16,6 +16,7 @@ from ElasticSearch.QueryConstructor.BucketAggregations import BucketAggregations
 from ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
 from ElasticSearch.QueryConstructor.MatchQuery import MatchQuery
 from ElasticSearch.QueryConstructor.TreeQueries import TreeQueries
+from ElasticSearch.QueryConstructor.SuggestAggregations import SuggestAggregations
 
 class ES_Searcher():
 	def __init__(self, search_params = {}, user_id = None, users_project_ids = []):
@@ -199,6 +200,28 @@ class ES_Searcher():
 			buckets = self.getBucketListFromAggregation(self.raw_aggregations[aggregation_name])
 		
 		return buckets
+
+
+	def suggestionsSearch(self, search_val, size = 10):
+		
+		self.setQuery()
+		buckets_query = SuggestAggregations(users_project_ids = self.users_project_ids, source_fields = [], size = size, sort_alphanum = True)
+		aggs = buckets_query.getSuggestionsQuery(search_val)
+		
+		logger.debug(json.dumps(aggs))
+		logger.debug(json.dumps(self.query))
+		
+		source_fields = False
+		
+		response = self.client.search(index=self.index, query=self.query, source=source_fields, aggs=aggs, size = 0)
+		
+		buckets = []
+		if 'aggregations' in response:
+			self.raw_aggregations = response['aggregations']
+			buckets = self.getParsedAggregations()
+		
+		return buckets
+
 
 
 	def paginatedSearch(self):

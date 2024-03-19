@@ -16,7 +16,7 @@ import pudb
 import json
 
 
-class TreeView():
+class SuggestionsView():
 	def __init__(self, request):
 		
 		self.request = request
@@ -53,35 +53,22 @@ class TreeView():
 		self.fielddefinitions = FieldDefinitions().fielddefinitions
 
 
-	@view_config(route_name='tree_aggregation', accept='application/json', renderer="json")
-	def viewTreeAggregationJSON(self):
+	@view_config(route_name='suggestions', accept='application/json', renderer="json")
+	def viewSuggestionsJSON(self):
 		
 		#pudb.set_trace()
 		
-		if 'tree' in self.search_params:
-			agg_key = self.search_params['tree']
-		
-		parent_ids = []
-		if 'parent_ids' in self.search_params:
-			parent_ids = self.search_params['parent_ids']
-		
-		
-		if agg_key not in self.fielddefinitions:
-			return {
-				'message': '{0} is not available as tree aggregation'.format(agg_key),
-				'buckets': {}
-			}
+		if 'suggestion_search' in self.search_params:
+			suggestion_val = self.search_params['suggestion_search']
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
-		buckets = es_searcher.singleTreeAggregationSearch(agg_key, parent_ids)
+		buckets = es_searcher.suggestionsSearch(suggestion_val)
 		
 		
 		
-		buckets_dict = {
-			'aggregation': agg_key,
-			'aggregation_names': self.fielddefinitions[agg_key].get('names', {'en', None}),
+		suggestions_dict = {
 			'buckets': buckets
 		}
 		
-		return buckets_dict
+		return suggestions_dict
 
