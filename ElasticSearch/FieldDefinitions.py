@@ -35,6 +35,7 @@ class FieldDefinitions():
 			'Gender',
 			'NumberOfUnits',
 			'Barcodes.Methods.region',
+			'ImageAvailable'
 		]
 		
 		self.fieldnames = [
@@ -243,6 +244,14 @@ class FieldDefinitions():
 				'buckets': {
 					'field_query': 'NumberOfSpecimenImages',
 					'type': 'number'
+				},
+			},
+			
+			'ImageAvailable': {
+				'names': {'en': 'Image(s) available'},
+				'buckets': {
+					'field_query': 'ImageAvailable',
+					'type': 'boolean'
 				},
 			},
 			

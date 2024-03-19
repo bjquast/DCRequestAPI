@@ -121,6 +121,7 @@ class CollectionSpecimenImages():
 				self.images_dict[row[1]] = {}
 				self.images_dict[row[1]]['Images'] = []
 				self.images_dict[row[1]]['NumberOfSpecimenImages'] = 0
+				self.images_dict[row[1]]['ImageAvailable'] = True
 			
 			image = {
 				'URI': row[2],

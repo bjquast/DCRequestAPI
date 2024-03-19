@@ -73,15 +73,42 @@ class TermFilterQueries(QuerySorter):
 		return filter_queries
 
 
+	def getCaseInsensitiveValue(self, query_def):
+		case_insensitive = "true"
+		if "type" in query_def and query_def['type'] not in ['keyword', 'keyword_lc']:
+			case_insensitive = "false"
+		
+		return case_insensitive
+
+
+	def replaceBooleanValues(self, query_def, filter_values):
+		if "type" in query_def and query_def['type'] in ['boolean']:
+			new_values = []
+			for value in filter_values:
+				if value in [True, 1, '1']:
+					new_values.append("true")
+				elif value in [False, 0, '0']:
+					new_values.append("false")
+				else:
+					new_values.append(value)
+				return new_values
+		return filter_values
+
+
 	def appendSimpleTermQuery(self, filter_key, filter_values):
+		
 		if filter_key not in self.term_queries:
 			self.term_queries[filter_key] = []
+		
+		case_insensitive = self.getCaseInsensitiveValue(self.simple_fields[filter_key])
+		filter_values = self.replaceBooleanValues(self.simple_fields[filter_key], filter_values)
+		
 		for filter_value in filter_values:
 			termquery = {
 				"term": {
 					self.simple_fields[filter_key]['field_query']: {
 						"value": filter_value, 
-						"case_insensitive": "true"
+						"case_insensitive": case_insensitive
 					}
 				}
 			}
@@ -94,6 +121,10 @@ class TermFilterQueries(QuerySorter):
 	def appendSimpleRestrictedTermQuery(self, filter_key, filter_values):
 		if filter_key not in self.term_queries:
 			self.term_queries[filter_key] = []
+		
+		case_insensitive = self.getCaseInsensitiveValue(self.simple_restricted_fields[filter_key])
+		filter_values = self.replaceBooleanValues(self.simple_restricted_fields[filter_key], filter_values)
+		
 		for filter_value in filter_values:
 			termquery = {
 					"bool": {
@@ -102,7 +133,7 @@ class TermFilterQueries(QuerySorter):
 								"term": {
 									self.simple_restricted_fields[filter_key]['field_query']: {
 										"value": filter_value, 
-										"case_insensitive": "true"
+										"case_insensitive": case_insensitive
 									}
 								}
 							}
@@ -124,6 +155,9 @@ class TermFilterQueries(QuerySorter):
 		if filter_key not in self.term_queries:
 			self.term_queries[filter_key] = []
 		
+		case_insensitive = self.getCaseInsensitiveValue(self.nested_fields[filter_key])
+		filter_values = self.replaceBooleanValues(self.nested_fields[filter_key], filter_values)
+		
 		for filter_value in filter_values:
 			termquery = {
 				"nested": {
@@ -135,7 +169,7 @@ class TermFilterQueries(QuerySorter):
 									"term": {
 										self.nested_fields[filter_key]['field_query']: {
 											"value": filter_value, 
-											"case_insensitive": "true"
+											"case_insensitive": case_insensitive
 										}
 									}
 								}
@@ -161,6 +195,9 @@ class TermFilterQueries(QuerySorter):
 		if filter_key not in self.term_queries:
 			self.term_queries[filter_key] = []
 		
+		case_insensitive = self.getCaseInsensitiveValue(self.nested_restricted_fields[filter_key])
+		filter_values = self.replaceBooleanValues(self.nested_restricted_fields[filter_key], filter_values)
+		
 		for filter_value in filter_values:
 			termquery = {
 				"nested": {
@@ -172,7 +209,7 @@ class TermFilterQueries(QuerySorter):
 									"term": {
 										self.nested_restricted_fields[filter_key]['field_query']: {
 											"value": filter_value, 
-											"case_insensitive": "true"
+											"case_insensitive": case_insensitive
 										}
 									}
 								}

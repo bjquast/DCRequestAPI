@@ -160,11 +160,15 @@ class IdentificationUnitParts():
 		
 		self.iu_parts_dict = {}
 		for element in iu_parts_list:
+			element = self.set_initial_default_values(element)
 			self.iu_parts_dict[element['_id']] = element
 		
 		return
 
 
+	def set_initial_default_values(self, iu_part_dict):
+		iu_part_dict['ImageAvailable'] = False
+		return iu_part_dict
 
 
 
