@@ -6,10 +6,10 @@ logger = logging.getLogger('elastic_queries')
 import pudb
 
 from ElasticSearch.FieldDefinitions import FieldDefinitions
-from ElasticSearch.QueryConstructor.QuerySorter import QuerySorter
+from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
-class BucketAggregations(QuerySorter):
+class BucketAggregations(QueryConstructor):
 	def __init__(self, users_project_ids = [], source_fields = [], size = 10, sort_alphanum = False, sort_dir = 'asc'):
 		#pudb.set_trace()
 		
@@ -24,28 +24,9 @@ class BucketAggregations(QuerySorter):
 		if len(self.source_fields) <= 0:
 			self.source_fields = fielddefs.bucketfields
 		
-		QuerySorter.__init__(self, fielddefs.fielddefinitions, self.source_fields)
+		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.source_fields)
 		self.sort_queries_by_definitions()
-		self.setSubFiltersInNestedAggregations()
-
-
-	def setSubFiltersInNestedAggregations(self):
-		# when the nested objects should be filtered by a value, e. g. the parent taxa by rank
-		#pudb.set_trace()
-		self.subfilters = {}
-		for field in self.nested_fields:
-			if 'sub_filters' in self.nested_fields[field]:
-				for sub_filter_element in self.nested_fields[field]['sub_filters']:
-					if field not in self.subfilters:
-						self.subfilters[field] = {}
-					
-					if sub_filter_element[0] not in self.subfilters[field]:
-						self.subfilters[field][sub_filter_element[0]] = []
-					
-					self.subfilters[field][sub_filter_element[0]].append(sub_filter_element[1])
-		
-		return
-		
+		self.setSubFilters()
 
 
 	def getAggregationsQuery(self):

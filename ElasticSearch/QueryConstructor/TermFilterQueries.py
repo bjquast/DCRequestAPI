@@ -6,10 +6,10 @@ logger = logging.getLogger('elastic_queries')
 import pudb
 
 from ElasticSearch.FieldDefinitions import FieldDefinitions
-from ElasticSearch.QueryConstructor.QuerySorter import QuerySorter
+from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
-class TermFilterQueries(QuerySorter):
+class TermFilterQueries(QueryConstructor):
 	def __init__(self, users_project_ids = [], source_fields = []):
 		self.users_project_ids = users_project_ids
 		self.source_fields = source_fields
@@ -18,28 +18,9 @@ class TermFilterQueries(QuerySorter):
 		if len(self.source_fields) <= 0:
 			self.source_fields = fielddefs.bucketfields
 		
-		QuerySorter.__init__(self, fielddefs.fielddefinitions, self.source_fields)
+		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.source_fields)
 		self.sort_queries_by_definitions()
 		self.setSubFilters()
-
-
-	def setSubFilters(self):
-		# when the nested objects should be filtered by a value, e. g. the parent taxa by rank
-		#pudb.set_trace()
-		self.subfilters = {}
-		for field in self.nested_fields:
-			if 'sub_filters' in self.nested_fields[field]:
-				for sub_filter_element in self.nested_fields[field]['sub_filters']:
-					if field not in self.subfilters:
-						self.subfilters[field] = {}
-					
-					if sub_filter_element[0] not in self.subfilters[field]:
-						self.subfilters[field][sub_filter_element[0]] = []
-					
-					self.subfilters[field][sub_filter_element[0]].append(sub_filter_element[1])
-		
-		return
-
 
 
 	def getTermFilterQueries(self, filters):
@@ -58,8 +39,6 @@ class TermFilterQueries(QuerySorter):
 			elif filter_key in self.nested_restricted_fields:
 				filter_values = filters[filter_key]
 				self.appendNestedRestrictedTermQuery(filter_key, filter_values)
-			
-			
 		
 		filter_queries = []
 		
@@ -71,28 +50,6 @@ class TermFilterQueries(QuerySorter):
 				filter_queries.append(self.term_queries[filter_key][0])
 		
 		return filter_queries
-
-
-	def getCaseInsensitiveValue(self, query_def):
-		case_insensitive = "true"
-		if "type" in query_def and query_def['type'] not in ['keyword', 'keyword_lc']:
-			case_insensitive = "false"
-		
-		return case_insensitive
-
-
-	def replaceBooleanValues(self, query_def, filter_values):
-		if "type" in query_def and query_def['type'] in ['boolean']:
-			new_values = []
-			for value in filter_values:
-				if value in [True, 1, '1']:
-					new_values.append("true")
-				elif value in [False, 0, '0']:
-					new_values.append("false")
-				else:
-					new_values.append(value)
-				return new_values
-		return filter_values
 
 
 	def appendSimpleTermQuery(self, filter_key, filter_values):
