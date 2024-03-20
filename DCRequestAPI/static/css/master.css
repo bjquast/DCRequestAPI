@@ -1,0 +1,34 @@
+/* css for master.pt 
+ * should not contain any elements or classes that are not in master.pt
+ */
+
+/* the grid layout 
+ * taken over from https://wiki.selfhtml.org/wiki/CSS/Tutorials/Grid/Einf%C3%BChrung#Holy-Grail-Layout
+ * */
+body {
+	display: grid;
+	gap: 0.5em;
+}
+
+@media (min-width: 30em) { 
+	body {
+		grid-template-columns: 1fr 3fr;	
+		grid-template-rows: auto auto auto 1fr 100px;
+	}
+}
+
+header, message_box, search_header, footer {
+	grid-column: 1 / -1;
+}
+
+#title_header {
+	display: grid;
+	gap: 0.5em;
+	grid-template-columns: 4fr 1fr;
+	grid-template-rows: auto;
+}
+
+#title_image {
+	width: 100%;
+	/*overflow-x: hidden;*/
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en"
+xmlns:tal="http://xml.zope.org/namespaces/tal"
+xmlns:metal="http://xml.zope.org/namespaces/metal"
+>
+<head>
+	<title>${pagetitle}</title>
+	<link rel="stylesheet" type="text/css" href="${request.static_url('DCRequestAPI:static/css/global.css')}">
+	<link rel="stylesheet" type="text/css" href="${request.static_url('DCRequestAPI:static/css/master.css')}">
+	<metal:js define-slot="css-head"/>
+	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/extern_js/jquery-3.6.1/jquery-3.6.1.js')}"></script>
+	<metal:js define-slot="js-head"/>
+</head>
+<body>
+	<header>
+		<img id="title_image" src="${request.static_url('DCRequestAPI:static/images/image_collage.png')}" alt="Images of collection specimens"/>
+		<div id="title_header">
+			<div class="title_box">
+				<h2>${pagetitle}</h2>
+			</div>
+			<div tal:condition="python: authenticated_user is None">
+				<details>
+					<summary class="clickable">Login</summary>
+					<div>
+						<span class="w25" ><label for="login">Username</label></span>
+						<span class="w75"><input type="text" form="search_form" id="login" name="username" value=""/></span>
+					</div>
+					<div>
+						<span class="w25"><label for="password">Password</label></span>
+						<span class="w75"><input type="password" form="search_form" id="password" name="password" value=""/></span>
+					</div>
+					<button id="login_button" type="submit" value="" name="login_button" form="search_form">Log in</button>
+				</details>
+			</div>
+			<div tal:condition="python: authenticated_user is not None">
+				<!--log out is handled in search_form.js to prevent the log out when form is submitted with "enter" -->
+				<span>${authenticated_user} <button id="logout_button" type="button" name="logout_button" form="search_form">Log out</button></span>
+				<input id="logout_checkbox" type="checkbox" class="hidden" name="logout" value="logout" form="search_form">
+			</div>
+		</div>
+	
+	</header>
+	<messages>
+		<metal:js define-slot="message_box"/>
+	</messages>
+	<search_header>
+		<metal:js define-slot="search_boxes"/>
+	</search_header>
+	<aside>
+		<metal:js define-slot="search_filters"/>
+	</aside>
+	
+	<main>
+		<metal:js define-slot="search_results"/>
+	</main>
+	
+	<footer>
+		<metal:js define-slot="footer_boxes"/>
+	</footer>
+	
+	
+</body>
+</html>

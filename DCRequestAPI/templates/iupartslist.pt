@@ -1,31 +1,106 @@
-<!DOCTYPE html>
-<html lang="en"
-xmlns:tal="http://xml.zope.org/namespaces/tal"
-xmlns:metal="http://xml.zope.org/namespaces/metal"
->
-<head>
-	<title>${pagetitle}</title>
-	<link rel="stylesheet" type="text/css" href="${request.static_url('DCRequestAPI:static/css/global.css')}">
+
+
+<html metal:use-macro="load: DCRequestAPI:templates/master.pt">
+
+<metal:js fill-slot="css-head">
 	<link rel="stylesheet" type="text/css" href="${request.static_url('DCRequestAPI:static/css/listview.css')}">
 	<link rel="stylesheet" type="text/css" href="${request.static_url('DCRequestAPI:static/css/filters.css')}">
 	<link rel="stylesheet" type="text/css" href="${request.static_url('DCRequestAPI:static/css/header.css')}">
 	<link rel="stylesheet" type="text/css" href="${request.static_url('DCRequestAPI:static/css/overlays.css')}">
-	
-	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/extern_js/jquery-3.6.1/jquery-3.6.1.js')}"></script>
+</metal:js>
+
+<metal:js fill-slot="js-head">
 	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/js/AppliedFiltersField.js')}"></script>
 	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/js/BucketsOverlay.js')}"></script>
 	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/js/search_form.js')}"></script>
-</head>
-<body>
-	<div metal:use-macro="load: DCRequestAPI:templates/header_macro.pt"></div>
+</metal:js>
 
+
+<metal:js fill-slot="messages">
+	<div tal:condition="python: len(messages) > 0" class="message error">
+		<p tal:repeat="message messages">${message}</p>
+	</div>
+</metal:js>
+
+<metal:js fill-slot="search_boxes">
 	<form id="search_form" action="${request.application_url}/list" method="GET" >
 	</form>
-
 	<div id="buckets-overlay-slot"></div>
+</metal:js>
 
+<metal:js fill-slot="search_filters">
+	<div metal:use-macro="load: DCRequestAPI:templates/filters_macro.pt" id="filter_macro"></div>
+</metal:js>
+
+
+<metal:js fill-slot="search_results">
 	<div id="filter-and-resulttable" class="flex-wrapped-row">
-		<div metal:use-macro="load: DCRequestAPI:templates/filters_macro.pt" id="filter_macro"></div>
+
+		<div id="results_iuparts">
+			<div tal:condition="python: len(iupartslist) <= 0">
+				<h3>No specimen found</h3>
+			</div>
+			
+			<div class="flex-space-between">
+				<div>
+					<div tal:condition="python: len(iupartslist) > 0 and resultnum > 0">
+						<span>Number of specimens: ${resultnum}</span>
+					</div>
+					<div metal:use-macro="load: DCRequestAPI:templates/paging_macro.pt"></div>
+				</div>
+				<div metal:use-macro="load: ./column_selector_macro.pt"></div>
+			</div>
+			
+			<div class="flex-space-between">
+				<div metal:use-macro="load: DCRequestAPI:templates/sorting_macro.pt"></div>
+				<div metal:use-macro="load: ./search_macro.pt"></div>
+			</div>
+
+			<div tal:condition="python: len(iupartslist) > 0" class="listview">
+				<table>
+					<thead>
+						<th tal:repeat="columnkey selected_sourcefields" class="column_header column_sort_selector clickable" data-columnkey="${columnkey}" tal:attributes="data-sorting_dir search_params['sorting_dir'] if 'sorting_dir' in search_params else ''">
+							<div class="flex-start-nowrap">
+								<div>${coldefs[columnkey]['en']} </div>
+								<div>
+									<img tal:condition="python: 'sorting_col' in search_params and search_params['sorting_col'] == columnkey and 'sorting_dir' in search_params and search_params['sorting_dir'] == 'asc'" class="sort_button" src="./static/buttons/sort_by_column_asc.png">
+									<img tal:condition="python: 'sorting_col' in search_params and search_params['sorting_col'] == columnkey and 'sorting_dir' in search_params and search_params['sorting_dir'] == 'desc'" class="sort_button" src="./static/buttons/sort_by_column_desc.png">
+									<img tal:condition="python: 'sorting_col' not in search_params or search_params and search_params['sorting_col'] != columnkey" class="sort_button" src="./static/buttons/sort_by_column.png">
+									
+								</div>
+							</div>
+						</th>
+					</thead>
+					<tbody>
+						<tr tal:repeat="iuparts iupartslist">
+							
+							<td tal:repeat="columnkey selected_sourcefields">
+								<block tal:condition="python: columnkey == 'PartAccessionNumber'">
+									${structure:iuparts['PartAccessionNumber'][0]}
+								</block>
+								
+								<block tal:condition="python: columnkey == 'StableIdentifierURL'">
+									${structure:iuparts['StableIdentifierURL'][0]}
+								</block>
+								
+								<block tal:condition="python: columnkey not in ['PartAccessionNumber', 'StableIdentifierURL']" tal:repeat="iupfield iuparts[columnkey]">
+									${iupfield}
+								</block>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</metal:js>
+
+
+<body>
+
+
+
+	<div id="filter-and-resulttable">
 
 		<div id="results_iuparts">
 			<div tal:condition="python: len(iupartslist) <= 0">
