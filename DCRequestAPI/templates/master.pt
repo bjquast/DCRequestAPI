@@ -14,7 +14,7 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 <body>
 	<header>
 		<img id="title_image" src="${request.static_url('DCRequestAPI:static/images/image_collage.png')}" alt="Images of collection specimens"/>
-		<div id="title_header">
+		<div id="title_header" class="flex-space-between align-items-center">
 			<div class="title_box">
 				<h2>${pagetitle}</h2>
 			</div>
@@ -40,12 +40,12 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 		</div>
 	
 	</header>
-	<messages>
-		<metal:js define-slot="message_box"/>
-	</messages>
-	<search_header>
-		<metal:js define-slot="search_boxes"/>
-	</search_header>
+	<message_box>
+		<metal:js define-slot="messages"/>
+	</message_box>
+	<search_box>
+		<metal:js define-slot="search_form"/>
+	</search_box>
 	<aside>
 		<metal:js define-slot="search_filters"/>
 	</aside>
@@ -55,7 +55,12 @@ xmlns:metal="http://xml.zope.org/namespaces/metal"
 	</main>
 	
 	<footer>
-		<metal:js define-slot="footer_boxes"/>
+		<fieldset>
+			<dl>
+				<dt>Data usage</dt>
+				<dd>Data can be used according to the CC-BY licence. Attribute data to: Leibniz-Institute for the Analysis of Biodiversity Change</dd>
+			</dl>
+		</fieldset>
 	</footer>
 	
 	

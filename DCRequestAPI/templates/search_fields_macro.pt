@@ -1,0 +1,9 @@
+<div>
+	<fieldset id="simple_search">
+		<legend>Simple search</legend>
+		<input id="simple_search" form="search_form" type="text" name="simple_search" autocomplete="off"/>
+		<div id="suggestions_list" class="hidden">
+			<ul></ul>
+		</div>
+	</fieldset>
+</div>
