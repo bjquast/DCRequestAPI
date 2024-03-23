@@ -55,7 +55,7 @@
 			
 			<div class="flex-space-between">
 				<div metal:use-macro="load: DCRequestAPI:templates/sorting_macro.pt"></div>
-				<div metal:use-macro="load: ./match_search_macro.pt"></div>
+				<!--<div metal:use-macro="load: ./match_search_macro.pt"></div>-->
 			</div>
 		</div>
 

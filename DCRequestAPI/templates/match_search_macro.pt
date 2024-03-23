@@ -10,7 +10,7 @@
 			<input form="search_form" type="submit" value="Search"/>
 		</span>
 		
-		<!--<span class="smallparagraph" rel="tooltip">Search terms separated by a white space will be connected by an AND operator, terms separated by a semi-colon will be connected by an or OR operator.</span>-->
+		<!--<span class="smallparagraph" rel="tooltip">Search terms separated by a white space will be connected by an AND operator, terms separated by a semi-colon will be connected by an OR operator.</span>-->
 	</div>
 </div>
 	
