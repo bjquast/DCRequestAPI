@@ -36,7 +36,7 @@ class RequestParams():
 		complex_params = ['term_filters',]
 		list_params = ['open_filter_selectors', 'result_table_columns', 'parent_ids']
 		
-		for param_name in simple_params: 
+		for param_name in simple_params:
 			if param_name in self.params_dict and len(self.params_dict[param_name]) > 0:
 				self.search_params[param_name] = self.params_dict[param_name][-1]
 		

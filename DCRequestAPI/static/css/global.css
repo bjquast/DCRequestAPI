@@ -1,18 +1,7 @@
 
-body {
-	font-family: sans-serif;
-	font-size: small;
-	/*min-height: 100vh;*/
-}
-
 h1 {
 	font-size: 1em;
 	line-height: 0.8em;
-}
-
-
-fieldset {
-	margin-right: 1rem;
 }
 
 
@@ -70,11 +59,20 @@ input{
 }
 
 
+.suggestions_list {
+	position: absolute;
+	z-index: 10;
+	background-color: white;
+	border-width: 0.1rem;
+	border-style: solid;
+	border-color: black;
+}
+
 .message{
 	border: 2px;
 	border-style: solid;
-	padding: 0.2em;
-	margin: 1em;
+	padding-left: 1em;
+	padding-right: 1em;
 }
 
 
@@ -125,6 +123,7 @@ input{
 .ul-no-bullet {
 	list-style-type: none;
 	padding-left: 1em;
+	padding-right: 1em;
 }
 
 .clickable {
@@ -164,13 +163,6 @@ input{
 	margin-bottom: 1em;
 }
 
-
-.flex-wrapped-row {
-	display: flex;
-	flex-wrap: wrap;
-}
-
-
 .flex-column {
 	display: flex;
 	flex-direction: column;
@@ -186,23 +178,17 @@ input{
 	align-self: center;
 }
 
-#filter-and-resulttable {
-	width: 100%;
-}
-
-
 #selectable_filters {
 	min-width: 20rem;
 	max-width: 25rem;
 }
 
 #results_iuparts {
-	width: 40%;
 	height: 60vh;
-	flex-grow: 8;
-	margin-right: 1em;
 }
 
-
+.align-items-center {
+	align-items: center;
+}
 
 
