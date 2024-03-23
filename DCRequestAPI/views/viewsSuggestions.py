@@ -58,13 +58,19 @@ class SuggestionsView():
 		
 		#pudb.set_trace()
 		
+		buckets = {}
+		
 		if 'suggestion_search' in self.search_params:
 			suggestion_val = self.search_params['suggestion_search']
-		
-		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
-		buckets = es_searcher.suggestionsSearch(suggestion_val)
-		
-		
+			
+			es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
+			buckets = es_searcher.suggestionsSearch(suggestion_val)
+			
+			translated_buckets = {}
+			for key in buckets:
+				translated_buckets[self.fielddefinitions[key]['names']['en']] = buckets[key]
+			
+			buckets = translated_buckets
 		
 		suggestions_dict = {
 			'buckets': buckets

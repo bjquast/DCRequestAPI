@@ -1,9 +1,17 @@
 <div>
 	<fieldset id="simple_search">
 		<legend>Simple search</legend>
-		<input id="simple_search" form="search_form" type="text" name="simple_search" autocomplete="off"/>
-		<div id="suggestions_list" class="hidden">
-			<ul></ul>
+		
+		<span tal:condition="python: 'simple_search' not in search_params or search_params['simple_search'] is None or search_params['simple_search'] == ''">
+			<input id="simple_search_input" form="search_form" type="text" name="simple_search" autocomplete="off"/>
+			<input form="search_form" type="submit" value="Search"/>
+		</span>
+		<span tal:condition="python: 'simple_search' in search_params and search_params['simple_search'] is not None and len(search_params['simple_search']) > 0">
+			<input id="simple_search_input" form="search_form" type="text" name="simple_search" value="${search_params['simple_search']}"/>
+			<input form="search_form" type="submit" value="Search"/>
+		</span>
+		<div id="simple_search_suggestions_list" class="suggestions_list hidden">
+			<ul class="ul-no-bullet"></ul>
 		</div>
 	</fieldset>
 </div>
