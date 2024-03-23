@@ -10,7 +10,7 @@ from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
 class SuggestAggregations(QueryConstructor):
-	def __init__(self, users_project_ids = [], source_fields = [], size = 10, sort_alphanum = True, sort_dir = 'asc'):
+	def __init__(self, users_project_ids = [], source_fields = [], size = 10, sort_alphanum = True, sort_dir = 'asc', prefix_or_match = 'prefix'):
 		#pudb.set_trace()
 		
 		self.users_project_ids = users_project_ids
@@ -18,6 +18,8 @@ class SuggestAggregations(QueryConstructor):
 		self.size = size
 		self.sort_alphanum = sort_alphanum
 		self.sort_dir = sort_dir.lower()
+		self.prefix_or_match = prefix_or_match
+		
 		self.sortstring = None
 		
 		fielddefs = FieldDefinitions()
@@ -27,6 +29,26 @@ class SuggestAggregations(QueryConstructor):
 		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.source_fields)
 		self.sort_queries_by_definitions()
 		self.setSubFilters()
+		
+
+
+	def getSearchQuery(self, field_defs, field, case_insensitive):
+		if self.prefix_or_match == 'prefix':
+			search_filter = {
+				"prefix": {
+					field_defs[field]['field_query']: {
+						"value": self.value,
+						"case_insensitive": case_insensitive
+					}
+				}
+			}
+		else:
+			search_filter = {
+				"match_bool_prefix": {
+					field: self.value
+				}
+			}
+		return search_filter
 
 
 	def getSuggestionsQuery(self, value):
@@ -57,19 +79,13 @@ class SuggestAggregations(QueryConstructor):
 		for field in self.simple_fields:
 			
 			case_insensitive = self.getCaseInsensitiveValue(self.simple_fields[field])
+			search_query = self.getSearchQuery(self.simple_fields, field, case_insensitive)
 			
 			self.aggs_query[field] = {
 				"filter": {
 					"bool": {
 						"must": [
-							{
-								"prefix": {
-									self.simple_fields[field]['field_query']: {
-										"value": self.value,
-										"case_insensitive": case_insensitive
-									}
-								}
-							}
+							search_query
 						]
 					}
 				},
@@ -94,6 +110,7 @@ class SuggestAggregations(QueryConstructor):
 		for field in self.nested_fields:
 			
 			case_insensitive = self.getCaseInsensitiveValue(self.nested_fields[field])
+			search_query = self.getSearchQuery(self.nested_fields, field, case_insensitive)
 			
 			self.aggs_query[field] = {
 				'nested': {
@@ -104,14 +121,7 @@ class SuggestAggregations(QueryConstructor):
 						"filter": {
 							"bool": {
 								"must": [
-									{
-										"prefix": {
-											self.nested_fields[field]['field_query']: {
-												"value": self.value,
-												"case_insensitive": case_insensitive
-											}
-										}
-									}
+									search_query
 								],
 								"filter": []
 							}
@@ -145,6 +155,7 @@ class SuggestAggregations(QueryConstructor):
 		for field in self.nested_restricted_fields:
 			
 			case_insensitive = self.getCaseInsensitiveValue(self.nested_restricted_fields[field])
+			search_query = self.getSearchQuery(self.nested_restricted_fields, field, case_insensitive)
 			
 			self.aggs_query[field] = {
 				'nested': {
@@ -155,14 +166,7 @@ class SuggestAggregations(QueryConstructor):
 						"filter": {
 							"bool": {
 								"must": [
-									{
-										"prefix": {
-											self.nested_restricted_fields[field]['field_query']: {
-												"value": self.value,
-												"case_insensitive": case_insensitive
-											}
-										}
-									}
+									search_query
 								],
 								'should': [
 									# need to use the DB_ProjectID within the path for nested objects otherwise the filter fails
@@ -202,19 +206,13 @@ class SuggestAggregations(QueryConstructor):
 		for field in self.simple_restricted_fields:
 			
 			case_insensitive = self.getCaseInsensitiveValue(self.simple_restricted_fields[field])
+			search_query = self.getSearchQuery(self.simple_restricted_fields, field, case_insensitive)
 			
 			self.aggs_query[field] = {
 				"filter": {
 					"bool": {
 						"must": [
-							{
-								"prefix": {
-									self.simple_restricted_fields[field]['field_query']: {
-										"value": self.value,
-										"case_insensitive": case_insensitive
-									}
-								}
-							}
+							search_query
 						],
 						'should': [
 							{"terms": {"Projects.DB_ProjectID": self.users_project_ids}},
