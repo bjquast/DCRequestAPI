@@ -83,6 +83,7 @@ class FieldDefinitions():
 			'MatchedTaxon',
 			'VernacularTerms',
 			'TypeStatus',
+			'MatchedTaxaTree',
 			#'MatchedTaxaTree.Phylum',
 			#'MatchedTaxaTree.Subphylum',
 			#'MatchedTaxaTree.Class',
