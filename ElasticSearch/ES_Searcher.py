@@ -16,7 +16,7 @@ from ElasticSearch.QueryConstructor.BucketAggregations import BucketAggregations
 from ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
 from ElasticSearch.QueryConstructor.MatchQuery import MatchQuery
 from ElasticSearch.QueryConstructor.TreeQueries import TreeQueries
-from ElasticSearch.QueryConstructor.SuggestAggregations import SuggestAggregations
+from ElasticSearch.QueryConstructor.AggsSuggestions import AggsSuggestions
 
 class ES_Searcher():
 	def __init__(self, search_params = {}, user_id = None, users_project_ids = []):
@@ -205,7 +205,7 @@ class ES_Searcher():
 	def suggestionsSearch(self, search_val, size = 10):
 		
 		self.setQuery()
-		buckets_query = SuggestAggregations(users_project_ids = self.users_project_ids, source_fields = [], size = size, sort_alphanum = True)
+		buckets_query = AggsSuggestions(users_project_ids = self.users_project_ids, source_fields = [], size = size, sort_alphanum = True)
 		aggs = buckets_query.getSuggestionsQuery(search_val)
 		
 		logger.debug(json.dumps(aggs))

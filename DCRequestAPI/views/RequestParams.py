@@ -32,7 +32,7 @@ class RequestParams():
 	def read_search_params(self):
 		self.search_params = {}
 		
-		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'match_query', 'aggregation', 'tree', 'suggestion_search']
+		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'match_query', 'aggregation', 'tree', 'aggs_suggestion_search']
 		complex_params = ['term_filters',]
 		list_params = ['open_filter_selectors', 'result_table_columns', 'parent_ids']
 		

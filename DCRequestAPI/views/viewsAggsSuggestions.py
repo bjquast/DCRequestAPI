@@ -16,7 +16,7 @@ import pudb
 import json
 
 
-class SuggestionsView():
+class AggsSuggestionsView():
 	def __init__(self, request):
 		
 		self.request = request
@@ -53,24 +53,26 @@ class SuggestionsView():
 		self.fielddefinitions = FieldDefinitions().fielddefinitions
 
 
-	@view_config(route_name='suggestions', accept='application/json', renderer="json")
+	@view_config(route_name='aggs_suggestions', accept='application/json', renderer="json")
 	def viewSuggestionsJSON(self):
 		
 		#pudb.set_trace()
 		
 		buckets = {}
 		
-		if 'suggestion_search' in self.search_params:
-			suggestion_val = self.search_params['suggestion_search']
+		if 'aggs_suggestion_search' in self.search_params:
+			suggestion_val = self.search_params['aggs_suggestion_search']
 			
 			es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
 			buckets = es_searcher.suggestionsSearch(suggestion_val)
 			
-			translated_buckets = {}
+			extended_buckets = {}
 			for key in buckets:
-				translated_buckets[self.fielddefinitions[key]['names']['en']] = buckets[key]
+				extended_buckets[key] = {}
+				extended_buckets[key]['names'] = self.fielddefinitions[key]['names']
+				extended_buckets[key]['buckets'] = buckets[key]
 			
-			buckets = translated_buckets
+			buckets = extended_buckets
 		
 		suggestions_dict = {
 			'buckets': buckets

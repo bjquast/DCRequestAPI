@@ -19,6 +19,14 @@
 		
 		<hr>
 		
+		<div id="aggs_search_field">
+			<label for="aggs_search_input">Search in filters:</label>
+			<input id="aggs_search_input" form="search_form" type="text" value="" autocomplete="off"/>
+			<div id="aggs_search_suggestions_list" class="suggestions_list hidden">
+				<ul class="ul-no-bullet"></ul>
+			</div>
+		</div>
+		
 		<h4>Choose filter</h4>
 		<div id="available_filters">
 			<div tal:repeat="aggs_name selected_bucketfields" class="filter-select-box">

@@ -9,7 +9,7 @@ from ElasticSearch.FieldDefinitions import FieldDefinitions
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
-class SuggestAggregations(QueryConstructor):
+class AggsSuggestions(QueryConstructor):
 	def __init__(self, users_project_ids = [], source_fields = [], size = 10, sort_alphanum = True, sort_dir = 'asc', prefix_or_match = 'prefix'):
 		#pudb.set_trace()
 		
@@ -24,9 +24,11 @@ class SuggestAggregations(QueryConstructor):
 		
 		fielddefs = FieldDefinitions()
 		if len(self.source_fields) <= 0:
-			self.source_fields = fielddefs.suggestion_fields
+			self.source_fields = fielddefs.bucketfields
 		
 		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.source_fields)
+		
+		self.removeNonTextFromSourceList()
 		self.sort_queries_by_definitions()
 		self.setSubFilters()
 		

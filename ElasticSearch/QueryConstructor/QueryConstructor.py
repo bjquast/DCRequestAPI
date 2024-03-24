@@ -70,6 +70,16 @@ class QueryConstructor():
 		return case_insensitive
 
 
+	def removeNonTextFromSourceList(self):
+		filtered_source_fields = []
+		for source_field in self.source_fields:
+			if source_field in self.fielddefinitions:
+				if not 'type' in self.fielddefinitions[source_field]['buckets'] or self.fielddefinitions[source_field]['buckets']['type'] in ['text', 'keyword', 'keyword_lc']:
+					filtered_source_fields.append(source_field)
+		self.source_fields = filtered_source_fields
+		return
+
+
 	def replaceBooleanValues(self, query_def, filter_values):
 		if "type" in query_def and query_def['type'] in ['boolean']:
 			new_values = []

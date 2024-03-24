@@ -2,7 +2,7 @@
 
 let appliedfilters = new AppliedFiltersField();
 let bucketsoverlay = new BucketsOverlay(appliedfilters);
-let simple_search_suggestions = new Suggestions("simple_search_input", "simple_search_suggestions_list");
+let aggs_suggestions = new AggsSuggestions(appliedfilters, "aggs_search_input", "aggs_search_suggestions_list");
 
 
 
@@ -12,11 +12,10 @@ $(document).ready( function() {
 	
 	set_more_button_events();
 	add_collapsible_events();
-	add_collapsible_status_event();
 	add_column_selector_event();
 	add_columnheader_sorting_events();
 	
-	simple_search_suggestions.add_suggestion_events();
+	aggs_suggestions.add_suggestion_events();
 	
 	appliedfilters.add_remove_filter_events();
 	
@@ -110,14 +109,6 @@ function add_collapsible_events() {
 	$('.filter_selectors').each( function () {
 		$(this).on('toggle', function() {
 			set_more_button_events();
-		});
-	});
-}
-
-
-function add_collapsible_status_event() {
-	$('#search_form').on('submit', function () {
-		$('.filter_selectors').each( function () {
 			if ($(this).attr('open') == 'open') {
 				$(this).children('input:checkbox').prop('checked', true);
 			}
@@ -127,6 +118,7 @@ function add_collapsible_status_event() {
 		});
 	});
 }
+
 
 function add_column_selector_event() {
 	$('#column_preferences').on('toggle', function() {
