@@ -25,7 +25,7 @@
 
 <metal:js fill-slot="search_form">
 	<form id="search_form" action="${request.application_url}/list" method="GET" >
-		<!--<div metal:use-macro="load: ./search_fields_macro.pt"></div>-->
+		<div metal:use-macro="load: ./search_fields_macro.pt"></div>
 	</form>
 	<div id="buckets-overlay-slot"></div>
 </metal:js>
@@ -55,7 +55,7 @@
 			
 			<div class="flex-space-between">
 				<div metal:use-macro="load: DCRequestAPI:templates/sorting_macro.pt"></div>
-				<div metal:use-macro="load: ./match_search_macro.pt"></div>
+				<!--<div metal:use-macro="load: ./match_search_macro.pt"></div>-->
 			</div>
 		</div>
 

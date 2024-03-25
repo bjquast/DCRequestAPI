@@ -18,13 +18,19 @@
 		</div>
 		
 		<hr>
-		
 		<div id="aggs_search_field">
 			<label for="aggs_search_input">Search in filters:</label>
 			<input id="aggs_search_input" form="search_form" type="text" value="" autocomplete="off"/>
 			<div id="aggs_search_suggestions_list" class="suggestions_list hidden">
 				<ul class="ul-no-bullet"></ul>
 			</div>
+			<!--<div>
+				<label>Connect search with:</label>
+				<label for="radio_filters_exclusive">AND</label>
+				<input id="radio_filters_exclusive" type="radio" name="filter_search_exclusive" value="exclusive">
+				<label for="radio_filters_non_exclusive">OR</label>
+				<input id="radio_filters_non_exclusive" type="radio" name="filter_search_exclusive" value="non_exclusive">
+			</div>-->
 		</div>
 		
 		<h4>Choose filter</h4>

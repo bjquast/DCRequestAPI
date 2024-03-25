@@ -15,6 +15,8 @@ $(document).ready( function() {
 	add_column_selector_event();
 	add_columnheader_sorting_events();
 	
+	add_match_query_events();
+	
 	aggs_suggestions.add_suggestion_events();
 	
 	appliedfilters.add_remove_filter_events();
@@ -101,6 +103,19 @@ function set_more_button_events() {
 				$(this).off();
 			});
 		}
+	});
+}
+
+
+function add_match_query_events() {
+	$('.match_query_checkbox').each( function () {
+		$(this).off();
+		
+		$(this).change( function () {
+			if (!$(this).prop('checked')) {
+				$("#search_form").submit();
+			}
+		});
 	});
 }
 

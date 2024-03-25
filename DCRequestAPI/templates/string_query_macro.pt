@@ -1,0 +1,12 @@
+		<hr>
+		<span tal:condition="python: 'string_query' not in search_params or search_params['string_query'] is None or search_params['string_query'] == ''">
+			<input id="string_search_input" form="search_form" type="text" name="string_query" autocomplete="off"/>
+			<input form="search_form" type="submit" value="Search"/>
+		</span>
+		<span tal:condition="python: 'string_query' in search_params and search_params['string_query'] is not None and len(search_params['string_query']) > 0">
+			<input id="string_search_input" form="search_form" type="text" name="string_query" value="${search_params['string_query']}" autocomplete="off"/>
+			<input form="search_form" type="submit" value="Search"/>
+		</span>
+		<div id="simple_search_suggestions_list" class="suggestions_list hidden">
+			<ul class="ul-no-bullet"></ul>
+		</div>

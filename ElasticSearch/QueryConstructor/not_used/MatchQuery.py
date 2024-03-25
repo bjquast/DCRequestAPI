@@ -10,16 +10,12 @@ from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
 class MatchQuery(QueryConstructor):
-	def __init__(self, users_project_ids = [], source_fields = [], operator = 'AND', connector = 'AND'):
+	def __init__(self, users_project_ids = [], source_fields = [], operator = 'AND'):
 		self.users_project_ids = users_project_ids
 		self.source_fields = source_fields
 		self.operator = operator.upper()
 		if self.operator not in ['AND', 'OR']:
 			self.operator = 'AND'
-		
-		self.connector = connector
-		if self.connector not in ['AND', 'OR']:
-			self.connector = 'AND'
 			
 		
 		fielddefs = FieldDefinitions()
@@ -31,19 +27,19 @@ class MatchQuery(QueryConstructor):
 
 
 
-	def appendSimpleMatchQuery(self, i, query_string):
+	def appendSimpleMatchQuery(self):
 		simple_multi_match = {
 			'multi_match': {
-				'query': query_string, 
+				'query': self.query_string, 
 				'fields': [fieldname for fieldname in self.simple_fields],
 				'operator': self.operator
 			}
 		}
-		self.match_queries_dict[i].append(simple_multi_match)
+		self.should_queries.append(simple_multi_match)
 		return
 
 
-	def appendNestedMatchQueries(self, i, query_string):
+	def appendNestedMatchQueries(self):
 		for fieldname in self.nested_fields:
 			query = {
 				'nested': {
@@ -54,7 +50,7 @@ class MatchQuery(QueryConstructor):
 								{
 									'match': {
 										fieldname: {
-											'query': query_string,
+											'query': self.query_string,
 											'operator': self.operator
 										}
 									}
@@ -65,11 +61,11 @@ class MatchQuery(QueryConstructor):
 				}
 			}
 			
-			self.match_queries_dict[i].append(query)
+			self.should_queries.append(query)
 		return
 
 
-	def appendSimpleRestrictedMatchQueries(self, i, query_string):
+	def appendSimpleRestrictedMatchQueries(self):
 		for fieldname in self.simple_restricted_fields:
 			query = {
 				'bool': {
@@ -77,7 +73,7 @@ class MatchQuery(QueryConstructor):
 						{
 							'match': {
 								fieldname: {
-									'query': query_string,
+									'query': self.query_string,
 									'operator': self.operator
 								}
 							}
@@ -96,11 +92,11 @@ class MatchQuery(QueryConstructor):
 					]
 				}
 			}
-			self.match_queries_dict[i].append(query)
+			self.should_queries.append(query)
 		return
 
 
-	def appendNestedRestrictedMatchQueries(self, i, query_string):
+	def appendNestedRestrictedMatchQueries(self):
 		for fieldname in self.nested_restricted_fields:
 			query = {
 				'nested': {
@@ -111,7 +107,7 @@ class MatchQuery(QueryConstructor):
 								{
 									'match': {
 										fieldname: {
-											'query': query_string,
+											'query': self.query_string,
 											'operator': self.operator
 										}
 									}
@@ -133,39 +129,32 @@ class MatchQuery(QueryConstructor):
 					}
 				}
 			}
-			self.match_queries_dict[i].append(query)
+			self.should_queries.append(query)
 		return
 
 
-	def getMatchQuery(self, query_strings = []):
+	def getMatchQuery(self, query_string):
 		#pudb.set_trace()
 		self.match_query = None
-		self.query_strings = query_strings
+		self.query_string = query_string
 		
-		if len(self.query_strings) > 0:
+		if self.query_string is not None and len(self.query_string) > 0:
 			
-			#self.match_queries_list = []
-			self.match_queries_dict = {}
+			self.should_queries = []
 			
-			# use i as key not the query string it self because it might be anything?!
-			for i in range(len(self.query_strings)):
-				if self.query_strings[i] is not None and len(self.query_strings[i]) > 0:
-					
-					self.match_queries_dict[i] = []
-					
-					if len(self.simple_fields) > 0:
-						self.appendSimpleMatchQuery(i, self.query_strings[i])
-					
-					if len(self.nested_fields) > 0:
-						self.appendNestedMatchQueries(i, self.query_strings[i])
-					
-					if len(self.simple_restricted_fields) > 0:
-						self.appendSimpleRestrictedMatchQueries(i, self.query_strings[i])
-					
-					if len(self.nested_restricted_fields) > 0:
-						self.appendNestedRestrictedMatchQueries(i, self.query_strings[i])
+			if len(self.simple_fields) > 0:
+				self.appendSimpleMatchQuery()
 			
-			if self.connector == 'OR':
+			if len(self.nested_fields) > 0:
+				self.appendNestedMatchQueries()
+			
+			if len(self.simple_restricted_fields) > 0:
+				self.appendSimpleRestrictedMatchQueries()
+			
+			if len(self.nested_restricted_fields) > 0:
+				self.appendNestedRestrictedMatchQueries()
+			
+			if len(self.should_queries) > 0:
 				self.match_query = {
 					'bool': {
 						'should': [],
@@ -173,32 +162,10 @@ class MatchQuery(QueryConstructor):
 					}
 				}
 				
-				for i in self.match_queries_dict:
-					self.match_query['bool']['should'].extend(self.match_queries_dict[i])
-				
-				if len(self.match_query['bool']['should']) <= 0:
-					self.match_query = None
+				self.match_query['bool']['should'].extend(self.should_queries)
 			
 			else:
-				self.match_query = {
-					'bool': {
-						'must': []
-					}
-				}
-				
-				for i in self.match_queries_dict:
-					if len(self.match_queries_dict[i]) > 0:
-						query_dict = {
-							'bool': {
-								'should': []
-							}
-						}
-						
-						query_dict['bool']['should'].extend(self.match_queries_dict[i])
-						self.match_query['bool']['must'].append(query_dict)
-				
-				if len(self.match_query['bool']['must']) <= 0:
-					self.match_query = None
+				self.match_query = None
 			
 			return self.match_query
 		

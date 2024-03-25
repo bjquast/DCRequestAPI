@@ -1,0 +1,48 @@
+.flex {
+	display: flex;
+}
+
+.flex-start {
+	display: flex;
+	justify-content: flex-start;
+	margin-bottom: 1em;
+}
+
+.flex-start-nowrap {
+	display: flex;
+	justify-content: flex-start;
+	flex-wrap: nowrap;
+}
+
+.flex-start-nowrap div {
+	margin-right: 1em;
+	margin-bottom: 1em;
+}
+
+.flex-start div {
+	margin-right: 1em;
+	margin-bottom: 1em;
+}
+
+
+.flex-space-between {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 1em;
+}
+
+.flex-column {
+	display: flex;
+	flex-direction: column;
+}
+
+
+.flex-row {
+	display: flex;
+	flex-direction: row;
+}
+
+.flexitem-align-center {
+	align-self: center;
+}
+
