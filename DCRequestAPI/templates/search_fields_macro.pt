@@ -1,19 +1,25 @@
 <div>
-	<fieldset id="simple_search" class="flex-row">
+	<fieldset id="simple_search" class="flex-space-between">
 		<legend>Search</legend>
-		<div>
-			<input id="match_query_input" form="search_form" type="text" name="match_query" value=""/>
-			<input form="search_form" type="submit" value="Search"/>
-		</div>
-		<div id="input_tokens">
-			<span tal:condition="python: 'match_query' in search_params and len(search_params['match_query']) > 0">
-				<span tal:repeat="match_string search_params['match_query']">
-					<span tal:condition="python: len(match_string) > 0">
-						<input type="checkbox" class="match_query_checkbox" value="${match_string}" name="match_query" data-match-query="${match_string}" checked="checked">
-						<label>${match_string}</label>
+		<div class="flex-row">
+			<div>
+				<input id="match_query_input" form="search_form" type="text" name="match_query" value=""/>
+				<input form="search_form" type="submit" value="Search"/>
+			</div>
+			<div id="input_tokens">
+				<span tal:condition="python: 'match_query' in search_params and len(search_params['match_query']) > 0">
+					<span tal:repeat="match_string search_params['match_query']">
+						<span tal:condition="python: len(match_string) > 0">
+							<input type="checkbox" class="match_query_checkbox" value="${match_string}" name="match_query" data-match-query="${match_string}" checked="checked">
+							<label>${match_string}</label>
+						</span>
 					</span>
 				</span>
-			</span>
+			</div>
+		</div>
+		<div tal:condition="python: authenticated_user is not None">
+			<input type="checkbox" name="restrict_to_users_projects" tal:attributes="checked 'checked' if 'restrict_to_users_projects' in search_params else None">
+			<label>Restrict to my projects</label>
 		</div>
 	</fieldset>
 </div>

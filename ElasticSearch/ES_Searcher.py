@@ -19,13 +19,14 @@ from ElasticSearch.QueryConstructor.TreeQueries import TreeQueries
 from ElasticSearch.QueryConstructor.AggsSuggestions import AggsSuggestions
 
 class ES_Searcher():
-	def __init__(self, search_params = {}, user_id = None, users_project_ids = []):
+	def __init__(self, search_params = {}, user_id = None, users_project_ids = [], restrict_to_users_projects = False):
 		es_connector = ES_Connector()
 		self.client = es_connector.client
 		
 		self.search_params = search_params
 		self.user_id = user_id
 		self.users_project_ids = users_project_ids
+		self.restrict_to_users_projects = restrict_to_users_projects
 		
 		self.index = 'iuparts'
 		self.source_fields = []
@@ -112,7 +113,13 @@ class ES_Searcher():
 	def addUserLimitation(self):
 		# prepare the query as a subquery to the must-queries, so that it is guarantied that it is AND connected. 
 		# this is in contrast to should filters where the addition of other should filters might disable the AND connection
-		self.user_limitation = {"bool": {"should": [{"terms": {"Projects.DB_ProjectID": self.users_project_ids}}, {"bool": {"must": [{"term": {"IUWithhold": "false"}}, {"term": {"SpecimenWithhold": "false"}}]}}], "minimum_should_match": 1}}
+		if self.restrict_to_users_projects is False:
+			# when open data without withhold should be shown
+			self.user_limitation = {"bool": {"should": [{"terms": {"Projects.DB_ProjectID": self.users_project_ids}}, {"bool": {"must": [{"term": {"IUWithhold": "false"}}, {"term": {"SpecimenWithhold": "false"}}]}}], "minimum_should_match": 1}}
+		else:
+			# when only the data from the users projects should be shown
+			self.user_limitation = {"terms": {"Projects.DB_ProjectID": self.users_project_ids}}
+		
 		self.query["bool"]["must"].append(self.user_limitation)
 		return
 
