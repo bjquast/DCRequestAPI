@@ -142,17 +142,19 @@ class ES_Searcher():
 	def setQuery(self):
 		self.query = {"bool": {"must": [], "should": [], "filter": []}}
 		
-		for param in self.search_params:
+		if 'term_filters' in self.search_params:
+			filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids, source_fields = self.bucket_fields).getTermFilterQueries(self.search_params['term_filters'])
+			self.query['bool']["filter"].extend(filter_queries)
+		
+		if 'match_query' in self.search_params:
+			connector = 'AND'
+			if 'match_queries_connector' in self.search_params:
+				connector = self.search_params['match_queries_connector']
 			
-			if param == 'term_filters':
-				filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids, source_fields = self.bucket_fields).getTermFilterQueries(self.search_params['term_filters'])
-				self.query['bool']["filter"].extend(filter_queries)
-			
-			if param == 'match_query':
-				#match_query = MatchQuery(users_project_ids = self.users_project_ids, source_fields = self.source_fields).getMatchQuery(self.search_params['match_query'])
-				match_query = MatchQuery(users_project_ids = self.users_project_ids).getMatchQuery(self.search_params['match_query'])
-				if match_query is not None:
-					self.query['bool']['must'].append(match_query)
+			match_query_obj = MatchQuery(users_project_ids = self.users_project_ids, connector = connector)
+			match_query = match_query_obj.getMatchQuery(self.search_params['match_query'])
+			if match_query is not None:
+				self.query['bool']['must'].append(match_query)
 		
 		
 		self.addUserLimitation()

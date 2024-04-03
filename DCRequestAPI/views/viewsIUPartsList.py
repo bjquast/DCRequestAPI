@@ -28,6 +28,7 @@ class IUPartsListView():
 		self.userlogin = UserLogin(self.request)
 		self.messages = []
 		
+		pudb.set_trace()
 		request_params = RequestParams(self.request)
 		self.search_params = request_params.search_params
 		self.requeststring = request_params.requeststring

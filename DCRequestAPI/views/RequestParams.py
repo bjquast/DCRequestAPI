@@ -29,11 +29,35 @@ class RequestParams():
 			self.params_dict = self.request.params.dict_of_lists()
 
 
+	def read_stack_queries_params(self):
+		if 'stack_query_id' in self.params_dict:
+			self.search_params['stack_query'] = []
+			for query_id in self.params_dict['stack_query_id']:
+				terms = self.params_dict.get('stack_query_terms_{0}'.format(query_id), [])
+				if len(terms) > 0:
+					filled_terms = []
+					for term in terms:
+						if term is not None and len(term) > 0:
+							filled_terms.append(term)
+					if len(filled_terms) > 0:
+						query_dict = {
+							'terms': filled_terms,
+							'outer_connector': self.params_dict.get('stack_search_outer_connector_{0}'.format(query_id), ['AND'])[-1],
+							'inner_connector': self.params_dict.get('stack_search_inner_connector_{0}'.format(query_id), ['AND'])[-1],
+							'fields': self.params_dict.get('stack_query_fields_{0}'.format(query_id), 'all fields')[-1]
+						}
+						
+						self.search_params['stack_query'].append(query_dict)
+				
+
+
 	def read_search_params(self):
 		self.search_params = {}
 		
+		self.read_stack_queries_params()
+		
 		exists_params = ['restrict_to_users_projects']
-		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'aggregation', 'tree', 'aggs_suggestion_search']
+		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'aggregation', 'tree', 'aggs_suggestion_search', 'match_queries_connector']
 		complex_params = ['term_filters',]
 		list_params = ['open_filter_selectors', 'result_table_columns', 'parent_ids', 'match_query']
 		

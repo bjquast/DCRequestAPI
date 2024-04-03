@@ -21,6 +21,8 @@ $(document).ready( function() {
 	
 	appliedfilters.add_remove_filter_events();
 	
+	add_users_projects_restriction_event();
+	
 	add_logout_event();
 	add_submit_events();
 } );
@@ -143,3 +145,9 @@ function add_column_selector_event() {
 	})
 }
 
+function add_users_projects_restriction_event() {
+	$('#restrict_users_projects_checkbox').change( function () {
+		console.log($(this));
+		$("#search_form").submit();
+	});
+}
