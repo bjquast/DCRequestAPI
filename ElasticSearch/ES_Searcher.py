@@ -156,6 +156,10 @@ class ES_Searcher():
 			if match_query is not None:
 				self.query['bool']['must'].append(match_query)
 		
+		if 'stack_query' in self.search_params:
+			for stack_query in self.search_params['stack_query']:
+				pass
+		
 		
 		self.addUserLimitation()
 		self.deleteEmptySubqueries()
