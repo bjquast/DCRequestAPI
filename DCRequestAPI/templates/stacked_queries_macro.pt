@@ -1,7 +1,7 @@
 <div>
 	<fieldset id="stacked_queries_search" class="flex-space-between">
 		<legend>Search</legend>
-		<div class="stacked_search_grid">
+		<div class="stacked-search-grid">
 			
 			<!-- when first or more fields are filled -->
 			<block tal:condition="python: 'stack_queries' in search_params and len(search_params['stack_queries']) > 0" tal:omit-tag="">
@@ -14,10 +14,6 @@
 								<option tal:attributes="selected 'selected' if search_params['stack_queries'][i]['outer_connector'] == 'OR' else None">OR</option>
 							</select>
 						</div>
-						<!-- counter hidden -->
-						<div>
-							<input type="text" form="search_form" class="hidden" name="stack_query_id" value="${i}"/>
-						</div>
 						<!-- former search terms as tokens -->
 						<div id="input_tokens_${i}">
 							<span tal:condition="python: len(search_params['stack_queries'][i]['terms']) > 0">
@@ -25,24 +21,19 @@
 								<span tal:repeat="search_term search_params['stack_queries'][i]['terms']">
 									<block tal:define="j repeat.search_term.index" tal:omit-tag="">
 										<span tal:condition="python: len(search_term) > 0">
-											<!-- hidden input for term id -->
-											<input type="text" form="search_form" class="hidden" name="stack_query_term_id" value="${i}_${j}"/>
+											<input form="search_form" type="text" name="stack_query_fields_${i}_${j}" value="${search_params['stack_queries'][i]['fields'][j]}" class="hidden">
 											<!-- checkboxes to unselect search terms -->
 											<input form="search_form" type="checkbox" class="stack_query_checkbox" value="${search_term}" name="stack_query_terms_${i}_${j}" data-stack-query="${search_term}" checked="checked">
-											<label>${search_term}</label>
-											<input form="search_form" type="text" name="stack_query_fields_${i}_${j}" value="${search_params['stack_queries'][i]['fields'][j]}" class="hidden">
-											<label> in ${search_params['stack_queries'][i]['fields'][j]}</label>
+											<label><b>${coldefs[search_params['stack_queries'][i]['fields'][j]]['en']}:</b> ${search_term}</label>
 										</span>
 									</block>
-									<span tal:condition="repeat.search_term.index > -1 and repeat.search_term.index < len(search_params['stack_queries'][i]['terms'])-1">${search_params['stack_queries'][i]['inner_connector']}</span>
+									<span tal:condition="repeat.search_term.index >= 0 and repeat.search_term.index < len(search_params['stack_queries'][i]['terms'])-1">${search_params['stack_queries'][i]['inner_connector']}</span>
 								</span>
 								<label>)</label>
 							</span>
 						</div>
 						<!-- input for search terms -->
 						<div tal:define="j len(search_params['stack_queries'][i]['terms'])">
-							<!-- hidden input for term id -->
-							<input type="text" form="search_form" class="hidden" name="stack_query_term_id" value="${i}_${j}"/>
 							<label>add term</label>
 							<input id="stack_query_terms_${i}_${j}" form="search_form" type="text" name="stack_query_terms_${i}_${j}" value=""/>
 						</div>
@@ -77,15 +68,8 @@
 						<option>OR</option>
 					</select>
 				</div>
-				<!-- counter hidden -->
-				<div>
-					<input type="text" form="search_form" class="hidden" name="stack_query_id" value="${i}"/>
-				</div>
-				
 				<!-- input for search terms -->
 				<div>
-					<!-- hidden input for term id -->
-					<input type="text" form="search_form" class="hidden" name="stack_query_term_id" value="${i}_0"/>
 					<input id="stack_query_terms_${i}_0" form="search_form" type="text" name="stack_query_terms_${i}_0" value=""/>
 				</div>
 				

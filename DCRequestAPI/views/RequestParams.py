@@ -1,5 +1,6 @@
 import pudb
 import json
+import re
 
 
 class RequestParams():
@@ -30,29 +31,40 @@ class RequestParams():
 
 
 	def read_stack_queries_params(self):
-		pudb.set_trace()
+		#pudb.set_trace()
 		
+		terms_pattern = re.compile(r'stack_query_terms_(\d+)_(\d+)$')
+		
+		query_dicts = {}
+		query_counts = []
 		self.search_params['stack_queries'] = []
-		if 'stack_query_id' in self.params_dict:
-			for query_id in self.params_dict['stack_query_id']:
-				terms = []
-				fields = []
-				for term_id in self.params_dict['stack_query_term_id']:
-					if term_id.startswith(str(query_id)):
-						term = self.params_dict.get('stack_query_terms_{0}'.format(term_id), [''])[-1]
-						field = self.params_dict.get('stack_query_fields_{0}'.format(term_id), [''])[-1]
-						if len(term) > 0 and len(field) > 0:
-							terms.append(term)
-							fields.append(field)
-				
-				if len(terms) > 0 and len(fields) > 0:
-					query_dict = {
-						'terms': terms,
-						'fields': fields,
-						'outer_connector': self.params_dict.get('stack_search_outer_connector_{0}'.format(query_id), ['AND'])[-1],
-						'inner_connector': self.params_dict.get('stack_search_inner_connector_{0}'.format(query_id), ['AND'])[-1]
-					}
-					self.search_params['stack_queries'].append(query_dict)
+		
+		for param in self.params_dict:
+			if param.startswith('stack_query_terms_'):
+				m = terms_pattern.match(param)
+				if m is not None:
+					query_count = m.group(1)
+					term_count = m.group(2)
+					
+					term = self.params_dict.get('stack_query_terms_{0}_{1}'.format(query_count, term_count), [''])[-1]
+					field = self.params_dict.get('stack_query_fields_{0}_{1}'.format(query_count, term_count), [''])[-1]
+					
+					if term is not None and len(term) > 0 and field is not None and len(field) > 0:
+						if query_count not in query_dicts:
+							query_counts.append(query_count)
+							query_dicts[query_count] = {
+								'terms': [],
+								'fields': [],
+								'outer_connector': self.params_dict.get('stack_search_outer_connector_{0}'.format(query_count), ['AND'])[-1],
+								'inner_connector': self.params_dict.get('stack_search_inner_connector_{0}'.format(query_count), ['AND'])[-1]
+							}
+						
+						query_dicts[query_count]['terms'].append(term)
+						query_dicts[query_count]['fields'].append(field)
+		
+		for query_count in query_counts:
+			self.search_params['stack_queries'].append(query_dicts[query_count])
+		
 		return
 
 

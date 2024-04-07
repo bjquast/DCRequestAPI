@@ -1,11 +1,19 @@
-.stacked_search_grid {
+.stacked-search-grid {
 	display: grid;
 	gap: 1em;
 }
 
 @media (min-width: 30em) { 
-	.stacked_search_grid {
+	.stacked-search-grid {
 		/* handle to move query up and down, query connector, search term(s), field, operator (connector) between search terms */ 
-		grid-template-columns: auto auto auto auto auto auto;
+		grid-template-columns: auto auto auto auto auto;
 	}
+}
+
+
+.grid-start-3cols {
+  display: grid;
+  justify-content: start;
+  gap: 1em;
+  grid-template-columns: auto auto auto;
 }
