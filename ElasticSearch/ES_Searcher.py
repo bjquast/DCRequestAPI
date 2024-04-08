@@ -17,6 +17,7 @@ from ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
 from ElasticSearch.QueryConstructor.MatchQuery import MatchQuery
 from ElasticSearch.QueryConstructor.TreeQueries import TreeQueries
 from ElasticSearch.QueryConstructor.AggsSuggestions import AggsSuggestions
+from ElasticSearch.QueryConstructor.StackedQueries import StackedInnerQuery
 
 class ES_Searcher():
 	def __init__(self, search_params = {}, user_id = None, users_project_ids = [], restrict_to_users_projects = False):
@@ -155,9 +156,12 @@ class ES_Searcher():
 			match_query = match_query_obj.getMatchQuery(self.search_params['match_query'])
 			if match_query is not None:
 				self.query['bool']['must'].append(match_query)
-		
-		if 'stack_query' in self.search_params:
-			for stack_query in self.search_params['stack_query']:
+		pudb.set_trace()
+		if 'stack_queries' in self.search_params:
+			for stack_query in self.search_params['stack_queries']:
+				inner_query = StackedInnerQuery(stack_query, users_project_ids = self.users_project_ids)
+				inner_query_dict = inner_query.getInnerStackQuery()
+				
 				pass
 		
 		
@@ -167,7 +171,7 @@ class ES_Searcher():
 
 	def updateMaxResultWindow(self, max_result_window):
 		#adjust max number of results that can be fetched
-		logger.debug(self.client.indices.get_settings(index=self.index))
+		#logger.debug(self.client.indices.get_settings(index=self.index))
 		
 		body = {'index': {'max_result_window': max_result_window}}
 		self.client.indices.put_settings(index=self.index, body=body)
@@ -179,8 +183,8 @@ class ES_Searcher():
 		buckets_query = TreeQueries(aggregation_name, parent_ids = parent_ids, users_project_ids = self.users_project_ids) #, sort_alphanum = True)
 		aggs = buckets_query.getTreeQuery()
 		
-		logger.debug(json.dumps(aggs))
-		logger.debug(json.dumps(self.query))
+		#logger.debug(json.dumps(aggs))
+		#logger.debug(json.dumps(self.query))
 		
 		source_fields = False
 		
@@ -200,8 +204,8 @@ class ES_Searcher():
 		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size, sort_alphanum = True)
 		aggs = buckets_query.getAggregationsQuery()
 		
-		logger.debug(json.dumps(aggs))
-		logger.debug(json.dumps(self.query))
+		#logger.debug(json.dumps(aggs))
+		#logger.debug(json.dumps(self.query))
 		
 		source_fields = False
 		
@@ -221,8 +225,8 @@ class ES_Searcher():
 		buckets_query = AggsSuggestions(users_project_ids = self.users_project_ids, source_fields = [], size = size, sort_alphanum = True)
 		aggs = buckets_query.getSuggestionsQuery(search_val)
 		
-		logger.debug(json.dumps(aggs))
-		logger.debug(json.dumps(self.query))
+		#logger.debug(json.dumps(aggs))
+		#logger.debug(json.dumps(self.query))
 		
 		source_fields = False
 		
@@ -253,8 +257,8 @@ class ES_Searcher():
 		aggs = buckets_query.getAggregationsQuery()
 		
 		#logger.debug(self.sort)
-		logger.debug(json.dumps(aggs))
-		logger.debug(json.dumps(self.query))
+		#logger.debug(json.dumps(aggs))
+		#logger.debug(json.dumps(self.query))
 		#logger.debug(json.dumps(self.sort))
 		
 		if len(self.source_fields) <= 0:

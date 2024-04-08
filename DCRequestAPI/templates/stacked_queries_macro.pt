@@ -24,7 +24,8 @@
 											<input form="search_form" type="text" name="stack_query_fields_${i}_${j}" value="${search_params['stack_queries'][i]['fields'][j]}" class="hidden">
 											<!-- checkboxes to unselect search terms -->
 											<input form="search_form" type="checkbox" class="stack_query_checkbox" value="${search_term}" name="stack_query_terms_${i}_${j}" data-stack-query="${search_term}" checked="checked">
-											<label><b>${coldefs[search_params['stack_queries'][i]['fields'][j]]['en']}:</b> ${search_term}</label>
+											<label tal:condition="search_params['stack_queries'][i]['fields'][j] != 'all fields'"><b>${coldefs[search_params['stack_queries'][i]['fields'][j]]['en']}:</b> ${search_term}</label>
+											<label tal:condition="search_params['stack_queries'][i]['fields'][j] == 'all fields'"><b>all fields:</b> ${search_term}</label>
 										</span>
 									</block>
 									<span tal:condition="repeat.search_term.index >= 0 and repeat.search_term.index < len(search_params['stack_queries'][i]['terms'])-1">${search_params['stack_queries'][i]['inner_connector']}</span>
