@@ -5,6 +5,14 @@
 			<div>
 				<input id="match_query_input" form="search_form" type="text" name="match_query" value=""/>
 				<input form="search_form" type="submit" value="Search"/>
+				<div tal:condition="python: 'match_query' in search_params and len(search_params['match_query']) > 0 and len(search_params['match_query'][-1]) > 0">
+					<label>Connect queries with: </label>
+					<input class="queries_connector_radio" form="search_form" type="radio" name="match_queries_connector" value="AND" checked="checked">
+					<label>AND</label>
+					<input class="queries_connector_radio" form="search_form" type="radio" name="match_queries_connector" value="OR"
+						tal:attributes="checked 'checked' if 'match_queries_connector' in search_params and search_params['match_queries_connector'].upper() == 'OR' else None">
+					<label>OR</label>
+				</div>
 			</div>
 			<div id="input_tokens">
 				<span tal:condition="python: 'match_query' in search_params and len(search_params['match_query']) > 0">
@@ -18,7 +26,7 @@
 			</div>
 		</div>
 		<div tal:condition="python: authenticated_user is not None">
-			<input type="checkbox" name="restrict_to_users_projects" tal:attributes="checked 'checked' if 'restrict_to_users_projects' in search_params else None">
+			<input id="restrict_users_projects_checkbox" type="checkbox" name="restrict_to_users_projects" tal:attributes="checked 'checked' if 'restrict_to_users_projects' in search_params else None">
 			<label>Restrict to my projects</label>
 		</div>
 	</fieldset>

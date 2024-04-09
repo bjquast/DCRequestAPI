@@ -9,7 +9,7 @@ from ElasticSearch.FieldDefinitions import FieldDefinitions
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
-class MatchQuery(QueryConstructor):
+class StringQuery(QueryConstructor):
 	def __init__(self, users_project_ids = [], source_fields = [], operator = 'AND', connector = 'AND'):
 		self.users_project_ids = users_project_ids
 		self.source_fields = source_fields
@@ -169,7 +169,7 @@ class MatchQuery(QueryConstructor):
 				self.match_query = {
 					'bool': {
 						'should': [],
-						'minimum_should_match': 1
+						"minimum_should_match": 1
 					}
 				}
 				
@@ -185,13 +185,12 @@ class MatchQuery(QueryConstructor):
 						'must': []
 					}
 				}
-				# must be a sequence of should queries to allow for a match in a single field
+				
 				for i in self.match_queries_dict:
 					if len(self.match_queries_dict[i]) > 0:
 						query_dict = {
 							'bool': {
-								'should': [],
-								'minimum_should_match': 1
+								'should': []
 							}
 						}
 						

@@ -1,0 +1,106 @@
+<div>
+	<fieldset id="stacked_queries_search" class="flex-space-between">
+		<legend>Search</legend>
+		<div class="stacked-search-grid">
+			
+			<!-- when first or more fields are filled -->
+			<block tal:condition="python: 'stack_queries' in search_params and len(search_params['stack_queries']) > 0" tal:omit-tag="">
+				<block tal:repeat="query search_params['stack_queries']" tal:omit-tag="">
+					<block tal:define="i repeat.query.index" tal:omit-tag="">
+						<!-- outer connector for the rows -->
+						<div>
+							<select name="stack_search_outer_connector_${i}" tal:attributes="class 'hidden' if i < 1 else None">
+								<option tal:attributes="selected 'selected' if search_params['stack_queries'][i]['outer_connector'] == 'AND' else None">AND</option>
+								<option tal:attributes="selected 'selected' if search_params['stack_queries'][i]['outer_connector'] == 'OR' else None">OR</option>
+							</select>
+						</div>
+						<!-- former search terms as tokens -->
+						<div id="input_tokens_${i}">
+							<span tal:condition="python: len(search_params['stack_queries'][i]['terms']) > 0">
+								<label>(</label>
+								<span tal:repeat="search_term search_params['stack_queries'][i]['terms']">
+									<block tal:define="j repeat.search_term.index" tal:omit-tag="">
+										<span tal:condition="python: len(search_term) > 0">
+											<input form="search_form" type="text" name="stack_query_fields_${i}_${j}" value="${search_params['stack_queries'][i]['fields'][j]}" class="hidden">
+											<!-- checkboxes to unselect search terms -->
+											<input form="search_form" type="checkbox" class="stack_query_checkbox" value="${search_term}" name="stack_query_terms_${i}_${j}" data-stack-query="${search_term}" checked="checked">
+											<label tal:condition="search_params['stack_queries'][i]['fields'][j] != 'all fields'"><b>${coldefs[search_params['stack_queries'][i]['fields'][j]]['en']}:</b> ${search_term}</label>
+											<label tal:condition="search_params['stack_queries'][i]['fields'][j] == 'all fields'"><b>all fields:</b> ${search_term}</label>
+										</span>
+									</block>
+									<span tal:condition="repeat.search_term.index >= 0 and repeat.search_term.index < len(search_params['stack_queries'][i]['terms'])-1">${search_params['stack_queries'][i]['inner_connector']}</span>
+								</span>
+								<label>)</label>
+							</span>
+						</div>
+						<!-- input for search terms -->
+						<div tal:define="j len(search_params['stack_queries'][i]['terms'])">
+							<label>add term</label>
+							<input id="stack_query_terms_${i}_${j}" form="search_form" type="text" name="stack_query_terms_${i}_${j}" value=""/>
+						</div>
+						<!-- field selector -->
+						<div tal:define="j len(search_params['stack_queries'][i]['terms'])">
+							<label> in </label>
+							<select form="search_form" name="stack_query_fields_${i}_${j}" >
+								<option value="all fields">all fields</option>
+								<option tal:repeat="source_field default_sourcefields" value="${source_field}">
+									${coldefs[source_field]['en']}
+								</option>
+							</select>
+						</div>
+						<!-- inner search terms connector -->
+						<div tal:define="token_num len(search_params['stack_queries'][i]['terms']) | 0">
+							<label> connect terms by </label>
+							<select name="stack_search_inner_connector_${i}">
+								<option tal:attributes="selected 'selected' if search_params['stack_queries'][i]['inner_connector'] == 'AND' else None">AND</option>
+								<option tal:attributes="selected 'selected' if search_params['stack_queries'][i]['inner_connector'] == 'OR' else None">OR</option>
+							</select>
+						</div>
+					</block>
+				</block>
+			</block>
+			
+
+			<block tal:define="i len(search_params['stack_queries']) | 0" tal:omit-tag="">
+				<!-- outer connector for the rows. first is empty -->
+				<div>
+					<select name="stack_search_outer_connector_${i}" tal:attributes="class 'hidden' if i < 1 else None">
+						<option>AND</option>
+						<option>OR</option>
+					</select>
+				</div>
+				<!-- input for search terms -->
+				<div>
+					<input id="stack_query_terms_${i}_0" form="search_form" type="text" name="stack_query_terms_${i}_0" value=""/>
+				</div>
+				
+				<!-- field selector -->
+				<div>
+					<label> in </label>
+					<select form="search_form" name="stack_query_fields_${i}_0">
+						<option value="all fields">all fields</option>
+						<option tal:repeat="source_field default_sourcefields" value="${source_field}">
+							${coldefs[source_field]['en']}
+						</option>
+					</select>
+				</div>
+				<!-- inner search terms connector -->
+				<div tal:define="token_num len(search_params['stack_queries'][i]['terms']) | 0">
+					<label> connect terms by </label>
+					<select name="stack_search_inner_connector_${i}">
+						<option>AND</option>
+						<option>OR</option>
+					</select>
+				</div>
+				
+				<!-- input tokens as empty placeholder for the grid-->
+				<div id="input_tokens_${i}">
+				</div>
+			</block>
+			
+			
+		</div>
+		<input form="search_form" type="submit" value="Search"/>
+	</fieldset>
+</div>
+
