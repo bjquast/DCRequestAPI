@@ -217,34 +217,64 @@ class StackedInnerQuery(QueryConstructor):
 
 class StackedOuterQuery():
 	def __init__(self):
-		self.query_stack = {}
+		
+		self.should = []
+		self.must = [] 
+		
+		self.query_stack = {
+			'bool': {
+				'must': [],
+				'should': [],
+				'minimum_should_match': 1
+			}
+		}
+
+
+	def deleteEmptyElements(self):
+		if 'should' in self.query_stack['bool'] and len(self.query_stack['bool']['should']) < 1:
+			del self.query_stack['bool']['should']
+			if 'minimum_should_match' in self.query_stack['bool']:
+				del self.query_stack['bool']['minimum_should_match']
+		if 'must' in self.query_stack['bool'] and len(self.query_stack['bool']['must']) < 1:
+			del self.query_stack['bool']['must']
 
 
 	def addShouldQuery(self, inner_query):
-		new_outer_query = []
+		self.deleteEmptyElements()
 		
 		if len(inner_query) > 0:
-			new_outer_query.append(inner_query)
+			new_outer_query = {
+				'bool': {
+					'should': [
+						inner_query
+					],
+					'minimum_should_match': 1
+				}
+			}
+			
 			if len(self.query_stack) > 0:
-				new_outer_query.append({
-					'bool': {
-						'should': self.query_stack
-					}
-				})
+				new_outer_query['bool']['should'].append(self.query_stack)
+			
 			self.query_stack = new_outer_query
+		
 		return
 
 
 	def addMustQuery(self, inner_query):
-		new_outer_query = []
+		self.deleteEmptyElements()
 		
 		if len(inner_query) > 0:
-			new_outer_query.append(inner_query)
+			new_outer_query = {
+				'bool': {
+					'must': [
+						inner_query
+					]
+				}
+			}
+			
 			if len(self.query_stack) > 0:
-				new_outer_query.append({
-					'bool': {
-						'must': [self.query_stack]
-					}
-				})
+				new_outer_query['bool']['must'].append(self.query_stack)
+			
 			self.query_stack = new_outer_query
+		
 		return

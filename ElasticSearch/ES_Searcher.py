@@ -157,10 +157,13 @@ class ES_Searcher():
 			if match_query is not None:
 				self.query['bool']['must'].append(match_query)
 		
-		pudb.set_trace()
+		#pudb.set_trace()
 		outer_query = StackedOuterQuery()
 		
 		if 'stack_queries' in self.search_params:
+			# set outer connector to AND for the first query, otherwise it might result in all documents matched when it starts with an OR query and it is the only query
+			if len(self.search_params['stack_queries']) > 0:
+				self.search_params['stack_queries'][0]['outer_connector'] = 'AND'
 			for stack_query in self.search_params['stack_queries']:
 				inner_query = StackedInnerQuery(stack_query, users_project_ids = self.users_project_ids)
 				inner_string_query = inner_query.getInnerStackQuery()
@@ -174,8 +177,8 @@ class ES_Searcher():
 			
 			if len(outer_query.query_stack) > 0:
 				# add them all to must to ensure that the stacked query results must be fullfilled when connected with other query types
-				self.query['bool']['must'].extend(outer_query.query_stack)
-				#logger.debug(self.query)
+				self.query['bool']['must'].append(outer_query.query_stack)
+				logger.debug(self.query)
 		
 		
 		self.addUserLimitation()
