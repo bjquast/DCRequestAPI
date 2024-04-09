@@ -14,32 +14,40 @@ class StackedInnerQuery(QueryConstructor):
 		self.query_dict = query_dict
 		self.users_project_ids = users_project_ids
 		
+		fielddefs = FieldDefinitions()
+		self.source_fields = fielddefs.fieldnames
+		
 		self.readQueryDict()
 		
-		fielddefs = FieldDefinitions()
-		
 		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.query_dict['fields'])
-		self.sort_queries_by_definitions()
 		
-		
+
 
 
 	def readQueryDict(self):
+		self.single_query_dicts = []
 		
 		if len(self.query_dict['terms']) > 0 and len(self.query_dict['terms']) == len(self.query_dict['fields']):
 			
-			# check if 'all fields' are selected and if so: add a term and field for each available field
+			# check if 'all fields' are selected
 			for i in range(len(self.query_dict['terms'])):
 				if self.query_dict['fields'][i] == 'all fields':
-					new_fields = self.source_fields
-					new_terms = [self.query_dict['terms'][i] for _ in self.source_fields]
 					
-					# insert the new lists into the old ones by slicing
-					self.query_dict['fields'][i:i] = new_fields
-					self.query_dict['terms'][i:i] = new_terms
+					query_dict = {
+						'term': self.query_dict['terms'][i],
+						'fields': self.source_fields
+					}
+					self.single_query_dicts.append(query_dict)
+			
+				else:
+					query_dict = {
+						'term': self.query_dict['terms'][i],
+						'fields': [self.query_dict['fields'][i]]
+					}
+					self.single_query_dicts.append(query_dict)
+			
 		else:
 			raise ValueError('count of terms and fields must be the same')
-			self.query_dict['terms'] = []
 		
 		return
 
@@ -146,61 +154,63 @@ class StackedInnerQuery(QueryConstructor):
 
 
 	def getInnerStackQuery(self):
-		#pudb.set_trace()
-		self.query_list = []
 		
-		for i in range(len(self.query_dict['terms'])):
-			if self.query_dict['terms'][i] is not None and len(self.query_dict['terms'][i]) > 0:
+		self.string_query = {
+			'bool': {
+				'should': [],
+				'must': []
+			}
+		}
+		
+		for query_dict in self.single_query_dicts:
 			
+			self.set_source_fields(query_dict['fields'])
+			self.sort_queries_by_definitions()
+			
+			# set the query_list for each query separately because i have to differentiate between queries in multiple fields and queries in one field when 
+			# combining them with the AND inner connector
+			self.query_list = []
+			
+			if query_dict['term'] is not None and len(query_dict['term']) > 0:
+				
 				if len(self.simple_fields) > 0:
-					self.appendSimpleStringQueries(self.query_dict['terms'][i])
+					self.appendSimpleStringQueries(query_dict['term'])
 				
 				if len(self.nested_fields) > 0:
-					self.appendNestedStringQueries(self.query_dict['terms'][i])
+					self.appendNestedStringQueries(query_dict['term'])
 				
 				if len(self.simple_restricted_fields) > 0:
-					self.appendSimpleRestrictedStringQueries(self.query_dict['terms'][i])
+					self.appendSimpleRestrictedStringQueries(query_dict['term'])
 				
 				if len(self.nested_restricted_fields) > 0:
-					self.appendNestedRestrictedStringQueries(self.query_dict['terms'][i])
-			
-		
-		if self.query_dict['inner_connector'] == 'OR':
-			self.string_query = {
-				'bool': {
-					'should': [],
-					"minimum_should_match": 1
-				}
-			}
-			
-			self.string_query['bool']['should'].extend(self.query_list)
-			
-			if len(self.string_query['bool']['should']) <= 0:
-				self.string_query = None
-		
-		else:
-			self.string_query = {
-				'bool': {
-					'must': []
-				}
-			}
-			
+					self.appendNestedRestrictedStringQueries(query_dict['term'])
 			
 			if len(self.query_list) > 0:
-				query_dict = {
-					'bool': {
-						'should': [],
-						'minimum_should_match': 1
-					}
-				}
+				if self.query_dict['inner_connector'] == 'OR':
+					self.string_query['bool']['should'].extend(self.query_list)
+					self.string_query['bool']['minimum_should_match'] = 1
+					
 				
-				query_dict['bool']['should'].extend(self.query_list)
-				self.string_query['bool']['must'].append(query_dict)
-			
-			if len(self.string_query['bool']['must']) <= 0:
-				self.string_query = None
+				else:
+					
+					# query within one field
+					if len(self.query_list) == 1:
+						self.string_query['bool']['must'].extend(self.query_list)
+					# query in multiple fields
+					elif len(self.query_list) > 1:
+						query_dict = {
+							'bool': {
+								'should': [],
+								'minimum_should_match': 1
+							}
+						}
+						
+						query_dict['bool']['should'].extend(self.query_list)
+						self.string_query['bool']['must'].append(query_dict)
 		
-		pudb.set_trace()
+		if len(self.string_query['bool']['must']) < 1 and len(self.string_query['bool']['should']) < 1:
+			self.string_query = None
+		
 		return self.string_query
 
 
@@ -210,28 +220,31 @@ class StackedOuterQuery():
 		self.query_stack = {}
 
 
-	def addAsOuterShouldQuery(self, inner_queries):
-		outer_query['bool'] = {}
-		outer_query['bool']['should'] = []
+	def addShouldQuery(self, inner_query):
+		new_outer_query = []
 		
-		if len(inner_queries) > 0:
-			for query in inner_queries:
-				outer_query['bool']['should'].append(query)
-			
-			outer_query['bool']['should'] = self.query_stack
-			outer_query['bool']['minimum_should_match'] = 1
-			self.query_stack = outer_query
+		if len(inner_query) > 0:
+			new_outer_query.append(inner_query)
+			if len(self.query_stack) > 0:
+				new_outer_query.append({
+					'bool': {
+						'should': self.query_stack
+					}
+				})
+			self.query_stack = new_outer_query
 		return
 
 
-	def addAsOuterMustQuery(self, inner_queries):
-		outer_query['bool'] = {}
-		outer_query['bool']['must'] = []
+	def addMustQuery(self, inner_query):
+		new_outer_query = []
 		
-		if len(inner_queries) > 0:
-			for query in inner_queries:
-				outer_query['bool']['must'].append(query)
-			
-			outer_query['bool']['must'] = self.query_stack
-			self.query_stack = outer_query
+		if len(inner_query) > 0:
+			new_outer_query.append(inner_query)
+			if len(self.query_stack) > 0:
+				new_outer_query.append({
+					'bool': {
+						'must': [self.query_stack]
+					}
+				})
+			self.query_stack = new_outer_query
 		return

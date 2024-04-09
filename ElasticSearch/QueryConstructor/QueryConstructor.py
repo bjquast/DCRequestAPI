@@ -20,8 +20,20 @@ class QueryConstructor():
 		self.fielddefinitions = fielddefinitions
 
 
+	def set_source_fields(self, source_fields = []):
+		# allow to set the source fields later for queries with different source fields as in StackedInnerQuery
+		if len(source_fields) > 0:
+			self.source_fields = source_fields
+		return
+
 
 	def sort_queries_by_definitions(self):
+		# reset the fields, needed when sort_queries_by_definitions is used more than once as with StackedInnerQuery
+		self.nested_restricted_fields = {}
+		self.nested_fields = {}
+		self.simple_restricted_fields = {}
+		self.simple_fields = {}
+		
 		
 		for fieldname in self.source_fields:
 			if fieldname in self.fielddefinitions:

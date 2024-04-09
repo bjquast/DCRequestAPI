@@ -17,7 +17,7 @@ from ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
 from ElasticSearch.QueryConstructor.MatchQuery import MatchQuery
 from ElasticSearch.QueryConstructor.TreeQueries import TreeQueries
 from ElasticSearch.QueryConstructor.AggsSuggestions import AggsSuggestions
-from ElasticSearch.QueryConstructor.StackedQueries import StackedInnerQuery
+from ElasticSearch.QueryConstructor.StackedQueries import StackedInnerQuery, StackedOuterQuery
 
 class ES_Searcher():
 	def __init__(self, search_params = {}, user_id = None, users_project_ids = [], restrict_to_users_projects = False):
@@ -156,13 +156,26 @@ class ES_Searcher():
 			match_query = match_query_obj.getMatchQuery(self.search_params['match_query'])
 			if match_query is not None:
 				self.query['bool']['must'].append(match_query)
+		
 		pudb.set_trace()
+		outer_query = StackedOuterQuery()
+		
 		if 'stack_queries' in self.search_params:
 			for stack_query in self.search_params['stack_queries']:
 				inner_query = StackedInnerQuery(stack_query, users_project_ids = self.users_project_ids)
-				inner_query_dict = inner_query.getInnerStackQuery()
+				inner_string_query = inner_query.getInnerStackQuery()
 				
-				pass
+				if inner_string_query is not None:
+					if stack_query['outer_connector'] == 'AND':
+						outer_query.addMustQuery(inner_string_query)
+					else:
+						outer_query.addShouldQuery(inner_string_query)
+				
+			
+			if len(outer_query.query_stack) > 0:
+				# add them all to must to ensure that the stacked query results must be fullfilled when connected with other query types
+				self.query['bool']['must'].extend(outer_query.query_stack)
+				#logger.debug(self.query)
 		
 		
 		self.addUserLimitation()
