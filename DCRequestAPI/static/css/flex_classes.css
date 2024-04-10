@@ -8,6 +8,11 @@
 	margin-bottom: 1em;
 }
 
+.flex-start-no-margin {
+	display: flex;
+	justify-content: flex-start;
+}
+
 .flex-start-nowrap {
 	display: flex;
 	justify-content: flex-start;
@@ -31,6 +36,11 @@
 	margin-bottom: 1em;
 }
 
+.flex-space-between-no-margin {
+	display: flex;
+	justify-content: space-between;
+}
+
 .flex-column {
 	display: flex;
 	flex-direction: column;
@@ -44,5 +54,9 @@
 
 .flexitem-align-center {
 	align-self: center;
+}
+
+.margin-left-2em {
+	margin-left: 2em;
 }
 

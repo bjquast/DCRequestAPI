@@ -25,7 +25,7 @@ class ES_Connector():
 
 	def connectESClient(self):
 		#https://elasticsearch-py.readthedocs.io/en/latest/api.html
-		return Elasticsearch(self.es_url, basic_auth=(self.es_user, self.es_password), verify_certs=False)
+		return Elasticsearch(self.es_url, basic_auth=(self.es_user, self.es_password), verify_certs=False, timeout=30)
 
 
 	def reconnectClient(self):

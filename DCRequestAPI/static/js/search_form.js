@@ -1,8 +1,9 @@
 'use strict'
 
-let appliedfilters = new AppliedFiltersField();
-let bucketsoverlay = new BucketsOverlay(appliedfilters);
-let aggs_suggestions = new AggsSuggestions(appliedfilters, "aggs_search_input", "aggs_search_suggestions_list");
+const appliedfilters = new AppliedFiltersField();
+const bucketsoverlay = new BucketsOverlay(appliedfilters);
+const aggs_suggestions = new AggsSuggestions(appliedfilters, "aggs_search_input", "aggs_search_suggestions_list");
+const stacked_search = new StackedSearch();
 
 
 
@@ -18,8 +19,8 @@ $(document).ready( function() {
 	add_match_query_events();
 	
 	aggs_suggestions.add_suggestion_events();
-	
 	appliedfilters.add_remove_filter_events();
+	stacked_search.add_toggle_subsearch_events();
 	
 	add_users_projects_restriction_event();
 	
