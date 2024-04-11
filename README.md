@@ -51,7 +51,7 @@ Add at least one connection to a DiversityCollection database in a section with 
 Multiple databases can be used when more than one of these sections are in the config.ini file. These sections must have a unique 
 name after the **data_source_**-prefix and a unique **accronym** entry. 
 
-Replace the `@@`enclosed variable with the connection parameters
+Replace the `@@`enclosed variables with the according parameters
 
     [data_source_DS1]
     accronym = @@DS1_ACCRONYM@@
@@ -90,10 +90,16 @@ When no taxamergerdb is available the entry **skip_taxa_db** must be set to a tr
     database = @@TAXA_MERGER_DB@@
 
 
+Edit the file ./production.ini to set the port (**port**), protocol (**url_sheme**), and a possible URL base path (**url_prefix**) for the internal [Waitress](https://docs.pylonsproject.org/projects/waitress/en/stable/index.html) web service.
 
 
+Overwrite the given default values when needed
 
-
+    [server:main]
+    use = egg:waitress#main
+    port = 6553
+    url_scheme = https
+    url_prefix = /dcrequestapi
 
 
 
