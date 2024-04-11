@@ -1,8 +1,8 @@
 # DCRequestAPI
 
-The DCRequestAPI should provide access to data stored in one or more [DiversityCollection](https://www.diversityworkbench.net/dwb_main.html) database instances. 
-It uses ElasticSearch to provide fast search options. The DCRequestAPI handles access rights as set in Withholding fields in DiversityCollection database.
-Logged on users have access to all data in their projects, unauthrorized users can only access public data.
+The DCRequestAPI provide access to data stored in one or more [DiversityCollection](https://www.diversityworkbench.net/dwb_main.html) database instances. 
+It uses ElasticSearch to implement fast search options. The DCRequestAPI handles access rights as set in `Withholding`-fields in DiversityCollection database.
+Logged in users have access to all data in their projects, unauthrorized users can only access public data.
 
 
 ## Setup
