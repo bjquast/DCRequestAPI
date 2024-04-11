@@ -21,7 +21,7 @@ E. g. install system requirements in Ubuntu:
     sudo apt-get install software-properties-common python3-dev python3-setuptools python3-pip unixodbc unixodbc-dev tdsodbc mysql-server mysql-client git
 
 
- - A running ElasticSearch instance (see [Installing ElasticSearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/install-elasticsearch.html)
+ - A running ElasticSearch instance (see [Installing ElasticSearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/install-elasticsearch.html))
 
 
 #### Set up and activate a virtual python environment
