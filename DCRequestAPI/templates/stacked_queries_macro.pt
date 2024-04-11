@@ -33,7 +33,7 @@
 								<label tal:attributes="class 'hidden' if len(search_params['stack_queries'][i]['terms']) < 2 else None">)</label>
 							</div>
 							<div>
-								<input class="toggle_subsearch margin-left-2em" type="button" name="toggle_subsearch_${i}" value="add sub search" data-stacked-query-num="${i}">
+								<input class="toggle_subsearch margin-left-2em" type="button" name="toggle_subsearch_${i}" value="sub search" data-stacked-query-num="${i}">
 							</div>
 						</div>
 						<!-- input for search terms -->
