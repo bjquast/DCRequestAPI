@@ -110,6 +110,6 @@ Add a proxy in your web servers config file. E. g. for an **Apache** web server 
     ProxyPreserveHost On
     ProxyRequests Off
 
-For details on proxying with mod_proxy in Apache see [https://httpd.apache.org/docs/2.4/mod/mod_proxy.html]
+For details on proxying with mod_proxy in Apache see https://httpd.apache.org/docs/2.4/mod/mod_proxy.html
 
 ### docker
