@@ -102,6 +102,14 @@ Overwrite the given default values when needed
     url_prefix = /dcrequestapi
 
 
+Add a proxy in your web servers config file. E. g. for an **Apache** web server you can add the following lines to one of your enabled site configs:
 
+    #Proxy for dcrequestapi:
+    ProxyPass /dcrequestapi http://localhost:6553/dcrequestapi connectiontimeout=5 timeout=300
+    ProxyPassReverse /dcrequestapi http://localhost:6553/dcrequestapi
+    ProxyPreserveHost On
+    ProxyRequests Off
+
+For details on proxying with mod_proxy in Apache see [https://httpd.apache.org/docs/2.4/mod/mod_proxy.html]
 
 ### docker
