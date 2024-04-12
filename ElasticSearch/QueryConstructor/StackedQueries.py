@@ -54,10 +54,12 @@ class StackedInnerQuery(QueryConstructor):
 
 	def appendSimpleStringQueries(self, query_string):
 		for field in self.simple_fields:
+			search_field = self.getStringQuerySearchField(field, self.simple_fields[field])
+			
 			query = {
 				'query_string': {
 					'query': query_string,
-					'default_field': field
+					'default_field': search_field
 				}
 			}
 			self.query_list.append(query)
@@ -66,6 +68,8 @@ class StackedInnerQuery(QueryConstructor):
 
 	def appendNestedStringQueries(self, query_string):
 		for field in self.nested_fields:
+			search_field = self.getStringQuerySearchField(field, self.nested_fields[field])
+			
 			query = {
 				'nested': {
 					'path': self.nested_fields[field]['path'],
@@ -75,7 +79,7 @@ class StackedInnerQuery(QueryConstructor):
 								{
 									'query_string': {
 										'query': query_string,
-										'default_field': field
+										'default_field': search_field
 									}
 								}
 							]
@@ -90,13 +94,15 @@ class StackedInnerQuery(QueryConstructor):
 
 	def appendSimpleRestrictedStringQueries(self, query_string):
 		for field in self.simple_restricted_fields:
+			search_field = self.getStringQuerySearchField(field, self.simple_restricted_fields[field])
+			
 			query = {
 				'bool': {
 					'must': [
 						{
 							'query_string': {
 								'query': query_string,
-								'default_field': field
+								'default_field': search_field
 							}
 						}
 					],
@@ -119,6 +125,8 @@ class StackedInnerQuery(QueryConstructor):
 
 	def appendNestedRestrictedStringQueries(self, query_string):
 		for field in self.nested_restricted_fields:
+			search_field = self.getStringQuerySearchField(field, self.nested_restricted_fields[field])
+			
 			query = {
 				'nested': {
 					'path': self.nested_restricted_fields[field]['path'],
@@ -128,7 +136,7 @@ class StackedInnerQuery(QueryConstructor):
 								{
 									'query_string': {
 										'query': query_string,
-										'default_field': field
+										'default_field': search_field
 									}
 								}
 							],

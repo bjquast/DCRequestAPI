@@ -1,11 +1,16 @@
 import pudb
 
+from ElasticSearch.ES_Mappings import MappingsDict
+
 
 class FieldDefinitions():
 	def __init__(self):
 		self.setFieldNames()
 		self.setFieldDefinitions()
 		self.appendTaxonRankDefinitions()
+		
+		self.es_mappings = MappingsDict['iuparts']
+		self.setFieldTypes()
 
 
 	def setFieldNames(self):
@@ -164,14 +169,14 @@ class FieldDefinitions():
 			'MatchedTaxon': {
 				'names': {'en': 'Taxon in GBIF'},
 				'buckets': {
-					'field_query': 'MatchedTaxon', 
+					'field_query': 'MatchedTaxon.keyword', 
 				},
 			},
 			
 			'MatchedParentTaxa': {
 				'names': {'en': 'Taxonomy'},
 				'buckets': {
-					'field_query': 'MatchedParentTaxa', 
+					'field_query': 'MatchedParentTaxa.keyword', 
 				},
 			},
 			
@@ -189,7 +194,7 @@ class FieldDefinitions():
 			'TypeStatus': {
 				'names': {'en': 'Type status'},
 				'buckets': {
-					'field_query': 'TypeStatus.keyword_lc'
+					'field_query': 'TypeStatus'
 				},
 			},
 			
@@ -381,5 +386,43 @@ class FieldDefinitions():
 		return
 
 
+	def setFieldTypes(self):
+		for field in self.fielddefinitions:
+			
+			# a field not defined in mapping, generated automatically
+			#if field == 'Barcodes.Methods.region':
+			#	pudb.set_trace()
+			
+			# set a defauld value
+			if 'buckets' in self.fielddefinitions[field]:
+				self.fielddefinitions[field]['buckets']['query_string_field'] = field
+			
+			field_keys = field.split('.')
+			
+			sub_dict = dict(self.es_mappings)
+			for key in field_keys:
+				if key in sub_dict['properties']:
+					sub_dict = sub_dict['properties'][key]
+			
+					if 'type' in sub_dict:
+						if 'buckets' in self.fielddefinitions[field]:
+							self.fielddefinitions[field]['buckets']['types'] = [sub_dict['type']]
+							if 'fields' in sub_dict:
+								for typename in sub_dict['fields']:
+									self.fielddefinitions[field]['buckets']['types'].append(typename)
+							
+							'''
+							if 'types' in self.fielddefinitions[field]['buckets']:
+								if 'text' in self.fielddefinitions[field]['buckets']['types']:
+									self.fielddefinitions[field]['buckets']['query_string_field'] = '{0}.{1}'.format(field, 'text')
+								elif 'keyword_lc' in self.fielddefinitions[field]['buckets']['types']:
+									self.fielddefinitions[field]['buckets']['query_string_field'] = '{0}.{1}'.format(field, 'keyword_lc')
+								elif 'keyword' in self.fielddefinitions[field]['buckets']['types']:
+									self.fielddefinitions[field]['buckets']['query_string_field'] = '{0}.{1}'.format(field, 'keyword')
+								else:
+									self.fielddefinitions[field]['buckets']['query_string_field'] = field
+							'''
+		
+		return
 
 

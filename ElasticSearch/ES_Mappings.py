@@ -307,8 +307,8 @@ MappingsDict['iuparts'] = {
 		
 		# Taxa matched in GBIF or TNT taxonomy
 		'MatchedTaxon': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
-		'MatchedTaxonAuthor': {'type': 'keyword'},
-		'MatchedTaxonRank': {'type': 'keyword'},
+		'MatchedTaxonAuthor': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+		'MatchedTaxonRank': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		'MatchedTaxonURI': {'type': 'keyword'},
 		'MatchedTaxonURL': {'type': 'keyword'},
 		'MatchedParentTaxa': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
@@ -318,8 +318,8 @@ MappingsDict['iuparts'] = {
 			'properties': {
 				'TaxonURI': {'type': 'keyword'},
 				'TaxonURL': {'type': 'keyword'},
-				'Taxon': {'type': 'keyword'},
-				'Rank': {'type': 'keyword'},
+				'Taxon': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+				'Rank': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 				'TreeLevel': {'type': 'integer'},
 				'ParentTaxonURI': {'type': 'keyword'},
 			}

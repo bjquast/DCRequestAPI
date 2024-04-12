@@ -19,8 +19,22 @@ class MSSQLConnector():
 			driver = config.get('driver', None)
 			username = config.get('username', None)
 			password = config.get('password', None)
+			trust_certificate = config.get('trust_certificate', None)
+			trusted_connection = config.get('trusted_connection', None)
+			encrypt = config.get('encrypt', None)
 			
-			mssqlparams = MSSQLConnectionParams(dsn = dsn, server = server, port = port, driver = driver, database = database, uid = username, pwd = password)
+			mssqlparams = MSSQLConnectionParams(
+				dsn = dsn, 
+				server = server, 
+				port = port, 
+				driver = driver, 
+				database = database, 
+				uid = username, 
+				pwd = password,
+				trust_certificate = trust_certificate,
+				trusted_connection = trusted_connection,
+				encrypt = encrypt
+				)
 			self.connectionstring = mssqlparams.getConnectionString()
 			
 			self.databasename = config['database']
@@ -72,7 +86,17 @@ class MSSQLConnector():
 
 
 class MSSQLConnectionParams():
-	def __init__(self, dsn = None, server = None, port = None, driver = None, database = None, uid = None, pwd = None):
+	def __init__(self, 
+					dsn = None,
+					server = None,
+					port = None,
+					driver = None,
+					database = None,
+					uid = None,
+					pwd = None, 
+					trust_certificate = None,
+					trusted_connection = None,
+					encrypt = None):
 		self.paramsdict = {}
 		
 		self.setDSN(dsn)
@@ -82,7 +106,9 @@ class MSSQLConnectionParams():
 		self.setUID(uid)
 		self.setPWD(pwd)
 		self.setDriver(driver)
-		
+		self.setTrustCertificate(trust_certificate)
+		self.setTrustedConnection(trusted_connection)
+		self.setEncrypt(encrypt)
 		
 	def setDSN(self, dsn = None):
 		self.paramsdict['DSN'] = dsn
@@ -109,6 +135,16 @@ class MSSQLConnectionParams():
 	def setPWD(self, pwd = None):
 		self.paramsdict['PWD'] = pwd
 	
+	def setTrustCertificate(self, trust_certificate):
+		self.paramsdict['TrustServerCertificate'] = trust_certificate
+		
+	def setTrustedConnection(self, trusted_connection):
+		self.paramsdict['Trusted_Connection'] = trusted_connection
+	
+	def setEncrypt(self, encrypt):
+		self.paramsdict['Encrypt'] = encrypt
+	
+	
 	def getDSN(self):
 		return self.paramsdict['DSN']
 	
@@ -126,6 +162,15 @@ class MSSQLConnectionParams():
 	
 	def getUID(self):
 		return self.paramsdict['UID']
+	
+	def getTrustCertificate(self):
+		return self.paramsdict['TrustServerCertificate']
+		
+	def getTrustedConnection(self):
+		return self.paramsdict['Trusted_Connection']
+	
+	def getEncrypt(self):
+		return self.paramsdict['Encrypt']
 	
 	'''
 	def getPWD(self):

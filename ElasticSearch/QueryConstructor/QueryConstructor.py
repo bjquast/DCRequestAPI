@@ -82,6 +82,18 @@ class QueryConstructor():
 		return case_insensitive
 
 
+	def getStringQuerySearchField(self, key, query_def):
+		# set the default value
+		search_field = key
+		if 'types' in query_def and 'text' in query_def['types']:
+			search_field = key
+		elif 'types' in query_def and 'keyword_lc' in query_def['types']:
+			search_field = '{0}.{1}'.format(key, 'keyword_lc')
+		elif 'types' in query_def and 'keyword' in query_def['types']:
+			search_field = '{0}.{1}'.format(key, 'keyword')
+		return search_field
+
+
 	def removeNonTextFromSourceList(self):
 		filtered_source_fields = []
 		for source_field in self.source_fields:

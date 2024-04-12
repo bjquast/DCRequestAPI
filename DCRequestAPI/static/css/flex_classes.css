@@ -29,6 +29,10 @@
 	margin-bottom: 1em;
 }
 
+.flex-end-no-margin {
+	display: flex;
+	justify-content: flex-end;
+}
 
 .flex-space-between {
 	display: flex;
