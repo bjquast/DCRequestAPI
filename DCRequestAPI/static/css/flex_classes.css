@@ -48,19 +48,38 @@
 .flex-column {
 	display: flex;
 	flex-direction: column;
+	flex-wrap: wrap;
 }
 
 
 .flex-row {
 	display: flex;
 	flex-direction: row;
+	flex-wrap: wrap;
 }
 
-.flexitem-align-center {
+.flex-row-start {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: start;
+}
+
+.align-self-center {
 	align-self: center;
+}
+
+.align-self-last-baseline {
+	align-self: last baseline;
+}
+
+.align-self-first-baseline {
+	align-self: first baseline;
 }
 
 .margin-left-2em {
 	margin-left: 2em;
 }
+
+
 

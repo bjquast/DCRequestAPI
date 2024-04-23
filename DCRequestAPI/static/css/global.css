@@ -120,6 +120,10 @@ input{
 	display: none;
 }
 
+.invisible {
+	visibility: hidden;
+}
+
 .ul-no-bullet {
 	list-style-type: none;
 	padding-left: 1em;
@@ -144,4 +148,23 @@ input{
 	align-items: center;
 }
 
+.no-whitespace-wrap {
+	white-space: nowrap;
+}
 
+.width-8em {
+	width: 8em;
+}
+
+.add_subsearch_label {
+	padding: 4px;
+	background-color: #eeeeeeff;
+	border-radius: 4px;
+	border: 1px solid;
+	border-color: gray;
+	overflow: hidden;
+}
+
+.add_subsearch_label:hover {
+	background-color: lightgray;
+}

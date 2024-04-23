@@ -1,7 +1,7 @@
 
 
 <div class="flex-start">
-	<div class="flexitem-align-center hidden">
+	<div class="align-self-center hidden">
 		<span tal:condition="python: len(coldefs) > 0">
 			<label for="sort_col_selector">Sort results by: </label> 
 			<select id="sort_col_selector" form="search_form" name="sorting_col">
@@ -10,7 +10,7 @@
 			</select>
 		</span>
 	</div>
-	<div class="flexitem-align-center hidden">
+	<div class="align-self-center hidden">
 		<span>
 			<label for="sort_dir_selector">Sort direction: </label>
 			<select id="sort_dir_selector" form="search_form" name="sorting_dir">
@@ -19,7 +19,7 @@
 			</select>
 		</span>
 	</div>
-	<div class="flexitem-align-center">
+	<div class="align-self-center">
 		<label>Pagesize: </label>
 		<select id="pagesize_selector" form="search_form" name="pagesize">
 			<option tal:repeat="available_pagesize [10,20,50,100,500,1000]" value="${available_pagesize}" tal:attributes="selected 'selected' if pagesize == available_pagesize else None">${available_pagesize}</option>

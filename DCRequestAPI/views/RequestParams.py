@@ -58,6 +58,8 @@ class RequestParams():
 								'outer_connector': self.params_dict.get('stack_search_outer_connector_{0}'.format(query_count), ['AND'])[-1],
 								'inner_connector': self.params_dict.get('stack_search_inner_connector_{0}'.format(query_count), ['AND'])[-1]
 							}
+							if 'stack_search_add_subquery_{0}'.format(query_count) in self.params_dict:
+								query_dicts[query_count]['add_subquery'] = True
 						
 						query_dicts[query_count]['terms'].append(term)
 						query_dicts[query_count]['fields'].append(field)
