@@ -56,16 +56,18 @@ class AggregationView():
 	@view_config(route_name='aggregation', accept='application/json', renderer="json")
 	def viewAggregationJSON(self):
 		
-		#pudb.set_trace()
-		
-		# remove aggregation from term filters to get all buckets in this aggregation
-		# but keep all other search params?
-		# that might be confusing for users
-		
 		if 'aggregation' in self.search_params:
 			agg_key = self.search_params['aggregation']
-			#if agg_key in self.search_params['term_filters']:
-			#	del self.search_params['term_filters'][agg_key]
+		
+		if 'buckets_sort_alphanum' in self.search_params:
+			buckets_sort_alphanum = self.search_params['buckets_sort_alphanum']
+		else:
+			buckets_sort_alphanum = False
+		
+		if 'buckets_sort_dir' in self.search_params:
+			buckets_sort_dir = self.search_params['buckets_sort_dir']
+		else:
+			buckets_sort_dir = 'asc'
 		
 		if agg_key not in self.fielddefinitions:
 			return {
@@ -74,7 +76,7 @@ class AggregationView():
 			}
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
-		buckets = es_searcher.singleAggregationSearch(agg_key)
+		buckets = es_searcher.singleAggregationSearch(agg_key, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
 		
 		
 		

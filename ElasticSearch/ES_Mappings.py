@@ -4,11 +4,18 @@ MappingsDict = dict()
 
 
 # normalizer to generate lowercase index of keywords
+# analyzer to keep accessionnumbers with - together
 MappingsDict['settings'] = {
 	'analysis': {
 		'normalizer': {
 			'use_lowercase': {
-				'filter': 'lowercase'
+				'filter': ['lowercase']
+			}
+		},
+		'analyzer': {
+			'whitespace_lc': {
+				'tokenizer': 'whitespace',
+				'filter': ['lowercase']
 			}
 		}
 	}
@@ -36,13 +43,19 @@ MappingsDict['iuparts'] = {
 		'DatabaseID': 
 			{'type': 'keyword'},
 		'PartAccessionNumber':
-			{'type': 'text', 'fields': {
+			{
+				'type': 'text',
+				'analyzer': 'whitespace_lc',
+				'fields': {
 					'keyword': {'type': 'keyword', 'ignore_above': 256},
 					'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
 				}
 			},
 		'SpecimenAccessionNumber':
-			{'type': 'text', 'fields': {
+			{
+				'type': 'text', 
+				'analyzer': 'whitespace_lc',
+				'fields': {
 					'keyword': {'type': 'keyword', 'ignore_above': 256},
 					'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
 				}

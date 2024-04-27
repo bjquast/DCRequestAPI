@@ -196,7 +196,7 @@ class ES_Searcher():
 	def singleTreeAggregationSearch(self, aggregation_name, parent_ids):
 		#pudb.set_trace()
 		self.setQuery()
-		buckets_query = TreeQueries(aggregation_name, parent_ids = parent_ids, users_project_ids = self.users_project_ids) #, sort_alphanum = True)
+		buckets_query = TreeQueries(aggregation_name, parent_ids = parent_ids, users_project_ids = self.users_project_ids) #, buckets_sort_alphanum = True)
 		aggs = buckets_query.getTreeQuery()
 		
 		#logger.debug(json.dumps(aggs))
@@ -214,10 +214,10 @@ class ES_Searcher():
 		return buckets
 
 
-	def singleAggregationSearch(self, aggregation_name, size = 5000):
+	def singleAggregationSearch(self, aggregation_name, size = 5000, buckets_sort_alphanum = True, buckets_sort_dir = 'asc'):
 		
 		self.setQuery()
-		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size, sort_alphanum = True)
+		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
 		aggs = buckets_query.getAggregationsQuery()
 		
 		#logger.debug(json.dumps(aggs))
@@ -235,10 +235,10 @@ class ES_Searcher():
 		return buckets
 
 
-	def suggestionsSearch(self, search_val, size = 10):
+	def suggestionsSearch(self, search_val, size = 10, buckets_sort_alphanum = True, buckets_sort_dir = 'asc'):
 		
 		self.setQuery()
-		buckets_query = AggsSuggestions(users_project_ids = self.users_project_ids, source_fields = [], size = size, sort_alphanum = True)
+		buckets_query = AggsSuggestions(users_project_ids = self.users_project_ids, source_fields = [], size = size, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
 		aggs = buckets_query.getSuggestionsQuery(search_val)
 		
 		#logger.debug(json.dumps(aggs))
@@ -270,6 +270,7 @@ class ES_Searcher():
 		self.setQuery()
 		
 		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids)
+		#aggs = {}
 		aggs = buckets_query.getAggregationsQuery()
 		
 		#logger.debug(self.sort)
@@ -301,8 +302,11 @@ class ES_Searcher():
 			self.search_params['page'] = maxpage
 			self.setStartRow()
 			response = self.client.search(index=self.index, size=self.pagesize, sort=self.sort, query=self.query, from_=self.start, source=source_fields, track_total_hits=True, aggs=aggs)
-			
-		self.raw_aggregations = response['aggregations']
+		
+		if 'aggregations' in response:
+			self.raw_aggregations = response['aggregations']
+		else:
+			self.raw_aggregations = {}
 		
 		docs = [doc for doc in response['hits']['hits']]
 		docs = self.withholdfilters.applyFiltersToSources(docs, self.users_project_ids)

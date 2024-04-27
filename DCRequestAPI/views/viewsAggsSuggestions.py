@@ -63,8 +63,18 @@ class AggsSuggestionsView():
 		if 'aggs_suggestion_search' in self.search_params:
 			suggestion_val = self.search_params['aggs_suggestion_search']
 			
+			if 'buckets_sort_alphanum' in self.search_params:
+				buckets_sort_alphanum = self.search_params['buckets_sort_alphanum']
+			else:
+				buckets_sort_alphanum = False
+			
+			if 'buckets_sort_dir' in self.search_params:
+				buckets_sort_dir = self.search_params['buckets_sort_dir']
+			else:
+				buckets_sort_dir = 'asc'
+			
 			es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
-			buckets = es_searcher.suggestionsSearch(suggestion_val)
+			buckets = es_searcher.suggestionsSearch(suggestion_val, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
 			
 			extended_buckets = {}
 			for key in buckets:

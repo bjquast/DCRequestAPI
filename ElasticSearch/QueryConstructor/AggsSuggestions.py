@@ -10,14 +10,14 @@ from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
 class AggsSuggestions(QueryConstructor):
-	def __init__(self, users_project_ids = [], source_fields = [], size = 10, sort_alphanum = True, sort_dir = 'asc', prefix_or_match = 'prefix'):
+	def __init__(self, users_project_ids = [], source_fields = [], size = 10, buckets_sort_alphanum = True, buckets_sort_dir = 'asc', prefix_or_match = 'prefix'):
 		#pudb.set_trace()
 		
 		self.users_project_ids = users_project_ids
 		self.source_fields = source_fields
 		self.size = size
-		self.sort_alphanum = sort_alphanum
-		self.sort_dir = sort_dir.lower()
+		self.buckets_sort_alphanum = buckets_sort_alphanum
+		self.buckets_sort_dir = buckets_sort_dir.lower()
 		self.prefix_or_match = prefix_or_match
 		
 		self.sortstring = None
@@ -67,11 +67,11 @@ class AggsSuggestions(QueryConstructor):
 
 	def getSorting(self):
 		sorting = {}
-		if self.sort_alphanum is True:
-			if self.sort_dir not in ['asc', 'desc']:
-				self.sort_dir = 'asc'
+		if self.buckets_sort_alphanum is True:
+			if self.buckets_sort_dir not in ['asc', 'desc']:
+				self.buckets_sort_dir = 'asc'
 			
-			sorting = {"_key": self.sort_dir}
+			sorting = {"_key": self.buckets_sort_dir}
 			
 		return sorting
 

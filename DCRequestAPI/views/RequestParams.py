@@ -49,7 +49,7 @@ class RequestParams():
 					term = self.params_dict.get('stack_query_terms_{0}_{1}'.format(query_count, term_count), [''])[-1]
 					field = self.params_dict.get('stack_query_fields_{0}_{1}'.format(query_count, term_count), [''])[-1]
 					
-					if term is not None and len(term) > 0 and field is not None and len(field) > 0:
+					if term is not None and field is not None:
 						if query_count not in query_dicts:
 							query_counts.append(query_count)
 							query_dicts[query_count] = {
@@ -60,12 +60,28 @@ class RequestParams():
 							}
 							if 'stack_search_add_subquery_{0}'.format(query_count) in self.params_dict:
 								query_dicts[query_count]['add_subquery'] = True
+							if 'stack_search_delete_subquery_{0}'.format(query_count) in self.params_dict:
+								query_dicts[query_count]['delete_subquery'] = True
 						
 						query_dicts[query_count]['terms'].append(term)
 						query_dicts[query_count]['fields'].append(field)
 		
-		for query_count in query_counts:
-			self.search_params['stack_queries'].append(query_dicts[query_count])
+		for query_count in query_dicts:
+			if 'delete_subquery' in query_dicts[query_count] and len(query_dicts[query_count]['terms']) > 1:
+				query_dicts[query_count]['terms'].pop()
+				query_dicts[query_count]['fields'].pop()
+			
+			terms_copy = []
+			fields_copy = []
+			for i in range(len(query_dicts[query_count]['terms'])):
+				if len(query_dicts[query_count]['terms'][i]) > 0:
+					terms_copy.append(query_dicts[query_count]['terms'][i])
+					fields_copy.append(query_dicts[query_count]['fields'][i])
+			query_dicts[query_count]['terms'] = terms_copy
+			query_dicts[query_count]['fields'] = fields_copy
+			
+			if len(query_dicts[query_count]['terms']) > 0:
+				self.search_params['stack_queries'].append(query_dicts[query_count])
 		
 		return
 
@@ -76,9 +92,21 @@ class RequestParams():
 		self.read_stack_queries_params()
 		
 		exists_params = ['restrict_to_users_projects']
-		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'aggregation', 'tree', 'aggs_suggestion_search', 'match_queries_connector']
+		boolean_params = ['buckets_sort_alphanum']
+		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'aggregation', 'tree', 'aggs_suggestion_search', 'match_queries_connector', 
+							'overlay_bucket_search', 'overlay_remaining_all_select', 'buckets_sort_dir'
+						]
 		complex_params = ['term_filters',]
 		list_params = ['open_filter_selectors', 'result_table_columns', 'parent_ids', 'match_query']
+		
+		for param_name in boolean_params:
+			if param_name in self.params_dict:
+				if self.params_dict[param_name][-1] in ['false', 'False', '', '0']:
+					self.search_params[param_name] = False
+				elif not self.params_dict[param_name][-1]:
+					self.search_params[param_name] = False
+				else:
+					self.search_params[param_name] = True
 		
 		for param_name in exists_params:
 			if param_name in self.params_dict:

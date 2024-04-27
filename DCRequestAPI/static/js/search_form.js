@@ -20,7 +20,7 @@ $(document).ready( function() {
 	
 	aggs_suggestions.add_suggestion_events();
 	appliedfilters.add_remove_filter_events();
-	stacked_search.add_toggle_subsearch_events();
+	stacked_search.add_subsearch_events();
 	
 	add_users_projects_restriction_event();
 	

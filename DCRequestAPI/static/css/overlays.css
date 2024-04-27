@@ -15,9 +15,9 @@
 	width: 60%;
 	background: #fffbf0; 
 	border: thin solid #e7c157;
-	position: absolute;
-	top: 30%;
-	left: 10%;
+	position: fixed;
+	top: 40%;
+	left: 20%;
 	margin: auto;
 	z-index: 10;
 }

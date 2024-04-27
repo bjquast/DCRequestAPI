@@ -19,7 +19,7 @@
 							<div tal:condition="python: len(search_params['stack_queries'][i]['terms']) > 0" class="flex-row-start">
 								<div tal:repeat="search_term search_params['stack_queries'][i]['terms']" class="no-whitespace-wrap">
 									<block tal:define="j repeat.search_term.index" tal:omit-tag="">
-										<span tal:attributes="class 'invisible' if len(search_params['stack_queries'][i]['terms']) < 2 or j > 0 else None">(</span>
+										<span tal:attributes="class '' if (len(search_params['stack_queries'][i]['terms']) > 1 or 'add_subquery' in search_params['stack_queries'][i]) and j == 0 else 'invisible'">(</span>
 										<span tal:condition="python: len(search_term) > 0">
 											<input form="search_form" type="text" class="width-8em" value="${search_term}" name="stack_query_terms_${i}_${j}" data-stack-query="${search_term}" />
 											<select form="search_form" name="stack_query_fields_${i}_${j}" class="width-8em">
@@ -30,7 +30,7 @@
 													</option>
 												</block>
 											</select>
-											<span tal:attributes="class 'invisible' if len(search_params['stack_queries'][i]['terms']) < 2 or j+1 != len(search_params['stack_queries'][i]['terms']) else None">)</span>
+											<span tal:attributes="class 'invisible' if len(search_params['stack_queries'][i]['terms']) < 2 or j+1 != len(search_params['stack_queries'][i]['terms']) or 'add_subquery' in search_params['stack_queries'][i] else None">)</span>
 										</span>
 									</block>
 									<span tal:condition="repeat.search_term.index >= 0 and repeat.search_term.index < len(search_params['stack_queries'][i]['terms'])-1">${search_params['stack_queries'][i]['inner_connector']}</span>
@@ -53,24 +53,26 @@
 											</block>
 										</span>
 									</block>
+									<span>)</span>
 								</div>
 							</div>
 							<div class="align-self-last-baseline">
 								<!-- inner search terms connector -->
 								<block tal:define="token_num len(search_params['stack_queries'][i]['terms']) | 0" tal:omit-tag="">
 									<span tal:attributes="class 'invisible' if token_num < 2 and 'add_subquery' not in search_params['stack_queries'][i] else None">
-										<label> connect by </label>
 										<select name="stack_search_inner_connector_${i}">
 											<option tal:attributes="selected 'selected' if search_params['stack_queries'][i]['inner_connector'] == 'AND' else None">AND</option>
 											<option tal:attributes="selected 'selected' if search_params['stack_queries'][i]['inner_connector'] == 'OR' else None">OR</option>
 										</select>
 									</span>
+									<!-- add and delete subquery checkboxes --> 
+									<input id="stack_search_add_subquery_${i}" class="add_subsearch_checkbox hidden" type="checkbox" name="stack_search_add_subquery_${i}" data-stacked-query-num="${i}">
+									<label for="stack_search_add_subquery_${i}" class="add_subsearch_label margin-left-2em" data-stacked-query-num="${i}">add</label>
+									<input tal:condition="token_num > 1" id="stack_search_delete_subquery_${i}" class="delete_subsearch_checkbox hidden" type="checkbox" name="stack_search_delete_subquery_${i}" data-stacked-query-num="${i}">
+									<label tal:condition="token_num > 1" for="stack_search_delete_subquery_${i}" class="delete_subsearch_label" data-stacked-query-num="${i}">delete last</label>
+									<!--<input class="delete_subsearch margin-left-2em" type="button" name="del_subsearch_${i}" value="del" data-stacked-query-num="${i}">-->
+									<!--<input class="toggle_subsearch margin-left-2em" type="button" name="toggle_subsearch_${i}" value="sub query" data-stacked-query-num="${i}">-->
 								</block>
-								<!-- add subquery checkboxes --> 
-								<input id="stack_search_add_subquery_${i}" class="hidden" type="checkbox" name="stack_search_add_subquery_${i}" data-stacked-query-num="${i}">
-								<label for="stack_search_add_subquery_${i}" class="add_subsearch_label margin-left-2em">add subquery</label>
-								<!--<input class="delete_subsearch margin-left-2em" type="button" name="del_subsearch_${i}" value="del" data-stacked-query-num="${i}">-->
-								<!--<input class="toggle_subsearch margin-left-2em" type="button" name="toggle_subsearch_${i}" value="sub query" data-stacked-query-num="${i}">-->
 							</div>
 						</block>
 					</block>

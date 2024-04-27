@@ -38,6 +38,13 @@
 	display: flex;
 	justify-content: space-between;
 	margin-bottom: 1em;
+	flex-wrap: wrap;
+}
+
+.flex-space-between-no-wrap {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 1em;
 }
 
 .flex-space-between-no-margin {
@@ -81,5 +88,8 @@
 	margin-left: 2em;
 }
 
+.padding-1em {
+	padding: 1em;
+}
 
 

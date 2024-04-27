@@ -156,7 +156,7 @@ input{
 	width: 8em;
 }
 
-.add_subsearch_label {
+.add_subsearch_label, .delete_subsearch_label {
 	padding: 4px;
 	background-color: #eeeeeeff;
 	border-radius: 4px;
@@ -165,6 +165,6 @@ input{
 	overflow: hidden;
 }
 
-.add_subsearch_label:hover {
+.add_subsearch_label:hover , .delete_subsearch_label:hover {
 	background-color: lightgray;
 }
