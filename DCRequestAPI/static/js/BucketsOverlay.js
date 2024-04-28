@@ -51,13 +51,9 @@ class BucketsOverlay {
 		self.readOverlayFormParameters();
 		self.overlay_form_data.append('aggregation', self.agg_key);
 		
-		console.log('###########', self.buckets_search_term);
 		if (self.buckets_search_term) {
-			console.log('-----------', self.buckets_search_term);
 			self.overlay_form_data.append('buckets_search_term', self.buckets_search_term);
 		}
-		
-		console.log(self.overlay_form_data);
 		
 		$.ajax({
 			url: "./aggregation",
@@ -186,6 +182,23 @@ class BucketsOverlay {
 			$(this).change( function() {
 				self.updateBucketList();
 			});
+			
+		});
+		
+		$('#overlay_remaining_all_select').change( function ( event ) {
+			event.stopPropagation();
+			let connector = $('#overlay_remaining_all_select').val();
+			
+			console.log('#####################', connector);
+			
+			if (connector == 'remaining') {
+				$('#term_filters_connector').val('AND');
+				console.log(connector);
+			}
+			else if (connector == 'all') {
+				$('#term_filters_connector').val('OR');
+				console.log(connector);
+			}
 			
 		});
 		

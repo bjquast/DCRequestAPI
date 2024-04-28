@@ -141,9 +141,13 @@ class ES_Searcher():
 
 	def setQuery(self):
 		self.query = {"bool": {"must": [], "should": [], "filter": []}}
-		
+		#pudb.set_trace()
 		if 'term_filters' in self.search_params:
-			filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids, source_fields = self.bucket_fields).getTermFilterQueries(self.search_params['term_filters'])
+			connector = 'AND'
+			if 'term_filters_connector' in self.search_params:
+				connector = self.search_params['term_filters_connector']
+			
+			filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids, source_fields = self.bucket_fields, connector = connector).getTermFilterQueries(self.search_params['term_filters'])
 			self.query['bool']["filter"].extend(filter_queries)
 		
 		if 'match_query' in self.search_params:
@@ -216,8 +220,9 @@ class ES_Searcher():
 	def singleAggregationSearch(self, aggregation_name, buckets_search_term = None, size = 5000, buckets_sort_alphanum = True, buckets_sort_dir = 'asc'):
 		
 		self.setQuery()
-		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
-		aggs = buckets_query.getAggregationsQuery(buckets_search_term = buckets_search_term)
+		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size, 
+			buckets_search_term = buckets_search_term, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
+		aggs = buckets_query.getAggregationsQuery()
 		
 		#logger.debug(json.dumps(aggs))
 		#logger.debug(json.dumps(self.query))
@@ -237,8 +242,9 @@ class ES_Searcher():
 	def suggestionsSearch(self, buckets_search_term, size = 10, buckets_sort_alphanum = True, buckets_sort_dir = 'asc'):
 		
 		self.setQuery()
-		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [], size = size, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
-		aggs = buckets_query.getAggregationsQuery(buckets_search_term = buckets_search_term)
+		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [], size = size, 
+			buckets_search_term = buckets_search_term, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
+		aggs = buckets_query.getAggregationsQuery()
 		
 		#logger.debug(json.dumps(aggs))
 		#logger.debug(json.dumps(self.query))
@@ -269,12 +275,11 @@ class ES_Searcher():
 		self.setQuery()
 		
 		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids)
-		#aggs = {}
 		aggs = buckets_query.getAggregationsQuery()
 		
 		#logger.debug(self.sort)
 		#logger.debug(json.dumps(aggs))
-		#logger.debug(json.dumps(self.query))
+		logger.debug(json.dumps(self.query))
 		#logger.debug(json.dumps(self.sort))
 		
 		if len(self.source_fields) <= 0:

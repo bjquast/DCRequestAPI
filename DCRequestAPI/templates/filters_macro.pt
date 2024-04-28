@@ -3,7 +3,16 @@
 	
 	<fieldset>
 		<legend>Filters</legend>
-		<h4>Selected filters</h4>
+		<div class="flex-space-between">
+			<div><h4>Selected filters</h4></div>
+			<div class="align-self-center">
+				<label for="term_filters_connector">connector</label>
+				<select id="term_filters_connector" form="search_form" name="term_filters_connector">
+					<option tal:attributes="selected 'selected' if 'term_filters_connector' in search_params and search_params['term_filters_connector'] == 'AND' else None">AND</option>
+					<option tal:attributes="selected 'selected' if 'term_filters_connector' in search_params and search_params['term_filters_connector'] == 'OR' else None">OR</option>
+				</select>
+			</div>
+		</div>
 		<div id="applied_filters">
 			<block tal:condition="python: 'term_filters' in search_params">
 				<block tal:repeat="filter_key search_params['term_filters']">
@@ -47,7 +56,7 @@
 							data-filter-value="${bucket['key']}">
 							${bucket['key']} (${bucket['doc_count']})
 						</li>
-						<li tal:condition="python: len(aggregations[aggs_name]) > 9"><button id="more_button_${aggs_name}" class="more_filter_entries_button" data-filter-key="${aggs_name}">more</button></li>
+						<li><button id="more_button_${aggs_name}" class="more_filter_entries_button" data-filter-key="${aggs_name}">more options</button></li>
 					</ul>
 				</details>
 			</div>

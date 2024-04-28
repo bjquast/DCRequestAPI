@@ -81,6 +81,7 @@ function add_logout_event() {
 
 function add_filter_events() {
 	$('.bucket_entry').each( function () {
+		$(this).off();
 		$(this).click( function() {
 			let filter_id = $(this).data('filter-id');
 			let filter_name = $(this).data('filter-name');
@@ -89,6 +90,12 @@ function add_filter_events() {
 			appliedfilters.add_filter(filter_id, filter_name, filter_key, filter_value);
 		});
 	});
+	
+	$('#term_filters_connector').off();
+	$('#term_filters_connector').change( function () {
+		$("#search_form").submit();
+	});
+	
 }
 
 

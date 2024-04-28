@@ -10,9 +10,10 @@ from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
 class TermFilterQueries(QueryConstructor):
-	def __init__(self, users_project_ids = [], source_fields = []):
+	def __init__(self, users_project_ids = [], source_fields = [], connector = 'AND'):
 		self.users_project_ids = users_project_ids
 		self.source_fields = source_fields
+		self.connector = connector
 		
 		fielddefs = FieldDefinitions()
 		if len(self.source_fields) <= 0:
@@ -42,13 +43,21 @@ class TermFilterQueries(QueryConstructor):
 		
 		filter_queries = []
 		
-		for filter_key in self.term_queries:
-			if len(self.term_queries[filter_key]) > 1:
-				should_query = {'bool': {'should': self.term_queries[filter_key], 'minimum_should_match': 1}}
-				filter_queries.append(should_query)
-			elif len(self.term_queries[filter_key]) == 1:
-				filter_queries.append(self.term_queries[filter_key][0])
+		if self.connector.upper() == 'AND':
+			for filter_key in self.term_queries:
+				if len(self.term_queries[filter_key]) > 1:
+					should_query = {'bool': {'should': self.term_queries[filter_key], 'minimum_should_match': 1}}
+					filter_queries.append(should_query)
+				elif len(self.term_queries[filter_key]) == 1:
+					filter_queries.append(self.term_queries[filter_key][0])
 		
+		elif self.connector.upper() == 'OR':
+			should_query = {'bool': {'should':[], 'minimum_should_match': 1}}
+			for filter_key in self.term_queries:
+				should_query['bool']['should'].extend(self.term_queries[filter_key])
+			filter_queries.append(should_query)
+			
+			
 		return filter_queries
 
 

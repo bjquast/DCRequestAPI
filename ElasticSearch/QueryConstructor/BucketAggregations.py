@@ -10,12 +10,17 @@ from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
 class BucketAggregations(QueryConstructor):
-	def __init__(self, users_project_ids = [], source_fields = [], size = 10, buckets_sort_alphanum = False, buckets_sort_dir = 'asc', prefix_or_match = 'prefix'):
+	def __init__(self, users_project_ids = [], source_fields = [], size = 10, buckets_search_term = None, buckets_sort_alphanum = False, buckets_sort_dir = 'asc', prefix_or_match = 'prefix'):
 		#pudb.set_trace()
 		
 		self.users_project_ids = users_project_ids
 		self.source_fields = source_fields
 		self.size = size
+		
+		self.buckets_search_term = buckets_search_term
+		if self.buckets_search_term == '':
+			self.buckets_search_term = None
+		
 		self.buckets_sort_alphanum = buckets_sort_alphanum
 		self.buckets_sort_dir = buckets_sort_dir.lower()
 		self.prefix_or_match = prefix_or_match
@@ -25,7 +30,8 @@ class BucketAggregations(QueryConstructor):
 			self.source_fields = fielddefs.bucketfields
 		
 		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.source_fields)
-		self.removeNonTextFromSourceList()
+		if self.buckets_search_term is not None:
+			self.removeNonTextFromSourceList()
 		self.sort_queries_by_definitions()
 		self.setSubFilters()
 
@@ -51,10 +57,7 @@ class BucketAggregations(QueryConstructor):
 		return search_filter
 
 
-	def getAggregationsQuery(self, buckets_search_term = None):
-		self.buckets_search_term = buckets_search_term
-		if self.buckets_search_term == '':
-			self.buckets_search_term = None
+	def getAggregationsQuery(self):
 		
 		self.aggs_query = {}
 		
