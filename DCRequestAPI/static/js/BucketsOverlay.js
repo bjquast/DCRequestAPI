@@ -189,15 +189,11 @@ class BucketsOverlay {
 			event.stopPropagation();
 			let connector = $('#overlay_remaining_all_select').val();
 			
-			console.log('#####################', connector);
-			
 			if (connector == 'remaining') {
 				$('#term_filters_connector').val('AND');
-				console.log(connector);
 			}
 			else if (connector == 'all') {
 				$('#term_filters_connector').val('OR');
-				console.log(connector);
 			}
 			
 		});
