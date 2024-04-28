@@ -10,7 +10,7 @@ from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
 class BucketAggregations(QueryConstructor):
-	def __init__(self, users_project_ids = [], source_fields = [], size = 10, buckets_sort_alphanum = False, buckets_sort_dir = 'asc'):
+	def __init__(self, users_project_ids = [], source_fields = [], size = 10, buckets_sort_alphanum = False, buckets_sort_dir = 'asc', prefix_or_match = 'prefix'):
 		#pudb.set_trace()
 		
 		self.users_project_ids = users_project_ids
@@ -18,18 +18,44 @@ class BucketAggregations(QueryConstructor):
 		self.size = size
 		self.buckets_sort_alphanum = buckets_sort_alphanum
 		self.buckets_sort_dir = buckets_sort_dir.lower()
-		self.sortstring = None
+		self.prefix_or_match = prefix_or_match
 		
 		fielddefs = FieldDefinitions()
 		if len(self.source_fields) <= 0:
 			self.source_fields = fielddefs.bucketfields
 		
 		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.source_fields)
+		self.removeNonTextFromSourceList()
 		self.sort_queries_by_definitions()
 		self.setSubFilters()
 
 
-	def getAggregationsQuery(self):
+	def getSearchQuery(self, field_defs, field, case_insensitive):
+		search_filter = {}
+		if self.buckets_search_term is not None:
+			if self.prefix_or_match == 'prefix':
+				search_filter = {
+					"prefix": {
+						field_defs[field]['field_query']: {
+							"value": self.buckets_search_term,
+							"case_insensitive": case_insensitive
+						}
+					}
+				}
+			else:
+				search_filter = {
+					"match_bool_prefix": {
+						field: self.buckets_search_term
+					}
+				}
+		return search_filter
+
+
+	def getAggregationsQuery(self, buckets_search_term = None):
+		self.buckets_search_term = buckets_search_term
+		if self.buckets_search_term == '':
+			self.buckets_search_term = None
+		
 		self.aggs_query = {}
 		
 		self.setAggregationsQuery()
@@ -54,84 +80,128 @@ class BucketAggregations(QueryConstructor):
 	def setAggregationsQuery(self):
 		
 		for field in self.simple_fields:
-			self.aggs_query[field] = {'terms': {'field': self.simple_fields[field]['field_query'], 'size': self.size}}
+			
+			case_insensitive = self.getCaseInsensitiveValue(self.simple_fields[field])
+			search_query = self.getSearchQuery(self.simple_fields, field, case_insensitive)
+			
+			self.aggs_query[field] = {
+				"filter": {
+					"bool": {
+						"must": []
+					}
+				},
+				"aggs": {
+					"buckets": {
+						"terms": {
+							"field": self.simple_fields[field]['field_query'],
+							'size': self.size
+						}
+					}
+				}
+			}
+			
+			if len(search_query) > 0:
+				self.aggs_query[field]['filter']['bool']['must'].append(search_query)
+			
 			sorting_dict = self.getSorting()
 			if len(sorting_dict) > 0:
-				self.aggs_query[field]['terms']['order'] = sorting_dict
+				self.aggs_query[field]['aggs']['buckets']['terms']['order'] = sorting_dict
 		
 		return
 
 
+
 	def setNestedAggregationsQuery(self):
 		for field in self.nested_fields:
+			
+			case_insensitive = self.getCaseInsensitiveValue(self.nested_fields[field])
+			search_query = self.getSearchQuery(self.nested_fields, field, case_insensitive)
+			
 			self.aggs_query[field] = {
 				'nested': {
 					'path': self.nested_fields[field]['path']
 				},
-				'aggs': {
-					'buckets': {
-						'aggs': {
-							'buckets': {
-								'terms': {'field': self.nested_fields[field]['field_query'], 'size': self.size}
+				"aggs": {
+					"buckets": {
+						"filter": {
+							"bool": {
+								"must": [],
+								"filter": []
 							}
 						},
-						'filter': {
-							'bool': {
-								'must': []
+						"aggs": {
+							"buckets": {
+								"terms": {
+									"field": self.nested_fields[field]['field_query'],
+									'size': self.size
+								}
 							}
 						}
 					}
 				}
 			}
 			
+			if len(search_query) > 0:
+				self.aggs_query[field]['aggs']["buckets"]['filter']['bool']['must'].append(search_query)
 			
 			if field in self.subfilters:
-				terms_sub_filter = {
+				sub_filter = {
 					'terms': self.subfilters[field]
 				}
-				self.aggs_query[field]['aggs']['buckets']['filter']['bool']['must'].append(terms_sub_filter)
+				self.aggs_query[field]['aggs']["buckets"]['filter']['bool']['filter'].append(sub_filter)
 			
 			sorting_dict = self.getSorting()
 			if len(sorting_dict) > 0:
-				self.aggs_query[field]['aggs']['buckets']['aggs']['buckets']['terms']['order'] = sorting_dict
+				self.aggs_query[field]['aggs']["buckets"]['aggs']['buckets']['terms']['order'] = sorting_dict
+			
 		return
 
 
 	def setNestedRestrictedAggregationsQuery(self):
 		
 		for field in self.nested_restricted_fields:
+			
+			case_insensitive = self.getCaseInsensitiveValue(self.nested_restricted_fields[field])
+			search_query = self.getSearchQuery(self.nested_restricted_fields, field, case_insensitive)
+			
 			self.aggs_query[field] = {
 				'nested': {
 					'path': self.nested_restricted_fields[field]['path']
 				},
-				'aggs': {
-					'buckets': {
-						'filter': {
-							'bool': {
+				"aggs": {
+					"buckets": {
+						"filter": {
+							"bool": {
+								"must": [],
 								'should': [
 									# need to use the DB_ProjectID within the path for nested objects otherwise the filter fails
 									{"terms": {"{0}.DB_ProjectID".format(self.nested_restricted_fields[field]['path']): self.users_project_ids}},
 									{"term": {self.nested_restricted_fields[field]['withholdflag']: "false"}}
 								],
-								"minimum_should_match": 1
+								"minimum_should_match": 1,
+								"filter": []
 							}
 						},
-						'aggs': {
-							'buckets': {
-								'terms': {'field': self.nested_restricted_fields[field]['field_query'], 'size': self.size}
+						"aggs": {
+							"buckets": {
+								"terms": {
+									"field": self.nested_restricted_fields[field]['field_query'],
+									'size': self.size
+								}
 							}
 						}
 					}
 				}
 			}
 			
+			if len(search_query) > 0:
+				self.aggs_query[field]['aggs']["buckets"]['filter']['bool']['must'].append(search_query)
+			
 			if field in self.subfilters:
-				if 'must' not in self.aggs_query[field]['aggs']['buckets']['filter']['bool']:
-					self.aggs_query[field]['aggs']['buckets']['filter']['bool']['must'] = []
-				terms_sub_filter = {
+				sub_filter = {
 					'terms': self.subfilters[field]
 				}
-				self.aggs_query[field]['aggs']['buckets']['filter']['bool']['must'].append(terms_sub_filter)
+				self.aggs_query[field]['aggs']["buckets"]['filter']['bool']['filter'].append(sub_filter)
 			
 			sorting_dict = self.getSorting()
 			if len(sorting_dict) > 0:
@@ -142,9 +212,14 @@ class BucketAggregations(QueryConstructor):
 	def setRestrictedAggregationsQuery(self):
 		
 		for field in self.simple_restricted_fields:
+			
+			case_insensitive = self.getCaseInsensitiveValue(self.simple_restricted_fields[field])
+			search_query = self.getSearchQuery(self.simple_restricted_fields, field, case_insensitive)
+			
 			self.aggs_query[field] = {
-				'filter': {
-					'bool': {
+				"filter": {
+					"bool": {
+						"must": [],
 						'should': [
 							{"terms": {"Projects.DB_ProjectID": self.users_project_ids}},
 							{"term": {self.simple_restricted_fields[field]['withholdflag']: "false"}}
@@ -152,12 +227,19 @@ class BucketAggregations(QueryConstructor):
 						"minimum_should_match": 1
 					}
 				},
-				'aggs': {
-					'buckets': {
-						'terms': {'field': self.simple_restricted_fields[field]['field_query'], 'size': self.size}
+				"aggs": {
+					"buckets": {
+						"terms": {
+							"field": self.simple_restricted_fields[field]['field_query'],
+							'size': self.size
+						}
 					}
 				}
 			}
+			
+			if len(search_query) > 0:
+				self.aggs_query[field]['filter']['bool']['must'].append(search_query)
+			
 			sorting_dict = self.getSorting()
 			if len(sorting_dict) > 0:
 				self.aggs_query[field]['aggs']['buckets']['terms']['order'] = sorting_dict

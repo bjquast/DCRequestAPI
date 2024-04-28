@@ -55,6 +55,10 @@ class AggregationView():
 
 	@view_config(route_name='aggregation', accept='application/json', renderer="json")
 	def viewAggregationJSON(self):
+		if 'buckets_search_term' in self.search_params:
+			buckets_search_term = self.search_params['buckets_search_term']
+		else:
+			buckets_search_term = None
 		
 		if 'aggregation' in self.search_params:
 			agg_key = self.search_params['aggregation']
@@ -76,7 +80,7 @@ class AggregationView():
 			}
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
-		buckets = es_searcher.singleAggregationSearch(agg_key, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
+		buckets = es_searcher.singleAggregationSearch(agg_key, buckets_search_term = buckets_search_term, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
 		
 		
 		

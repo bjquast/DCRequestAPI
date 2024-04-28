@@ -20,7 +20,7 @@ class AggsSuggestions {
 		
 		let form = document.getElementById("search_form");
 		let form_data = new FormData(form);
-		form_data.append('aggs_suggestion_search', search_term);
+		form_data.append('buckets_search_term', search_term);
 		
 		$.ajax({
 			url: "./aggs_suggestions",

@@ -4,12 +4,13 @@ class BucketsOverlay {
 	constructor (applied_filters_field) {
 		this.applied_filters_field = applied_filters_field;
 		this.agg_key = '';
+		this.buckets_search_term = '';
 		
 		/*
 		this.buckets_sort_dir = 'asc';
 		this.buckets_sort_alphanum = true;
 		this.remaining_or_all = 'remaining';
-		this.search_term = '';
+		this.buckets_search_term = '';
 		*/
 	}
 
@@ -45,9 +46,16 @@ class BucketsOverlay {
 
 	updateBucketList() {
 		let self = this;
+		
 		self.buckets = [];
 		self.readOverlayFormParameters();
 		self.overlay_form_data.append('aggregation', self.agg_key);
+		
+		console.log('###########', self.buckets_search_term);
+		if (self.buckets_search_term) {
+			console.log('-----------', self.buckets_search_term);
+			self.overlay_form_data.append('buckets_search_term', self.buckets_search_term);
+		}
 		
 		console.log(self.overlay_form_data);
 		
@@ -157,6 +165,21 @@ class BucketsOverlay {
 
 	setOverlayEvents() {
 		let self = this;
+		
+		$('#overlay_bucket_search').off();
+		$("#overlay_bucket_search").on("keyup", ( function() {
+			let search_val = $(this).val();
+			
+			if (search_val) {
+				self.buckets_search_term = search_val;
+				self.updateBucketList();
+			}
+			
+			else {
+				self.buckets_search_term = '';
+				self.updateBucketList();
+			}
+		}));
 		
 		$('.update_params').each( function () {
 			$(this).off();

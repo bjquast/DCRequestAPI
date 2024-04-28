@@ -16,7 +16,6 @@ from ElasticSearch.QueryConstructor.BucketAggregations import BucketAggregations
 from ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
 from ElasticSearch.QueryConstructor.MatchQuery import MatchQuery
 from ElasticSearch.QueryConstructor.TreeQueries import TreeQueries
-from ElasticSearch.QueryConstructor.AggsSuggestions import AggsSuggestions
 from ElasticSearch.QueryConstructor.StackedQueries import StackedInnerQuery, StackedOuterQuery
 
 class ES_Searcher():
@@ -214,11 +213,11 @@ class ES_Searcher():
 		return buckets
 
 
-	def singleAggregationSearch(self, aggregation_name, size = 5000, buckets_sort_alphanum = True, buckets_sort_dir = 'asc'):
+	def singleAggregationSearch(self, aggregation_name, buckets_search_term = None, size = 5000, buckets_sort_alphanum = True, buckets_sort_dir = 'asc'):
 		
 		self.setQuery()
 		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
-		aggs = buckets_query.getAggregationsQuery()
+		aggs = buckets_query.getAggregationsQuery(buckets_search_term = buckets_search_term)
 		
 		#logger.debug(json.dumps(aggs))
 		#logger.debug(json.dumps(self.query))
@@ -235,11 +234,11 @@ class ES_Searcher():
 		return buckets
 
 
-	def suggestionsSearch(self, search_val, size = 10, buckets_sort_alphanum = True, buckets_sort_dir = 'asc'):
+	def suggestionsSearch(self, buckets_search_term, size = 10, buckets_sort_alphanum = True, buckets_sort_dir = 'asc'):
 		
 		self.setQuery()
-		buckets_query = AggsSuggestions(users_project_ids = self.users_project_ids, source_fields = [], size = size, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
-		aggs = buckets_query.getSuggestionsQuery(search_val)
+		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [], size = size, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
+		aggs = buckets_query.getAggregationsQuery(buckets_search_term = buckets_search_term)
 		
 		#logger.debug(json.dumps(aggs))
 		#logger.debug(json.dumps(self.query))

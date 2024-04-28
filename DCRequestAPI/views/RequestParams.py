@@ -93,8 +93,8 @@ class RequestParams():
 		
 		exists_params = ['restrict_to_users_projects']
 		boolean_params = ['buckets_sort_alphanum']
-		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'aggregation', 'tree', 'aggs_suggestion_search', 'match_queries_connector', 
-							'overlay_bucket_search', 'overlay_remaining_all_select', 'buckets_sort_dir'
+		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'aggregation', 'tree', 'match_queries_connector', 
+							'buckets_search_term', 'overlay_remaining_all_select', 'buckets_sort_dir'
 						]
 		complex_params = ['term_filters',]
 		list_params = ['open_filter_selectors', 'result_table_columns', 'parent_ids', 'match_query']

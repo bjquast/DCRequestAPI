@@ -20,8 +20,6 @@ class AggsSuggestions(QueryConstructor):
 		self.buckets_sort_dir = buckets_sort_dir.lower()
 		self.prefix_or_match = prefix_or_match
 		
-		self.sortstring = None
-		
 		fielddefs = FieldDefinitions()
 		if len(self.source_fields) <= 0:
 			self.source_fields = fielddefs.bucketfields
