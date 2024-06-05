@@ -91,16 +91,25 @@ class LoginViews(object):
 		self.credentials = request_params.credentials
 		
 		token = None
+		roles = []
+		projects = []
+		project_ids = []
 		
 		# check if there are any authentication data given in request
 		# and if so: authenticate the user
 		if 'username' in self.credentials and 'password' in self.credentials:
 			token = self.userlogin.authenticate_user(self.credentials['username'], self.credentials['password'])
+			roles = self.request.identity['dwb_roles']
+			project_list = self.request.identity['projects']
+			projects = [project[1] for project in project_list]
+			project_ids = [project[0] for project in project_list]
 		
 		self.messages.extend(self.userlogin.get_messages())
 		
 		response = {
-			'token': token
+			'token': token,
+			'roles': roles,
+			'projects': projects
 		}
 		if len(self.messages) > 0:
 			response['messages'] = self.messages
