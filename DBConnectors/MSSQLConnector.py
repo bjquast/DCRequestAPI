@@ -16,7 +16,7 @@ class MSSQLConnector():
 			dsn = config.get('dsn', None)
 			database = config.get('database', None)
 			port = config.get('port', None)
-			driver = config.get('driver', None)
+			driver = config.get('driver', '/usr/lib/x86_64-linux-gnu/odbc/libtdsodbc.so')
 			username = config.get('username', None)
 			password = config.get('password', None)
 			trust_certificate = config.get('trust_certificate', None)
@@ -90,7 +90,7 @@ class MSSQLConnectionParams():
 					dsn = None,
 					server = None,
 					port = None,
-					driver = None,
+					driver = '/usr/lib/x86_64-linux-gnu/odbc/libtdsodbc.so',
 					database = None,
 					uid = None,
 					pwd = None, 
@@ -120,7 +120,7 @@ class MSSQLConnectionParams():
 		if server is not None:
 			self.paramsdict['dsn'] = None
 	
-	def setDriver(self, driver = None):
+	def setDriver(self, driver):
 		self.paramsdict['Driver'] = driver
 	
 	def setPort(self, port = None):

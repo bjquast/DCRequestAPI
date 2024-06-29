@@ -112,8 +112,7 @@ class SessionDBSetup():
 			`session_id` INT NOT NULL,
 			`db_connector_id` VARCHAR(50),
 			PRIMARY KEY(`session_id`, `db_connector_id`, `users_dwb_role`),
-			FOREIGN KEY(`session_id`) REFERENCES `session_has_connector` (`session_id`),
-			FOREIGN KEY(`db_connector_id`) REFERENCES `session_has_connector` (`db_connector_id`)
+			FOREIGN KEY(`session_id`, `db_connector_id`) REFERENCES `session_has_connector` (`session_id`, `db_connector_id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 		;
 		"""
@@ -128,8 +127,7 @@ class SessionDBSetup():
 			`session_id` INT NOT NULL,
 			`db_connector_id` VARCHAR(50),
 			PRIMARY KEY(`session_id`, `db_connector_id`, `users_dwb_project_id`),
-			FOREIGN KEY(`session_id`) REFERENCES `session_has_connector` (`session_id`),
-			FOREIGN KEY(`db_connector_id`) REFERENCES `session_has_connector` (`db_connector_id`)
+			FOREIGN KEY(`session_id`, `db_connector_id`) REFERENCES `session_has_connector` (`session_id`, `db_connector_id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 		;
 		"""

@@ -7,7 +7,11 @@ logger_query = logging.getLogger('query')
 
 import pudb
 import string
-import secrets
+#import secrets
+
+from configparser import ConfigParser
+config = ConfigParser(allow_no_value=True)
+config.read('./config.ini')
 
 from .encryptor import Encryptor
 
@@ -35,7 +39,7 @@ class DBSession():
 	def __init__(self):
 		self.dwb_servers = DWB_Servers().get_available_dwb_cons()
 		self.encryptor = Encryptor()
-		self.expiration_interval = 60
+		self.expiration_interval = config.get('session_db', 'expiration_time', fallback = 20)
 		
 		self.con, self.cur = mysql_connect()
 		
@@ -56,18 +60,6 @@ class DBSession():
 			return True
 		else:
 			return False
-	
-	
-	def get_token_from_request(self, request):
-		token = None
-		if 'token' in request.session:
-			token = request.session['token']
-		elif 'token' in request.params:
-			try:
-				token = request.params.getone('token')
-			except:
-				token = None
-		return token
 
 
 	def get_mssql_connectionparams(self):
@@ -129,7 +121,7 @@ class DBSession():
 		
 		self.cur.execute(query, [hashed_token, encrypted_pw, username])
 		self.con.commit()
-		self.set_session_id(hashed_token)
+		self.__set_session_id(hashed_token)
 		
 		self.insert_session_has_connector(connector_ids)
 		for connector_id in connector_ids:
@@ -139,7 +131,7 @@ class DBSession():
 		return token
 
 
-	def set_session_id(self, hashed_token):
+	def __set_session_id(self, hashed_token):
 		query = """
 		SELECT session_id
 		FROM `sessions`
@@ -334,6 +326,14 @@ class DBSession():
 	
 	
 	def delete_old_sessions(self):
+		
+		query = """
+		DROP TEMPORARY 
+		TABLE IF EXISTS sessions_to_delete
+		;"""
+		self.cur.execute(query)
+		self.con.commit()
+		
 		query = """
 		CREATE TEMPORARY 
 		TABLE sessions_to_delete
@@ -345,19 +345,38 @@ class DBSession():
 		self.con.commit()
 		
 		self._delete_sessions()
+
+
+	def get_session_id_by_token(self, token):
+		if token is None:
+			return
+		hashed_token = self.encryptor.hash_token(token)
 		
 		query = """
-		DROP TEMPORARY 
-		TABLE sessions_to_delete
+		SELECT s.`session_id`
+		FROM `sessions` s
+		WHERE s.`hashed_token` = %s
 		;"""
-		self.cur.execute(query)
-		self.con.commit()
+		self.cur.execute(query, hashed_token)
+		row = self.cur.fetchone()
+		if row is not None:
+			return row[0]
+		else:
+			return None
 
 
 	def delete_session_by_token(self, token):
 		if token is None:
 			return
 		hashed_token = self.encryptor.hash_token(token)
+		
+		query = """
+		DROP TEMPORARY 
+		TABLE IF EXISTS sessions_to_delete
+		;"""
+		
+		self.cur.execute(query)
+		self.con.commit()
 		
 		query = """
 		CREATE TEMPORARY 
@@ -370,13 +389,6 @@ class DBSession():
 		self.con.commit()
 		
 		self._delete_sessions()
-		
-		query = """
-		DROP TEMPORARY 
-		TABLE sessions_to_delete
-		;"""
-		self.cur.execute(query)
-		self.con.commit()
 
 
 	def get_credentials_from_session(self, token):

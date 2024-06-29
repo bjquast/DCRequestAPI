@@ -6,6 +6,7 @@ from dwb_authentication.dbsession import DBSession
 
 class SecurityPolicy:
 	def __init__(self):
+		self.messages = []
 		pass
 
 
@@ -26,19 +27,25 @@ class SecurityPolicy:
 	def de_authenticate(self, request):
 		dbsession = DBSession()
 		
-		token = dbsession.get_token_from_request(request)
-		if token is not None:
-			dbsession.delete_session_by_token(token)
+		session_id = None
 		
+		token = self.get_token_from_request(request)
+		if token is not None:
+			session_id = dbsession.get_session_id_by_token(token)
+			if session_id is not None:
+				dbsession.delete_session_by_token(token)
+		
+		# even if the session token has not been found de-authenticate
+		# because it might be called from html form and the user expects to be logged of now
 		self.reset_authenticated_identity()
-		return
+		return session_id
 
 
 	def get_identity_by_token(self, request):
 		
 		dbsession = DBSession()
 		
-		token = dbsession.get_token_from_request(request)
+		token = self.get_token_from_request(request)
 		if token is not None:
 			identity = dbsession.get_identity_by_token(token)
 			if identity is not None:
@@ -81,6 +88,29 @@ class SecurityPolicy:
 		}
 
 
+	def get_token_from_request(self, request):
+		token = None
+		if 'token' in request.session:
+			token = request.session['token']
+		elif 'token' in request.params:
+			try:
+				token = request.params.getone('token')
+			except:
+				token = None
+		else:
+			try:
+				json_params = request.json_body
+				if 'token' in json_params:
+					if (isinstance (json_params['token'], str)):
+						token = json_params['token']
+			except:
+				token = None
+				
+		return token
+
+
+
+
 	'''
 	def get_username_by_token(self, request):
 		"""
@@ -89,7 +119,7 @@ class SecurityPolicy:
 		
 		dbsession = DBSession()
 		
-		token = dbsession.get_token_from_request(request)
+		token = self.get_token_from_request(request)
 		if token is not None:
 			identity = dbsession.get_identity_from_session(token)
 			identity = dbsession.get_identity_from_session(token)

@@ -37,7 +37,7 @@ class UserLogin():
 			loginparams = {}
 		
 		else:
-			# check password against haveibeenpawned to check if it is a 'well known' password
+			# check password against haveibeenpwned to check if it is a 'well known' password
 			secure_password = self.password_not_pawned(password)
 			if secure_password is False:
 				loginparams = {}
