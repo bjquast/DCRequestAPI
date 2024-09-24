@@ -13,6 +13,10 @@ port     = @@DS1_PORT@@
 driver   = @@DS1_DRIVER@@
 uid      = @@DS1_UID@@
 password = @@DS1_PASSWORD@@
+# trust_certificate causes Windows authentication to be used, so it must be unset or NO to use SQL SERVER authentication
+trust_certificate = @@DS2_TRUST_CERTIFICATE@@
+trusted_connection = @@DS2_TRUSTED_CONNECTION@@
+encrypt = @@DS2_ENCRYPT@@
 
 # add further data sources if you need
 
@@ -24,6 +28,10 @@ port     = @@DS2_PORT@@
 driver   = @@DS2_DRIVER@@
 uid      = @@DS2_UID@@
 password = @@DS2_PASSWORD@@
+# trust_certificate causes Windows authentication to be used, so it must be unset or no to use SQL SERVER authentication
+trust_certificate = @@DS2_TRUST_CERTIFICATE@@
+trusted_connection = @@DS2_TRUSTED_CONNECTION@@
+encrypt = @@DS2_ENCRYPT@@
 
 
 [elasticsearch]
