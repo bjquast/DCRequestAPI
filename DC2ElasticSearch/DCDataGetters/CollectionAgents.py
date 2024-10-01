@@ -30,7 +30,10 @@ class CollectionAgents():
 			WHEN ca.[DataWithholdingReason] = '' THEN 'false'
 			WHEN ca.[DataWithholdingReason] IS NULL THEN 'false'
 			ELSE 'true'
-		END AS CollectorsWithhold
+		END AS CollectorsWithhold,
+		 -- columns for Embargo settings comming from DiversityProjects, a LIB specific idea, may not implemented elsewhere
+		CASE WHEN idstemp.[embargo_collector] = 1 THEN 'true' ELSE 'false' END AS [embargo_collector],
+		CASE WHEN idstemp.[embargo_anonymize_collector] = 1 THEN 'true' ELSE 'false' END AS [embargo_anonymize_collector]
 		FROM [#temp_iu_part_ids] idstemp
 		INNER JOIN IdentificationUnit iu 
 		ON iu.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND iu.[IdentificationUnitID] = idstemp.[IdentificationUnitID]
@@ -95,9 +98,10 @@ class CollectionAgents():
 				'CollectorsOrder': collectors_order,
 				'CollectorsSpecimenFieldNumber': row[5],
 				'CollectorsDataWithholding': row[6],
-				'CollectorsWithhold': row[7]
+				'CollectorsWithhold': row[7],
+				'embargo_collector': row[8],
+				'embargo_anonymize_collector': row[9]
 			}
-			
 			collectors_order += 1
 			
 			self.collectors_dict[row[1]]['CollectionAgents'].append(collector)

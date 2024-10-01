@@ -76,6 +76,7 @@ class DataPage():
 			self.matchedtaxa_dict = self.getMatchedTaxa(self.iuparts_dict)
 		else:
 			self.matchedtaxa_dict = {}
+		return
 
 
 	def getMatchedTaxa(self, iuparts_dict):

@@ -64,12 +64,12 @@ MappingsDict['iuparts'] = {
 			{"type": "date",
 			"format": "yyyy-MM-dd HH:mm:ss",
 			'ignore_malformed': True},
-		'DepositorsName':
-			{'type': 'text', 'fields': {
-					'keyword': {'type': 'keyword', 'ignore_above': 256},
-					'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
-				}
-			},
+		'DepositorsName': {
+			'type': 'text', 'fields': {
+				'keyword': {'type': 'keyword', 'ignore_above': 256},
+				'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
+			}
+		},
 		
 		'StableIdentifierURL': {'type': 'keyword'},
 		'LastUpdated': {"type": "date",
@@ -94,6 +94,13 @@ MappingsDict['iuparts'] = {
 			'ignore_malformed': True
 		},
 		'SpecimenUpdatedBy': {'type': 'keyword'},
+		
+		# Embargos from DiversityProjects
+		'embargo_anonymize_depositor': {'type': 'boolean'},
+		'embargo_event_but_country': {'type': 'boolean'},
+		'embargo_coordinates': {'type': 'boolean'},
+		'embargo_event_but_country_after_1992': {'type': 'boolean'},
+		'embargo_coll_date': {'type': 'boolean'},
 		
 		# Storage
 		'PreparationMethod': {'type': 'text', 'fields': {
@@ -209,6 +216,8 @@ MappingsDict['iuparts'] = {
 			{'type': 'text', 'fields': {'keyword': {'type': 'keyword', 'ignore_above': 256}}},
 		'EventWithholdDate': {'type': 'boolean'},
 		
+		
+		
 		# ExternalDatasource
 		'ExternalIdentifier':
 			{'type': 'text', 'fields': {
@@ -265,6 +274,9 @@ MappingsDict['iuparts'] = {
 						'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
 					}
 				},
+				'ResponsibleName': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+				# Embargos from DiversityProjects
+				'embargo_anonymize_determiner': {'type': 'boolean'}
 			}
 		},
 		'LastIdentificationCache': {'type': 'text', 'fields': {
@@ -314,7 +326,10 @@ MappingsDict['iuparts'] = {
 				'CollectorsWithhold': {'type': 'boolean'},
 				# have to add the ProjectID here as it is the only way to filter nested objects by ProjectID for aggregations?!
 				'ProjectID': {'type': 'integer'},
-				'DB_ProjectID': {'type': 'keyword'}
+				'DB_ProjectID': {'type': 'keyword'},
+				# Embargos from DiversityProjects
+				'embargo_collector': {'type': 'boolean'},
+				'embargo_anonymize_collector': {'type': 'boolean'}
 			}
 		},
 		

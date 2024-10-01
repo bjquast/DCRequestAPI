@@ -29,6 +29,13 @@ class IdentificationUnitParts():
 		idstemp.[SpecimenAccessionNumber], 
 		idstemp.[PartAccessionNumber],
 		CONCAT_WS('/', REPLACE(dbo.StableIdentifierBase(), 'http:', 'https:'), idstemp.[CollectionSpecimenID], idstemp.[IdentificationUnitID], idstemp.[SpecimenPartID]) AS [StableIdentifierURL],
+		 -- columns for Embargo settings comming from DiversityProjects, a LIB specific idea, may not implemented elsewhere
+		CASE WHEN idstemp.[embargo_anonymize_depositor] = 1 THEN 'true' ELSE 'false' END AS [embargo_anonymize_depositor],
+		CASE WHEN idstemp.[embargo_event_but_country] = 1 THEN 'true' ELSE 'false' END AS [embargo_event_but_country],
+		CASE WHEN idstemp.[embargo_coordinates] = 1 THEN 'true' ELSE 'false' END AS [embargo_coordinates],
+		CASE WHEN idstemp.[embargo_event_but_country_after_1992] = 1 THEN 'true' ELSE 'false' END AS [embargo_event_but_country_after_1992],
+		CASE WHEN idstemp.[embargo_coll_date] = 1 THEN 'true' ELSE 'false' END AS [embargo_coll_date],
+		 -- end embargo columns
 		CONVERT (NVARCHAR, cs.[LogUpdatedWhen], 121) AS [LastUpdated],
 		CONVERT(NVARCHAR, cs.[AccessionDate], 120) AS [AccessionDate], 
 		cs.[DepositorsName], 

@@ -27,7 +27,10 @@ class Identifications():
 		i.VernacularTerm,
 		i.NameURI AS TaxonNameURI,
 		i.TypeStatus,
-		i.TypeNotes
+		i.TypeNotes,
+		i.ResponsibleName,
+		 -- columns for Embargo settings comming from DiversityProjects, a LIB specific idea, may not implemented elsewhere
+		CASE WHEN idstemp.[embargo_anonymize_determiner] = 1 THEN 'true' ELSE 'false' END AS [embargo_anonymize_determiner]
 		FROM [#temp_iu_part_ids] idstemp
 		INNER JOIN IdentificationUnit iu 
 		ON iu.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND iu.[IdentificationUnitID] = idstemp.[IdentificationUnitID]
@@ -63,7 +66,8 @@ class Identifications():
 				'TaxonNameURI': row[6],
 				'TypeStatus': row[7],
 				'TypeNotes': row[8],
-				
+				'ResponsibleName': row[9],
+				'embargo_anonymize_determiner': row[10]
 			}
 			
 			self.identifications_dict[row[1]]['Identifications'].append(identification)

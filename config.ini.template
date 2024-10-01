@@ -13,10 +13,13 @@ port     = @@DS1_PORT@@
 driver   = @@DS1_DRIVER@@
 uid      = @@DS1_UID@@
 password = @@DS1_PASSWORD@@
-# trust_certificate causes Windows authentication to be used, so it must be unset or NO to use SQL SERVER authentication
 trust_certificate = @@DS2_TRUST_CERTIFICATE@@
+# trust_connection causes Windows authentication to be used, so it must be unset or set to NO to use SQL SERVER authentication
 trusted_connection = @@DS2_TRUSTED_CONNECTION@@
 encrypt = @@DS2_ENCRYPT@@
+# project_db_connector references an existing section with SQL SERVER connection parameters
+project_db_connector = projects_P1
+
 
 # add further data sources if you need
 
@@ -28,10 +31,38 @@ port     = @@DS2_PORT@@
 driver   = @@DS2_DRIVER@@
 uid      = @@DS2_UID@@
 password = @@DS2_PASSWORD@@
-# trust_certificate causes Windows authentication to be used, so it must be unset or no to use SQL SERVER authentication
 trust_certificate = @@DS2_TRUST_CERTIFICATE@@
+# trusted_connection causes Windows authentication to be used, so it must be unset or set to NO to use SQL SERVER authentication
 trusted_connection = @@DS2_TRUSTED_CONNECTION@@
 encrypt = @@DS2_ENCRYPT@@
+# project_db_connector references an existing section with SQL SERVER connection parameters
+# can be the same for different data_source sections
+project_db_connector = projects_P1
+
+
+[projects_P1]
+server   = @@P1_SERVER@@
+database = @@P1_DATABASE@@
+port     = @@P1_PORT@@
+driver   = @@P1_DRIVER@@
+uid      = @@P1_UID@@
+password = @@P1_PASSWORD@@
+trust_certificate = @@P1_TRUST_CERTIFICATE@@
+trusted_connection = @@P1_TRUSTED_CONNECTION@@
+encrypt = @@P1_ENCRYPT@@
+
+
+[projects_P2]
+server   = @@P2_SERVER@@
+database = @@P2_DATABASE@@
+port     = @@P2_PORT@@
+driver   = @@P2_DRIVER@@
+uid      = @@P2_UID@@
+password = @@P2_PASSWORD@@
+trust_certificate = @@P2_TRUST_CERTIFICATE@@
+trusted_connection = @@P2_TRUSTED_CONNECTION@@
+encrypt = @@P2_ENCRYPT@@
+
 
 [elasticsearch]
 url = @@ES_URL@@

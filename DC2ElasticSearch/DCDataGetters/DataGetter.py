@@ -8,20 +8,24 @@ logger = logging.getLogger('elastic_indexer')
 log_query = logging.getLogger('query')
 
 from DBConnectors.MSSQLConnector import MSSQLConnector
+
+from DC2ElasticSearch.EmbargoFilter.EmbargoGetter import EmbargoGetter
+from DC2ElasticSearch.EmbargoFilter.EmbargoWithholdSetter import EmbargoWithholdSetter
+
 from DC2ElasticSearch.DCDataGetters.CreateChangedSpecimensProcedure import CreateChangedSpecimensProcedure
 
 class DataGetter():
 	def __init__(self, dc_params, last_updated = None):
 		
 		self.dc_params = dc_params
-		self.dc_con = MSSQLConnector(self.dc_params['connectionstring'])
+		self.dc_db = MSSQLConnector(self.dc_params['connectionstring'])
 		self.server_url = self.dc_params['server_url']
 		self.database_name = self.dc_params['database_name']
 		self.accronym = self.dc_params['accronym']
 		self.database_id = self.dc_params['database_id']
 		
-		self.cur = self.dc_con.getCursor()
-		self.con = self.dc_con.getConnection()
+		self.cur = self.dc_db.getCursor()
+		self.con = self.dc_db.getConnection()
 		
 		self.last_updated = last_updated
 		
@@ -146,6 +150,15 @@ class DataGetter():
 		[SpecimenPartID] INT,
 		[SpecimenAccessionNumber] NVARCHAR(255),
 		[PartAccessionNumber] NVARCHAR(255),
+		 -- columns for Embargo settings comming from DiversityProjects, a LIB specific idea, may not implemented elsewhere
+		[embargo_anonymize_depositor] BIT DEFAULT 0,
+		[embargo_collector] BIT DEFAULT 0,
+		[embargo_anonymize_collector] BIT DEFAULT 0,
+		[embargo_anonymize_determiner] BIT DEFAULT 0,
+		[embargo_event_but_country] BIT DEFAULT 0,
+		[embargo_coordinates] BIT DEFAULT 0,
+		[embargo_event_but_country_after_1992] BIT DEFAULT 0,
+		[embargo_coll_date] BIT DEFAULT 0,
 		INDEX [idx_idshash] UNIQUE ([idshash]),
 		INDEX [idx_DatabaseURI] ([DatabaseURI]),
 		INDEX [idx_CollectionSpecimenID] ([CollectionSpecimenID]),
@@ -210,7 +223,19 @@ class DataGetter():
 			
 			self.cur.execute(query)
 			self.cur.commit()
+			
+		self.set_embargo_flags()
 		
+		return
+
+
+	def set_embargo_flags(self):
+		if 'projects_connectionstring' in self.dc_params and self.dc_params['projects_connectionstring'] is not None:
+			projects_db = MSSQLConnector(self.dc_params['projects_connectionstring'])
+			embargo_getter = EmbargoGetter(projects_db, self.dc_db)
+			embargo_withhold_setter = EmbargoWithholdSetter(self.dc_db, embargo_getter.embargo_temptable)
+		else:
+			pass
 		return
 
 

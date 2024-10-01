@@ -29,7 +29,7 @@ class UpdateES_Index:
 		#self.last_updated = '2024-03-11 17:44:46'
 		
 		self.skip_taxa_db = self.config.getboolean('taxamergerdb', 'skip_taxa_db', fallback = False)
-		self.multi_threaded_getter = config.getboolean('default', 'multi_threaded_getter', fallback = False)
+		self.multi_threaded_getter = self.config.getboolean('default', 'multi_threaded_getter', fallback = False)
 		
 		if self.last_updated is None:
 			raise ValueError('Last update time could not be determined, check if index has been filled before')
@@ -57,12 +57,6 @@ class UpdateES_Index:
 
 
 if __name__ == "__main__":
-	config = ConfigParser(allow_no_value=True)
-	config.read('./config.ini')
-	skip_taxa_db = config.getboolean('taxamergerdb', 'skip_taxa_db', fallback = False)
-	multi_threaded_getter = config.getboolean('default', 'multi_threaded_getter', fallback = False)
-	
-	
 	updater = UpdateES_Index()
 	updater.update_es_index()
 	

@@ -45,7 +45,7 @@ class MSSQLConnector():
 			if matchobj is not None:
 				self.databasename = matchobj.groups()[0]
 		else:
-			raise Exception ('No database connection parameters given')
+			raise ValueError ('No database connection parameters given')
 		
 		'''
 		take over attributes from MSSQLConnector class
