@@ -29,6 +29,7 @@ setup(name='DCRequestAPI',
 	author_email='b.quast@leibniz-lib.de',
 	license='CC By 4.0',
 	install_requires=requires,
+	packages=['DCRequestAPI', 'DBConnectors', 'ElasticSearch', 'DC2ElasticSearch', 'TaxaMergerDBSetup', 'dwb_authentication'],
 	entry_points={
 		'paste.app_factory': [
 		'main = DCRequestAPI:main'

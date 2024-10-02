@@ -33,6 +33,8 @@ class TaxaMatchTable():
 		self.synonymsmergetable = "`{0}`.TaxaSynonymsMergeTable".format(self.taxamergerdb)
 		self.specimentable = specimentemptable
 		
+		self.collation = 'utf8mb4_unicode_ci'
+		
 		self.createTempTable()
 
 
@@ -47,7 +49,7 @@ class TaxaMatchTable():
 		query = """
 		UPDATE `{0}` cs
 		INNER JOIN {1} mt
-		ON (cs.TaxonNameURI_sha = mt.TaxonNameURI_sha)
+		ON (cs.TaxonNameURI_sha = mt.TaxonNameURI_sha COLLATE {2})
 		SET 
 			cs.taxon_id = mt.id,
 			cs.taxon = mt.taxon,
@@ -55,7 +57,7 @@ class TaxaMatchTable():
 			cs.`rank` = mt.`rank`,
 			cs.FamilyCache = mt.familyCache,
 			cs.OrderCache = mt.orderCache
-		;""".format(self.specimentable, self.taxamergetable, self.taxarelationtable)
+		;""".format(self.specimentable, self.taxamergetable, self.collation)
 		
 		querylog.debug(query)
 		self.cur.execute(query)
@@ -68,8 +70,8 @@ class TaxaMatchTable():
 		query = """
 		UPDATE `{0}` cs
 		INNER JOIN {1} sm
-		ON (cs.TaxonNameURI_sha = sm.TaxonNameURI_sha)
-		INNER JOIN {2} mt
+		ON (cs.TaxonNameURI_sha = sm.TaxonNameURI_sha COLLATE {2})
+		INNER JOIN {3} mt
 		ON (sm.syn_taxon_id = mt.id)
 		SET 
 			cs.taxon_id = mt.id,
@@ -78,7 +80,7 @@ class TaxaMatchTable():
 			cs.`rank` = mt.`rank`,
 			cs.FamilyCache = mt.familyCache,
 			cs.OrderCache = mt.orderCache
-		;""".format(self.specimentable, self.synonymsmergetable, self.taxamergetable)
+		;""".format(self.specimentable, self.synonymsmergetable, self.collation, self.taxamergetable)
 		
 		querylog.debug(query)
 		self.cur.execute(query)
@@ -203,9 +205,9 @@ class TaxaMatchTable():
 		CREATE TEMPORARY TABLE temp_single_names
 		SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
 		FROM taxonmatcher tm
-		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.authorship = mt.author AND tm.family_name = mt.familyCache)
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon COLLATE {1} AND tm.authorship = mt.author COLLATE {1} AND tm.family_name = mt.familyCache COLLATE {1})
 		GROUP BY specimen_id
-		;""".format(self.taxamergetable)
+		;""".format(self.taxamergetable, self.collation)
 		
 		querylog.debug(query)
 		self.cur.execute(query)
@@ -215,13 +217,13 @@ class TaxaMatchTable():
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
-		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.authorship = mt.author AND tm.family_name = mt.familyCache)
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon COLLATE {1} AND tm.authorship = mt.author COLLATE {1} AND tm.family_name = mt.familyCache COLLATE {1})
 		 -- prevent that a scientificName is taken that occurs more than once
 		INNER JOIN temp_single_names tsn
 		ON tsn.specimen_id = tm.specimen_id
 		WHERE tm.taxon_name != '' AND tm.authorship != '' AND tsn.matchcount = 1
 		;
-		""".format(self.taxamergetable)
+		""".format(self.taxamergetable, self.collation)
 		querylog.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
@@ -242,9 +244,9 @@ class TaxaMatchTable():
 		CREATE TEMPORARY TABLE temp_single_names
 		SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
 		FROM taxonmatcher tm
-		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.authorship = mt.author AND tm.regnum_name = mt.regnumCache)
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon COLLATE {1} AND tm.authorship = mt.author COLLATE {1} AND tm.regnum_name = mt.regnumCache COLLATE {1})
 		GROUP BY specimen_id
-		;""".format(self.taxamergetable)
+		;""".format(self.taxamergetable, self.collation)
 		
 		querylog.debug(query)
 		self.cur.execute(query)
@@ -254,13 +256,13 @@ class TaxaMatchTable():
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
-		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.authorship = mt.author AND tm.regnum_name = mt.regnumCache)
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon COLLATE {1} AND tm.authorship = mt.author COLLATE {1} AND tm.regnum_name = mt.regnumCache COLLATE {1})
 		 -- prevent that a scientificName is taken that occurs more than once
 		INNER JOIN temp_single_names tsn 
 		ON tsn.specimen_id = tm.specimen_id
 		WHERE tm.taxon_name != '' AND tm.authorship != '' AND tsn.matchcount = 1
 		;
-		""".format(self.taxamergetable)
+		""".format(self.taxamergetable, self.collation)
 		#querylog.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
@@ -281,9 +283,9 @@ class TaxaMatchTable():
 		CREATE TEMPORARY TABLE temp_single_names
 		SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
 		FROM taxonmatcher tm
-		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.authorship = mt.author AND tm.order_name = mt.OrderCache AND tm.regnum_name = mt.regnumCache)
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon COLLATE {1} AND tm.authorship = mt.author COLLATE {1} AND tm.order_name = mt.OrderCache COLLATE {1} AND tm.regnum_name = mt.regnumCache COLLATE {1})
 		GROUP BY specimen_id
-		;""".format(self.taxamergetable)
+		;""".format(self.taxamergetable, self.collation)
 		
 		querylog.debug(query)
 		self.cur.execute(query)
@@ -293,13 +295,13 @@ class TaxaMatchTable():
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
-		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.authorship = mt.author AND tm.order_name = mt.OrderCache AND tm.regnum_name = mt.regnumCache)
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon COLLATE {1} AND tm.authorship = mt.author COLLATE {1} AND tm.order_name = mt.OrderCache COLLATE {1} AND tm.regnum_name = mt.regnumCache COLLATE {1})
 		 -- prevent that a scientificName is taken that occurs more than once
 		INNER JOIN temp_single_names tsn
 		ON tsn.specimen_id = tm.specimen_id
 		WHERE tm.taxon_name != '' AND tm.authorship != '' AND tsn.matchcount = 1
 		;
-		""".format(self.taxamergetable)
+		""".format(self.taxamergetable, self.collation)
 		querylog.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
@@ -320,9 +322,9 @@ class TaxaMatchTable():
 		CREATE TEMPORARY TABLE temp_single_names
 		SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
 		FROM taxonmatcher tm
-		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.regnum_name = mt.regnumCache)
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon COLLATE {1} AND tm.regnum_name = mt.regnumCache COLLATE {1})
 		GROUP BY specimen_id
-		;""".format(self.taxamergetable)
+		;""".format(self.taxamergetable, self.collation)
 		
 		querylog.debug(query)
 		self.cur.execute(query)
@@ -332,13 +334,13 @@ class TaxaMatchTable():
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
-		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.regnum_name = mt.regnumCache)
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon COLLATE {1} AND tm.regnum_name = mt.regnumCache COLLATE {1})
 		 -- prevent that a taxon is taken that occurs more than once
 		INNER JOIN temp_single_names tsn 
 		ON tsn.specimen_id = tm.specimen_id
 		WHERE tm.taxon_name != '' AND tsn.matchcount = 1
 		;
-		""".format(self.taxamergetable)
+		""".format(self.taxamergetable, self.collation)
 		#querylog.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
@@ -359,9 +361,9 @@ class TaxaMatchTable():
 		CREATE TEMPORARY TABLE temp_single_names
 		SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
 		FROM taxonmatcher tm
-		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.order_name = mt.OrderCache AND tm.regnum_name = mt.regnumCache)
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon COLLATE {1} AND tm.order_name = mt.OrderCache COLLATE {1} AND tm.regnum_name = mt.regnumCache COLLATE {1})
 		GROUP BY specimen_id
-		;""".format(self.taxamergetable)
+		;""".format(self.taxamergetable, self.collation)
 		
 		querylog.debug(query)
 		self.cur.execute(query)
@@ -371,13 +373,13 @@ class TaxaMatchTable():
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
-		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon AND tm.order_name = mt.OrderCache AND tm.regnum_name = mt.regnumCache)
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.taxon COLLATE {1} AND tm.order_name = mt.OrderCache COLLATE {1} AND tm.regnum_name = mt.regnumCache COLLATE {1})
 		 -- prevent that a taxon is taken that occurs more than once
 		INNER JOIN temp_single_names tsn
 		ON tsn.specimen_id = tm.specimen_id
 		WHERE tm.taxon_name != '' AND tsn.matchcount = 1
 		;
-		""".format(self.taxamergetable)
+		""".format(self.taxamergetable, self.collation)
 		querylog.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
@@ -398,9 +400,9 @@ class TaxaMatchTable():
 		CREATE TEMPORARY TABLE temp_single_names
 		SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
 		FROM taxonmatcher tm
-		INNER JOIN {0} mt ON (tm.taxon_name = mt.`taxon` AND tm.family_name = mt.familyCache)
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.`taxon` COLLATE {1} AND tm.family_name = mt.familyCache COLLATE {1})
 		GROUP BY specimen_id
-		;""".format(self.taxamergetable)
+		;""".format(self.taxamergetable, self.collation)
 		
 		querylog.debug(query)
 		self.cur.execute(query)
@@ -410,13 +412,13 @@ class TaxaMatchTable():
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
-		INNER JOIN {0} mt ON (tm.taxon_name = mt.`taxon` AND tm.family_name = mt.familyCache)
+		INNER JOIN {0} mt ON (tm.taxon_name = mt.`taxon` COLLATE {1} AND tm.family_name = mt.familyCache COLLATE {1})
 		 -- prevent that a taxon_name is taken that occurs more than once
 		INNER JOIN temp_single_names tsn
 		ON tsn.specimen_id = tm.specimen_id
 		WHERE tm.taxon_name != '' AND tsn.matchcount = 1
 		;
-		""".format(self.taxamergetable)
+		""".format(self.taxamergetable, self.collation)
 		querylog.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
@@ -437,10 +439,10 @@ class TaxaMatchTable():
 		CREATE TEMPORARY TABLE temp_single_names
 		SELECT COUNT(tm.specimen_id) AS matchcount, tm.specimen_id 
 		FROM taxonmatcher tm
-		INNER JOIN {0} st ON (tm.`taxon_name` = st.`taxon`)
-		INNER JOIN {1} mt ON (st.syn_taxon_id = mt.id AND tm.family_name = mt.familyCache)
+		INNER JOIN {0} st ON (tm.`taxon_name` = st.`taxon` COLLATE {2})
+		INNER JOIN {1} mt ON (st.syn_taxon_id = mt.id AND tm.family_name = mt.familyCache COLLATE {2})
 		GROUP BY specimen_id
-		;""".format(self.synonymsmergetable, self.taxamergetable)
+		;""".format(self.synonymsmergetable, self.taxamergetable, self.collation)
 		
 		querylog.debug(query)
 		self.cur.execute(query)
@@ -450,14 +452,14 @@ class TaxaMatchTable():
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
-		INNER JOIN {0} st ON (tm.`taxon_name` = st.`taxon`)
-		INNER JOIN {1} mt ON (st.syn_taxon_id = mt.id AND tm.family_name = mt.familyCache)
+		INNER JOIN {0} st ON (tm.`taxon_name` = st.`taxon` COLLATE {2})
+		INNER JOIN {1} mt ON (st.syn_taxon_id = mt.id AND tm.family_name = mt.familyCache COLLATE {2})
 		 -- prevent that a taxon name is taken that occurs more than once
 		INNER JOIN temp_single_names tsn 
 		ON tsn.specimen_id = tm.specimen_id
 		WHERE tm.taxon_name != '' AND tsn.matchcount = 1
 		;
-		""".format(self.synonymsmergetable, self.taxamergetable)
+		""".format(self.synonymsmergetable, self.taxamergetable, self.collation)
 		querylog.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
@@ -471,11 +473,11 @@ class TaxaMatchTable():
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
-		INNER JOIN {0} st ON (tm.`taxon_name` = st.`taxon` AND tm.authorship = st.author)
+		INNER JOIN {0} st ON (tm.`taxon_name` = st.`taxon` COLLATE {2} AND tm.authorship = st.author COLLATE {2})
 		INNER JOIN {1} mt ON (st.syn_taxon_id = mt.id)
 		WHERE tm.taxon_name != '' AND tm.authorship != ''
 		;
-		""".format(self.synonymsmergetable, self.taxamergetable)
+		""".format(self.synonymsmergetable, self.taxamergetable, self.collation)
 		querylog.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
@@ -489,10 +491,10 @@ class TaxaMatchTable():
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
-		INNER JOIN {0} mt ON (tm.genus_name = mt.`taxon` AND tm.family_name = mt.familyCache AND tm.regnum_name = mt.regnumCache)
+		INNER JOIN {0} mt ON (tm.genus_name = mt.`taxon` COLLATE {1} AND tm.family_name = mt.familyCache COLLATE {1} AND tm.regnum_name = mt.regnumCache COLLATE {1})
 		WHERE tm.genus_name != ''
 		;
-		""".format(self.taxamergetable)
+		""".format(self.taxamergetable, self.collation)
 		#querylog.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
@@ -506,10 +508,10 @@ class TaxaMatchTable():
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
-		INNER JOIN {0} mt ON (tm.genus_name = mt.`taxon` AND tm.family_name = mt.familyCache AND tm.order_name = mt.OrderCache AND tm.regnum_name = mt.regnumCache)
+		INNER JOIN {0} mt ON (tm.genus_name = mt.`taxon` COLLATE {1} AND tm.family_name = mt.familyCache COLLATE {1} AND tm.order_name = mt.OrderCache COLLATE {1} AND tm.regnum_name = mt.regnumCache COLLATE {1})
 		WHERE tm.genus_name != ''
 		;
-		""".format(self.taxamergetable)
+		""".format(self.taxamergetable, self.collation)
 		querylog.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
@@ -523,10 +525,10 @@ class TaxaMatchTable():
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
-		INNER JOIN {0} mt ON (tm.family_name = mt.`taxon` AND tm.family_name = mt.familyCache AND tm.regnum_name = mt.regnumCache)
+		INNER JOIN {0} mt ON (tm.family_name = mt.`taxon` COLLATE {1} AND tm.family_name = mt.familyCache COLLATE {1} AND tm.regnum_name = mt.regnumCache COLLATE {1})
 		WHERE tm.genus_name != ''
 		;
-		""".format(self.taxamergetable)
+		""".format(self.taxamergetable, self.collation)
 		#querylog.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
@@ -540,10 +542,10 @@ class TaxaMatchTable():
 		INSERT INTO matchingresults
 		SELECT tm.specimen_id, mt.`id`, mt.`taxon`, mt.`author`, mt.`rank`
 		FROM taxonmatcher tm
-		INNER JOIN {0} mt ON (tm.family_name = mt.`taxon` AND tm.family_name = mt.familyCache AND tm.order_name = mt.OrderCache AND tm.regnum_name = mt.regnumCache)
+		INNER JOIN {0} mt ON (tm.family_name = mt.`taxon` COLLATE {1} AND tm.family_name = mt.familyCache COLLATE {1} AND tm.order_name = mt.OrderCache COLLATE {1} AND tm.regnum_name = mt.regnumCache COLLATE {1})
 		WHERE tm.genus_name != ''
 		;
-		""".format(self.taxamergetable)
+		""".format(self.taxamergetable, self.collation)
 		querylog.debug(query)
 		self.cur.execute(query)
 		self.con.commit()
