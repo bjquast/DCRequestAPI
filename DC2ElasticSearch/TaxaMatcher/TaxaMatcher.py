@@ -40,6 +40,9 @@ class TaxaMatcher():
 		self.con = self.dbcon.getConnection()
 		
 		self.specimentable = "SpecimenTempTable"
+		self.taxamergetable = "TaxaMergeTable"
+		
+		self.collation = self.getTaxaMergeTableCollation()
 		
 		self.namepatterns_botany = NamePatternsBotany()
 		self.namepatterns_zoology = NamePatternsZoology()
@@ -47,14 +50,33 @@ class TaxaMatcher():
 		# fix for our Ichthyology department that added Eschmeyer chapter numbers to the family names
 		self.eschmeyerpattern = re.compile(r'\s*\-?\d+\s*$')
 		
-		self.matchingtable = TaxaMatchTable(self.dbcon, dbconfig['database'], self.specimentable)
+		self.matchingtable = TaxaMatchTable(self.dbcon, self.specimentable, self.taxamergetable, self.collation)
 		
 		#self.setWithholdForUnmatchedSpecimens()
 		#self.deleteUnMatchedSpecimens()
 
+
+	'''
+	read the collation from TaxaMergeTable as this is the table for comparison in the matching process
+	'''
+	def getTaxaMergeTableCollation(self):
+		query = """
+		SELECT 
+			TABLE_COLLATION 
+		FROM INFORMATION_SCHEMA.TABLES
+		WHERE TABLE_NAME = '{0}'
+		""".format(self.taxamergetable)
+		self.cur.execute(query)
+		row = self.cur.fetchone()
+		if row is not None and row[0] is not None:
+			collation = row[0]
+		else:
+			collation = 'utf8_unicode_ci'
+		return collation
+
 	'''
 	This is the target table where the results of the matching are inserted
-	A similar temporary table is genereated within TaxaMatchTable which is used for the matching process
+	A similar temporary table is generated within TaxaMatchTable which is used for the matching process
 	After thinking about it, a second table is needed for the matching process as the results of
 	the calculateNames() method has to be stored in any way and the alternative would be to create a 
 	temporary table for updating the target table with the names gathered by calculateNames
@@ -93,8 +115,8 @@ class TaxaMatcher():
 		KEY (`RegnumCache`),
 		KEY (`TaxonomicGroup`),
 		KEY (`TaxonNameURI_sha`)
-		) DEFAULT CHARSET=utf8mb4
-		;""".format(self.specimentable)
+		) DEFAULT CHARSET=utf8mb4 COLLATE={1}
+		;""".format(self.specimentable, self.collation)
 		
 		self.cur.execute(query)
 		self.con.commit()

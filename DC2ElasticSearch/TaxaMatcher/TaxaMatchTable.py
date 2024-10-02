@@ -18,22 +18,19 @@ class TaxaMatchTable():
 	the given taxon names in the data comming from specimen
 	"""
 	
-	def __init__(self, tempdb_con, taxamergerdb, specimentemptable):
+	def __init__(self, tempdb_con, specimentemptable, taxamergetable, collation):
 		
 		self.dbcon = tempdb_con
 		
 		self.cur = self.dbcon.getCursor()
 		self.con = self.dbcon.getConnection()
 		
-		self.taxamergerdb = taxamergerdb
-		
-		self.taxamergetable = "`{0}`.TaxaMergeTable".format(self.taxamergerdb)
-		self.taxarelationtable = "`{0}`.TaxaResultingRelationTable".format(self.taxamergerdb)
-		
-		self.synonymsmergetable = "`{0}`.TaxaSynonymsMergeTable".format(self.taxamergerdb)
 		self.specimentable = specimentemptable
+		self.collation = collation
 		
-		self.collation = 'utf8mb4_unicode_ci'
+		self.taxamergetable = taxamergetable
+		self.taxarelationtable = "TaxaResultingRelationTable"
+		self.synonymsmergetable = "TaxaSynonymsMergeTable"
 		
 		self.createTempTable()
 
