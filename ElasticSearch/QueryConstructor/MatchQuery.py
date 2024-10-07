@@ -70,6 +70,7 @@ class MatchQuery(QueryConstructor):
 
 
 	def appendSimpleRestrictedMatchQueries(self, i, query_string):
+		withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.simple_restricted_fields[field]['withholdflags']]
 		for fieldname in self.simple_restricted_fields:
 			query = {
 				'bool': {
@@ -88,7 +89,11 @@ class MatchQuery(QueryConstructor):
 							'bool': {
 								'should': [
 									{"terms": {"Projects.DB_ProjectID": self.users_project_ids}},
-									{"term": {self.simple_restricted_fields[fieldname]['withholdflag']: "false"}}
+									{
+										"bool": {
+											"must": withholdterms
+										}
+									}
 								],
 								"minimum_should_match": 1
 							}
@@ -101,6 +106,9 @@ class MatchQuery(QueryConstructor):
 
 
 	def appendNestedRestrictedMatchQueries(self, i, query_string):
+		
+		withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.nested_restricted_fields[field]['withholdflags']]
+		
 		for fieldname in self.nested_restricted_fields:
 			query = {
 				'nested': {
@@ -123,7 +131,11 @@ class MatchQuery(QueryConstructor):
 										'should': [
 											# need to use the DB_ProjectID within the path for nested objects otherwise the filter fails
 											{"terms": {"{0}.DB_ProjectID".format(self.nested_restricted_fields[fieldname]['path']): self.users_project_ids}},
-											{"term": {self.nested_restricted_fields[fieldname]['withholdflag']: "false"}}
+											{
+												"bool": {
+													"must": withholdterms
+												}
+											}
 										],
 										"minimum_should_match": 1
 									}

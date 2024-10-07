@@ -3,6 +3,9 @@ import pudb
 from ElasticSearch.ES_Mappings import MappingsDict
 
 
+# TODO: read the fields that must be withholded from withholdfilters and add the according fields for withholdflags
+# for each item in self.fielddefinitions 
+
 class FieldDefinitions():
 	def __init__(self):
 		self.setFieldNames()
@@ -202,7 +205,7 @@ class FieldDefinitions():
 				'names': {'en': 'Material category'},
 				'buckets': {
 					'field_query': 'MaterialCategory',
-					'withholdflag': 'PartWithhold',
+					'withholdflags': ['PartWithhold'],
 				},
 			},
 			
@@ -210,7 +213,7 @@ class FieldDefinitions():
 				'names': {'en': 'Sampling locality'},
 				'buckets': {
 					'field_query': 'LocalityVerbatim.keyword',
-					'withholdflag': 'EventWithhold',
+					'withholdflags': ['EventWithhold', 'embargo_event_but_country', 'embargo_event_but_country_after_1992'],
 				},
 			},
 			
@@ -218,7 +221,7 @@ class FieldDefinitions():
 				'names': {'en': 'Locality description'},
 				'buckets': {
 					'field_query': 'LocalityDescription.keyword',
-					'withholdflag': 'EventWithhold',
+					'withholdflags': ['EventWithhold', 'embargo_event_but_country', 'embargo_event_but_country_after_1992'],
 				},
 			},
 			
@@ -226,7 +229,7 @@ class FieldDefinitions():
 				'names': {'en': 'Habitat'},
 				'buckets': {
 					'field_query': 'HabitatDescription.keyword',
-					'withholdflag': 'EventWithhold',
+					'withholdflags': ['EventWithhold', 'embargo_event_but_country', 'embargo_event_but_country_after_1992'],
 				},
 			},
 			
@@ -234,7 +237,7 @@ class FieldDefinitions():
 				'names': {'en': 'Collecting method'},
 				'buckets': {
 					'field_query': 'CollectingMethod.keyword',
-					'withholdflag': 'EventWithhold',
+					'withholdflags': ['EventWithhold', 'embargo_event_but_country', 'embargo_event_but_country_after_1992'],
 				},
 			},
 			
@@ -242,11 +245,12 @@ class FieldDefinitions():
 				'names': {'en': 'Country'},
 				'buckets': {
 					'field_query': 'CountryCache.keyword',
-					'withholdflag': 'EventWithhold',
+					'withholdflags': ['EventWithhold'],
 				},
 			},
 			
 			'WGS84_Coordinate': {
+				# does not have buckets key, so it does not occur in aggregations, term filters and queries
 				'names': {'en': 'Coordinate'},
 			},
 			
@@ -254,7 +258,7 @@ class FieldDefinitions():
 				'names': {'en': 'Collector(s)'},
 				'buckets': {
 					'field_query': 'CollectionAgents.CollectorsName.keyword',
-					'withholdflag': 'CollectionAgents.CollectorsWithhold',
+					'withholdflags': ['CollectionAgents.CollectorsWithhold', 'CollectionAgents.embargo_collector', 'CollectionAgents.embargo_anonymize_collector'],
 					'path': 'CollectionAgents',
 				},
 			},

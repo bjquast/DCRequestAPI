@@ -90,6 +90,7 @@ class TermFilterQueries(QueryConstructor):
 		
 		case_insensitive = self.getCaseInsensitiveValue(self.simple_restricted_fields[filter_key])
 		filter_values = self.replaceBooleanValues(self.simple_restricted_fields[filter_key], filter_values)
+		withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.simple_restricted_fields[field]['withholdflags']]
 		
 		for filter_value in filter_values:
 			termquery = {
@@ -106,7 +107,11 @@ class TermFilterQueries(QueryConstructor):
 						],
 						"should": [
 							{"terms": {"Projects.DB_ProjectID": self.users_project_ids}},
-							{"term": {self.simple_restricted_fields[filter_key]['withholdflag']: "false"}}
+							{
+								"bool": {
+									"must": withholdterms
+								}
+							}
 						],
 						"minimum_should_match": 1
 					}
@@ -163,6 +168,7 @@ class TermFilterQueries(QueryConstructor):
 		
 		case_insensitive = self.getCaseInsensitiveValue(self.nested_restricted_fields[filter_key])
 		filter_values = self.replaceBooleanValues(self.nested_restricted_fields[filter_key], filter_values)
+		withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.nested_restricted_fields[field]['withholdflags']]
 		
 		for filter_value in filter_values:
 			termquery = {
@@ -183,7 +189,11 @@ class TermFilterQueries(QueryConstructor):
 							"should": [
 								# need to use the DB_ProjectID within the path for nested objects otherwise the filter fails
 								{"terms": {"{0}.DB_ProjectID".format(self.nested_restricted_fields[filter_key]['path']): self.users_project_ids}},
-								{"term": {self.nested_restricted_fields[filter_key]['withholdflag']: "false"}}
+								{
+									"bool": {
+										"must": withholdterms
+									}
+								}
 							],
 							"minimum_should_match": 1,
 							"filter": []

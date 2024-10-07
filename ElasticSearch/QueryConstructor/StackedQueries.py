@@ -95,6 +95,7 @@ class StackedInnerQuery(QueryConstructor):
 	def appendSimpleRestrictedStringQueries(self, query_string):
 		for field in self.simple_restricted_fields:
 			search_field = self.getStringQuerySearchField(field, self.simple_restricted_fields[field])
+			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.simple_restricted_fields[field]['withholdflags']]
 			
 			query = {
 				'bool': {
@@ -111,7 +112,11 @@ class StackedInnerQuery(QueryConstructor):
 							'bool': {
 								'should': [
 									{"terms": {"Projects.DB_ProjectID": self.users_project_ids}},
-									{"term": {self.simple_restricted_fields[field]['withholdflag']: "false"}}
+									{
+										"bool": {
+											"must": withholdterms
+										}
+									}
 								],
 								"minimum_should_match": 1
 							}
@@ -126,6 +131,8 @@ class StackedInnerQuery(QueryConstructor):
 	def appendNestedRestrictedStringQueries(self, query_string):
 		for field in self.nested_restricted_fields:
 			search_field = self.getStringQuerySearchField(field, self.nested_restricted_fields[field])
+			
+			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.nested_restricted_fields[field]['withholdflags']]
 			
 			query = {
 				'nested': {
@@ -146,7 +153,11 @@ class StackedInnerQuery(QueryConstructor):
 										'should': [
 											# need to use the DB_ProjectID within the path for nested objects otherwise the filter fails
 											{"terms": {"{0}.DB_ProjectID".format(self.nested_restricted_fields[field]['path']): self.users_project_ids}},
-											{"term": {self.nested_restricted_fields[field]['withholdflag']: "false"}}
+											{
+												"bool": {
+													"must": withholdterms
+												}
+											}
 										],
 										"minimum_should_match": 1
 									}

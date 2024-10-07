@@ -113,8 +113,6 @@ class IUPartsListView():
 	@view_config(route_name='iupartslist', accept='text/html', renderer="DCRequestAPI:templates/iupartslist.pt")
 	def IUPartsListHTML(self):
 		
-		#pudb.set_trace()
-		
 		iupartstable = IUPartsTable()
 		if len(self.search_params['result_table_columns']) > 0:
 			iupartstable.setSelectedSourceFields(self.search_params['result_table_columns'])

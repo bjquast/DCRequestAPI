@@ -31,7 +31,7 @@ class TreeQueries():
 		
 		# currently only nested fields without restrictions are implemented
 		if self.field in self.tree_fields and self.field in self.fielddefinitions:
-			if 'buckets' in self.fielddefinitions[self.field] and 'path' in self.fielddefinitions[self.field]['buckets'] and 'withholdflag' not in self.fielddefinitions[self.field]['buckets']:
+			if 'buckets' in self.fielddefinitions[self.field] and 'path' in self.fielddefinitions[self.field]['buckets'] and 'withholdflags' not in self.fielddefinitions[self.field]['buckets']:
 				self.buckets_definition = self.fielddefinitions[self.field]['buckets']
 		return
 

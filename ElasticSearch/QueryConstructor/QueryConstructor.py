@@ -37,11 +37,11 @@ class QueryConstructor():
 		
 		for fieldname in self.source_fields:
 			if fieldname in self.fielddefinitions:
-				if 'buckets' in self.fielddefinitions[fieldname] and 'path' in self.fielddefinitions[fieldname]['buckets'] and 'withholdflag' in self.fielddefinitions[fieldname]['buckets']:
+				if 'buckets' in self.fielddefinitions[fieldname] and 'path' in self.fielddefinitions[fieldname]['buckets'] and 'withholdflags' in self.fielddefinitions[fieldname]['buckets']:
 					self.nested_restricted_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
-				elif 'buckets' in self.fielddefinitions[fieldname] and 'path' in self.fielddefinitions[fieldname]['buckets'] and 'withholdflag' not in self.fielddefinitions[fieldname]['buckets']:
+				elif 'buckets' in self.fielddefinitions[fieldname] and 'path' in self.fielddefinitions[fieldname]['buckets'] and 'withholdflags' not in self.fielddefinitions[fieldname]['buckets']:
 					self.nested_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
-				elif 'buckets' in self.fielddefinitions[fieldname] and 'withholdflag' in self.fielddefinitions[fieldname]['buckets']:
+				elif 'buckets' in self.fielddefinitions[fieldname] and 'withholdflags' in self.fielddefinitions[fieldname]['buckets']:
 					self.simple_restricted_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
 				elif 'buckets' in self.fielddefinitions[fieldname]:
 					self.simple_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']

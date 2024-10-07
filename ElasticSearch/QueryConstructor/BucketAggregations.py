@@ -166,6 +166,7 @@ class BucketAggregations(QueryConstructor):
 			
 			case_insensitive = self.getCaseInsensitiveValue(self.nested_restricted_fields[field])
 			search_query = self.getSearchQuery(self.nested_restricted_fields, field, case_insensitive)
+			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.nested_restricted_fields[field]['withholdflags']]
 			
 			self.aggs_query[field] = {
 				'nested': {
@@ -179,7 +180,11 @@ class BucketAggregations(QueryConstructor):
 								'should': [
 									# need to use the DB_ProjectID within the path for nested objects otherwise the filter fails
 									{"terms": {"{0}.DB_ProjectID".format(self.nested_restricted_fields[field]['path']): self.users_project_ids}},
-									{"term": {self.nested_restricted_fields[field]['withholdflag']: "false"}}
+									{
+										"bool": {
+											"must": withholdterms
+										}
+									}
 								],
 								"minimum_should_match": 1,
 								"filter": []
@@ -218,6 +223,7 @@ class BucketAggregations(QueryConstructor):
 			
 			case_insensitive = self.getCaseInsensitiveValue(self.simple_restricted_fields[field])
 			search_query = self.getSearchQuery(self.simple_restricted_fields, field, case_insensitive)
+			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.simple_restricted_fields[field]['withholdflags']]
 			
 			self.aggs_query[field] = {
 				"filter": {
@@ -225,7 +231,11 @@ class BucketAggregations(QueryConstructor):
 						"must": [],
 						'should': [
 							{"terms": {"Projects.DB_ProjectID": self.users_project_ids}},
-							{"term": {self.simple_restricted_fields[field]['withholdflag']: "false"}}
+							{
+								"bool": {
+									"must": withholdterms
+								}
+							}
 						],
 						"minimum_should_match": 1
 					}
