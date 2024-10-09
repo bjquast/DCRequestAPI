@@ -53,7 +53,7 @@ services:
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
-      - ./data/elasticsearch/certs:/usr/share/elasticsearch/config/certs
+      - /var/data/dcrequestapi/elasticsearch/certs:/usr/share/elasticsearch/config/certs
     env_file:
       - ./compose.env
     networks:
@@ -115,6 +115,16 @@ services:
       timeout: 5s
       retries: 120
 
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role==worker
+          - node.hostname == ganapti
+      restart_policy:
+        condition: none
+
   es01:
     depends_on:
       - setup
@@ -122,8 +132,8 @@ services:
     hostname: es01
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
-      - ./data/elasticsearch/certs:/usr/share/elasticsearch/config/certs
-      - ./data/elasticsearch/esdata01:/usr/share/elasticsearch/data
+      - /var/data/dcrequestapi/elasticsearch/certs:/usr/share/elasticsearch/config/certs
+      - /var/data/dcrequestapi/elasticsearch/esdata01:/usr/share/elasticsearch/data
     env_file:
       - ./compose.env
     networks:
@@ -148,7 +158,18 @@ services:
       - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.verification_mode=certificate
       - xpack.license.self_generated.type=${LICENSE}
-    #mem_limit: ${MEM_LIMIT}
+    deploy:
+      resources:
+        limits:
+          memory: "32589934592"
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role==worker
+          - node.hostname == ganapti
+      restart_policy:
+        condition: any
     ulimits:
       memlock:
         soft: -1
@@ -169,8 +190,8 @@ services:
     hostname: es02
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
-      - ./data/elasticsearch/certs:/usr/share/elasticsearch/config/certs
-      - ./data/elasticsearch/esdata02:/usr/share/elasticsearch/data
+      - /var/data/dcrequestapi/elasticsearch/certs:/usr/share/elasticsearch/config/certs
+      - /var/data/dcrequestapi/elasticsearch/esdata02:/usr/share/elasticsearch/data
     env_file:
       - ./compose.env
     networks:
@@ -193,7 +214,16 @@ services:
       - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.verification_mode=certificate
       - xpack.license.self_generated.type=${LICENSE}
-    #mem_limit: ${MEM_LIMIT}
+    deploy:
+      resources:
+        limits:
+          memory: "32589934592"
+      placement:
+        constraints:
+          - node.role==worker
+          - node.hostname == ganapti
+      restart_policy:
+        condition: any
     ulimits:
       memlock:
         soft: -1
@@ -214,8 +244,8 @@ services:
     hostname: es03
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
-      - ./data/elasticsearch/certs:/usr/share/elasticsearch/config/certs
-      - ./data/elasticsearch/esdata03:/usr/share/elasticsearch/data
+      - /var/data/dcrequestapi/elasticsearch/certs:/usr/share/elasticsearch/config/certs
+      - /var/data/dcrequestapi/elasticsearch/esdata03:/usr/share/elasticsearch/data
     env_file:
       - ./compose.env
     networks:
@@ -238,7 +268,16 @@ services:
       - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.verification_mode=certificate
       - xpack.license.self_generated.type=${LICENSE}
-    #mem_limit: ${MEM_LIMIT}
+    deploy:
+      resources:
+        limits:
+          memory: "32589934592"
+      placement:
+        constraints:
+          - node.role==worker
+          - node.hostname == ganapti
+      restart_policy:
+        condition: any
     ulimits:
       memlock:
         soft: -1
