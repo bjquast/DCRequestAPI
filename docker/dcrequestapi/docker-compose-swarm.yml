@@ -1,13 +1,12 @@
 version: '3.4'
 services:
   db:
-    hostname: ${MYSQL_HOST}
     image: mysql:8
     volumes:
       - /var/data/dcrequestapi/mysql_custom.cnf:/etc/mysql/conf.d/custom.cnf
       - /var/data/dcrequestapi/mysql:/var/lib/mysql:delegated
     env_file:
-      - ./.env
+      - ./compose.env
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
