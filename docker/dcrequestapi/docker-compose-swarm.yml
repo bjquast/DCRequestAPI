@@ -7,7 +7,7 @@ services:
       - /var/data/dcrequestapi/mysql_custom.cnf:/etc/mysql/conf.d/custom.cnf
       - /var/data/dcrequestapi/mysql:/var/lib/mysql:delegated
     env_file:
-      - ./compose.env
+      - ./.env
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
