@@ -28,6 +28,8 @@ services:
 
   dcrequestapi:
     image: docker.leibniz-lib.de:5000/dcrequestapi
+    env_file:
+      - ./compose.env
     ports:
       - "${PYRAMID_PORT}:${PYRAMID_PORT}"
     networks:
@@ -52,6 +54,8 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
       - ./data/elasticsearch/certs:/usr/share/elasticsearch/config/certs
+    env_file:
+      - ./compose.env
     networks:
       - dcrequestapi_net
     user: "0"
@@ -120,6 +124,8 @@ services:
     volumes:
       - ./data/elasticsearch/certs:/usr/share/elasticsearch/config/certs
       - ./data/elasticsearch/esdata01:/usr/share/elasticsearch/data
+    env_file:
+      - ./compose.env
     networks:
       - dcrequestapi_net
     ports:
@@ -165,6 +171,8 @@ services:
     volumes:
       - ./data/elasticsearch/certs:/usr/share/elasticsearch/config/certs
       - ./data/elasticsearch/esdata02:/usr/share/elasticsearch/data
+    env_file:
+      - ./compose.env
     networks:
       - dcrequestapi_net
     environment:
@@ -208,6 +216,8 @@ services:
     volumes:
       - ./data/elasticsearch/certs:/usr/share/elasticsearch/config/certs
       - ./data/elasticsearch/esdata03:/usr/share/elasticsearch/data
+    env_file:
+      - ./compose.env
     networks:
       - dcrequestapi_net
     environment:
