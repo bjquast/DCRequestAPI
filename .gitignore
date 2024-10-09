@@ -6,5 +6,9 @@ config.ini
 **/data/**
 **/TaxaMergerDB_Dump/**
 *.env
+*.*~
 **/.venv/**
-
+**/.idea
+.venv/
+venv/
+out.json
