@@ -5,15 +5,13 @@ services:
     volumes:
       - /var/data/dcrequestapi/mysql_custom.cnf:/etc/mysql/conf.d/custom.cnf
       - /var/data/dcrequestapi/mysql:/var/lib/mysql:delegated
-    env_file:
-      - ./compose.env
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - dcrequestapi
+      - dcrequestapi_net
     deploy:
       mode: replicated
       replicas: 1
@@ -30,8 +28,6 @@ services:
       - "${PYRAMID_PORT}:${PYRAMID_PORT}"
     networks:
       - dcrequestapi_net
-    env_file:
-      - ./compose.env
     volumes:
       - /var/data/dcrequestapi/data/TaxaMergerDB_Dump:./TaxaMergerDBSetup/TaxaMergerDB_Dump
     depends_on:
@@ -50,12 +46,10 @@ services:
 
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
-    env_file:
-      - ./compose.env
     volumes:
       - ./data/elasticsearch/certs:/usr/share/elasticsearch/config/certs
     networks:
-      - dcrequestapi
+      - dcrequestapi_net
     user: "0"
     command: >
       bash -c '
@@ -123,9 +117,7 @@ services:
       - ./data/elasticsearch/certs:/usr/share/elasticsearch/config/certs
       - ./data/elasticsearch/esdata01:/usr/share/elasticsearch/data
     networks:
-      - dcrequestapi
-    env_file:
-      - ./compose.env
+      - dcrequestapi_net
     ports:
       - ${ES_PORT}:9200
     environment:
@@ -164,15 +156,13 @@ services:
   es02:
     depends_on:
       - es01
-    env_file:
-      - ./compose.env
     hostname: es02
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
       - ./data/elasticsearch/certs:/usr/share/elasticsearch/config/certs
       - ./data/elasticsearch/esdata02:/usr/share/elasticsearch/data
     networks:
-      - dcrequestapi
+      - dcrequestapi_net
     environment:
       - node.name=es02
       - cluster.name=${CLUSTER_NAME}
@@ -209,15 +199,13 @@ services:
   es03:
     depends_on:
       - es02
-    env_file:
-      - ./compose.env
     hostname: es03
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
       - ./data/elasticsearch/certs:/usr/share/elasticsearch/config/certs
       - ./data/elasticsearch/esdata03:/usr/share/elasticsearch/data
     networks:
-      - dcrequestapi
+      - dcrequestapi_net
     environment:
       - node.name=es03
       - cluster.name=${CLUSTER_NAME}
