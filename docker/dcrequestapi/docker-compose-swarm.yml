@@ -35,7 +35,7 @@ services:
     networks:
       - dcrequestapi_net
     volumes:
-      - /var/data/dcrequestapi/data/TaxaMergerDB_Dump:./TaxaMergerDBSetup/TaxaMergerDB_Dump
+      - /var/data/dcrequestapi/data/TaxaMergerDB_Dump:/usr/src/app/TaxaMergerDBSetup/TaxaMergerDB_Dump
     depends_on:
       - db
       - es03
