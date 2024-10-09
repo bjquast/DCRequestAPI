@@ -50,6 +50,8 @@ services:
 
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    env_file:
+      - ./compose.env
     volumes:
       - ./data/elasticsearch/certs:/usr/share/elasticsearch/config/certs
     networks:
@@ -162,6 +164,8 @@ services:
   es02:
     depends_on:
       - es01
+    env_file:
+      - ./compose.env
     hostname: es02
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
@@ -205,6 +209,8 @@ services:
   es03:
     depends_on:
       - es02
+    env_file:
+      - ./compose.env
     hostname: es03
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
