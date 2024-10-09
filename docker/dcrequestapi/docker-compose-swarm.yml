@@ -33,6 +33,8 @@ services:
       - dcrequestapi_net
     env_file:
       - ./compose.env
+    volumes:
+      - /var/data/dcrequestapi/data/TaxaMergerDB_Dump:./TaxaMergerDBSetup/TaxaMergerDB_Dump
     depends_on:
       - db
       - es03
