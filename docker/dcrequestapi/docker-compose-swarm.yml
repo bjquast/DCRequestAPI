@@ -122,8 +122,8 @@ services:
       - ./data/elasticsearch/esdata01:/usr/share/elasticsearch/data
     networks:
       - dcrequestapi
-    ports:
-      - ${ES_PORT}:9200
+    #ports:
+    #  - ${ES_PORT}:9200
     environment:
       - node.name=es01
       - cluster.name=${CLUSTER_NAME}
