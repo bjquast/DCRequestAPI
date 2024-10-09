@@ -2,9 +2,13 @@ version: '3.4'
 services:
   db:
     image: mysql:8
+    #ports:
+    # - ${MYSQL_PORT_EXPOSED}:${MYSQL_PORT}
     volumes:
       - /var/data/dcrequestapi/mysql_custom.cnf:/etc/mysql/conf.d/custom.cnf
-      - /var/data/dcrequestapi/mysql:/var/lib/mysql:delegated
+      - /var/data/dcrequestapi/mysql:/var/lib/mysql
+    env_file:
+      - ./compose.env
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
