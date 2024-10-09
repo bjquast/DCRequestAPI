@@ -114,7 +114,7 @@ services:
 
   es01:
     depends_on:
-      - setup:
+      - setup
     #   # condition: service_healthy
     hostname: es01
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
