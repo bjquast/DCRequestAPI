@@ -13,12 +13,12 @@ port     = @@DS1_PORT@@
 driver   = @@DS1_DRIVER@@
 uid      = @@DS1_UID@@
 password = @@DS1_PASSWORD@@
-trust_certificate = @@DS2_TRUST_CERTIFICATE@@
+trust_certificate = @@DS1_TRUST_CERTIFICATE@@
 # trust_connection causes Windows authentication to be used, so it must be unset or set to NO to use SQL SERVER authentication
-trusted_connection = @@DS2_TRUSTED_CONNECTION@@
-encrypt = @@DS2_ENCRYPT@@
+trusted_connection = @@DS1_TRUSTED_CONNECTION@@
+encrypt = @@DS1_ENCRYPT@@
 # project_db_connector references an existing section with SQL SERVER connection parameters
-project_db_connector = projects_P1
+project_db_connector = @@DS1_PROJECT_DB_CONNECTOR@@
 
 
 # add further data sources if you need
@@ -37,7 +37,7 @@ trusted_connection = @@DS2_TRUSTED_CONNECTION@@
 encrypt = @@DS2_ENCRYPT@@
 # project_db_connector references an existing section with SQL SERVER connection parameters
 # can be the same for different data_source sections
-project_db_connector = projects_P1
+project_db_connector = @@DS2_PROJECT_DB_CONNECTOR@@
 
 
 [projects_P1]
