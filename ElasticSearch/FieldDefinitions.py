@@ -20,7 +20,7 @@ class FieldDefinitions():
 		self.bucketfields = [
 			'DatabaseAccronym',
 			#'CollectionsTree.CollectionName',
-			'CollectionName',
+			#'CollectionName',
 			'CollectionsTree',
 			'Projects.Project',
 			'LastIdentificationCache',
@@ -184,7 +184,7 @@ class FieldDefinitions():
 			},
 			
 			'MatchedTaxaTree': {
-				'names': {'en': 'Taxonomic Tree'},
+				'names': {'en': 'Taxonomy'},
 				'buckets': {
 					'field_query': 'MatchedTaxaTree.Taxon',
 					'id_field_for_tree': 'MatchedTaxaTree.TaxonURI',
@@ -309,7 +309,7 @@ class FieldDefinitions():
 			},
 			
 			'CollectionsTree': {
-				'names': {'en': 'Collections (hierarchichal)'},
+				'names': {'en': 'Collection(s)'},
 				'buckets': {
 					'field_query': 'CollectionsTree.CollectionName',
 					'path': 'CollectionsTree',
