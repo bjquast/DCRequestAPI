@@ -70,8 +70,9 @@ class MatchQuery(QueryConstructor):
 
 
 	def appendSimpleRestrictedMatchQueries(self, i, query_string):
-		withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.simple_restricted_fields[field]['withholdflags']]
+		
 		for fieldname in self.simple_restricted_fields:
+			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.simple_restricted_fields[fieldname]['withholdflags']]
 			query = {
 				'bool': {
 					'must': [
@@ -107,9 +108,8 @@ class MatchQuery(QueryConstructor):
 
 	def appendNestedRestrictedMatchQueries(self, i, query_string):
 		
-		withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.nested_restricted_fields[field]['withholdflags']]
-		
 		for fieldname in self.nested_restricted_fields:
+			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.nested_restricted_fields[fieldname]['withholdflags']]
 			query = {
 				'nested': {
 					'path': self.nested_restricted_fields[fieldname]['path'],

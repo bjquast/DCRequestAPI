@@ -90,7 +90,7 @@ class TermFilterQueries(QueryConstructor):
 		
 		case_insensitive = self.getCaseInsensitiveValue(self.simple_restricted_fields[filter_key])
 		filter_values = self.replaceBooleanValues(self.simple_restricted_fields[filter_key], filter_values)
-		withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.simple_restricted_fields[field]['withholdflags']]
+		withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.simple_restricted_fields[filter_key]['withholdflags']]
 		
 		for filter_value in filter_values:
 			termquery = {
@@ -168,7 +168,7 @@ class TermFilterQueries(QueryConstructor):
 		
 		case_insensitive = self.getCaseInsensitiveValue(self.nested_restricted_fields[filter_key])
 		filter_values = self.replaceBooleanValues(self.nested_restricted_fields[filter_key], filter_values)
-		withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.nested_restricted_fields[field]['withholdflags']]
+		withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.nested_restricted_fields[filter_key]['withholdflags']]
 		
 		for filter_value in filter_values:
 			termquery = {
