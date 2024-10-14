@@ -34,14 +34,14 @@ class IUPartsTable():
 
 	def setSelectedBucketFields(self, bucketfields = []):
 		self.selected_bucketfields = []
-		if len(bucketfields) <= 0:
-			for bucketfield in self.bucketfields:
-				self.selected_bucketfields.append(bucketfield)
+		#if len(bucketfields) <= 0:
+		#	for bucketfield in self.bucketfields:
+		#		self.selected_bucketfields.append(bucketfield)
 		
-		else:
-			for bucketfield in bucketfields:
-				if bucketfield in self.bucketfields:
-					self.selected_bucketfields.append(bucketfield)
+		#else:
+		for bucketfield in bucketfields:
+			if bucketfield in self.bucketfields:
+				self.selected_bucketfields.append(bucketfield)
 		return
 
 

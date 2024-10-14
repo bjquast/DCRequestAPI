@@ -123,8 +123,8 @@ class IUPartsListView():
 		if len(self.search_params['result_table_columns']) > 0:
 			iupartstable.setSelectedSourceFields(self.search_params['result_table_columns'])
 		
-		if len(self.search_params['open_filter_selectors']) > 0:
-			iupartstable.setSelectedBucketFields(self.search_params['open_filter_selectors'])
+		#if len(self.search_params['open_filter_selectors']) > 0:
+		iupartstable.setSelectedBucketFields(self.search_params['open_filter_selectors'])
 		
 		restrict_to_users_projects = False
 		if 'restrict_to_users_projects' in self.search_params and self.uid is not None:

@@ -49,7 +49,7 @@
 					<!-- hidden checkbox to submit the state of the details box -->
 					<input type="checkbox" form="search_form" name="open_filter_selectors" class="hidden" value="${aggs_name}" tal:attributes="checked 'checked' if aggs_name in open_filter_selectors else None">
 					<summary class="clickable">${bucketdefs[aggs_name]['en']}</summary>
-					<ul tal:condition="python: aggs_name in aggregations" class="ul-no-bullet">
+					<ul tal:condition="python: aggs_name in aggregations and aggs_name in selected_bucketfields" class="ul-no-bullet">
 						<li tal:repeat="bucket aggregations[aggs_name]" class="bucket_entry clickable" 
 							data-filter-id="filter_${aggs_name}_${bucket['key']}" 
 							data-filter-name="${bucketdefs[aggs_name]['en']}"
