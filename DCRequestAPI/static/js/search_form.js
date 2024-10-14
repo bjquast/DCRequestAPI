@@ -2,7 +2,6 @@
 
 const appliedfilters = new AppliedFiltersField();
 const bucketsoverlay = new BucketsOverlay(appliedfilters);
-//const filterlists = new FilterList();
 const aggs_suggestions = new AggsSuggestions(appliedfilters, "aggs_search_input", "aggs_search_suggestions_list");
 const stacked_search = new StackedSearch();
 
@@ -138,15 +137,104 @@ function add_collapsible_filters_events() {
 			if ($(this).attr('open') == 'open') {
 				$(this).children('input:checkbox').prop('checked', true);
 				let filter_list_id = $(this).prop('id');
-				filterlist = new FilterList(filter_list_id);
+				
+				updateFilterList(filter_list_id);
+				
+				//let filterlist = new FilterList(filter_list_id);
+				//filterlist.requestBuckets();
+				//set_more_button_events();
 			}
 			else {
 				$(this).children('input:checkbox').prop('checked', false);
-				$(this).children('ul').remove();
+				$(this).find('ul').remove();
+				console.log('removed');
 			}
 		});
 	});
 }
+
+
+//////////////////////////////////////////////////
+
+function readSearchFormParameters() {
+	let form = document.getElementById("search_form");
+	let form_data = new FormData(form);
+	return form_data
+}
+
+
+function createFilterList(filter_list_id, buckets) {
+	
+	$('#' + filter_list_id).append('<ul>');
+	let unordered_list = $('#' + filter_list_id + ' ul');
+	console.log('##############', unordered_list);
+	unordered_list.addClass('ul-no-bullet');
+	
+	for (let i = 0; i < buckets['buckets'].length; i++) {
+		let list_entry = $('<li></li>');
+		unordered_list.append(list_entry);
+		
+		list_entry.addClass('bucket_entry clickable');
+		list_entry.html(buckets['buckets'][i][0] + ' (' + buckets['buckets'][i][1] + ')');
+		list_entry.attr('data-filter-id', 'filter_' + buckets['aggregation'] + '_' + buckets['buckets'][i][0]);
+		list_entry.attr('data-filter-key', buckets['aggregation']);
+		list_entry.attr('data-filter-value', buckets['buckets'][i][0]);
+		if (buckets['aggregation_names']['en']) {
+			list_entry.attr('data-filter-name', buckets['aggregation_names']['en']);
+		}
+		else {
+			list_entry.attr('data-filter-name', buckets['aggregation']);
+		}
+	}
+	let button_list_entry = $('<li></li>');
+	unordered_list.append(button_list_entry);
+	let more_button = $('<button>more options</button>');
+	button_list_entry.append(more_button);
+	more_button.addClass('more_filter_entries_button');
+	more_button.attr('id', 'more_button_' + buckets['aggregation']);
+	more_button.attr('data-filter-key', buckets['aggregation']);
+}
+
+
+function updateFilterList(filter_list_id) {
+	let buckets = [];
+	let filter_key = filter_list_id.substring(12,);
+	
+	console.log('---------', filter_list_id);
+	console.log('---------', filter_key);
+	
+	let form_data = readSearchFormParameters();
+	
+	console.log(form_data);
+	
+	form_data.append('aggregation', filter_key);
+	form_data.append('buckets_size', 10);
+	
+	console.log(form_data);
+	
+	$.ajax({
+		url: "./aggregation",
+		type: 'POST',
+		processData: false,
+		contentType: false,
+		dataType: 'json',
+		data: form_data
+	})
+	.fail(function (xhr, textStatus, errorThrown) {
+		let error_response = xhr.responseJSON;
+		console.log(error_response);
+	})
+	.done( function(data) {
+		buckets = data;
+		console.log('got them');
+		console.log(buckets);
+		createFilterList(filter_list_id, buckets);
+		add_filter_events();
+		set_more_button_events();
+	});
+}
+
+//////////////////////////////////////////////////////////
 
 
 function add_column_selector_event() {

@@ -62,6 +62,8 @@ class AggregationView():
 		
 		if 'aggregation' in self.search_params:
 			agg_key = self.search_params['aggregation']
+		else:
+			agg_key = None
 		
 		if 'buckets_sort_alphanum' in self.search_params:
 			buckets_sort_alphanum = self.search_params['buckets_sort_alphanum']
@@ -73,14 +75,19 @@ class AggregationView():
 		else:
 			buckets_sort_dir = 'asc'
 		
+		if 'buckets_size' in self.search_params:
+			buckets_size = self.search_params['buckets_size']
+		else:
+			buckets_size = 5000
+		
 		if agg_key not in self.fielddefinitions:
 			return {
-				'message': '{0} can is not available as bucket aggregation'.format(agg_key),
+				'message': '{0} is not available as bucket aggregation'.format(agg_key),
 				'buckets': {}
 			}
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
-		buckets = es_searcher.singleAggregationSearch(agg_key, buckets_search_term = buckets_search_term, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
+		buckets = es_searcher.singleAggregationSearch(agg_key, buckets_search_term = buckets_search_term, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir, size = buckets_size)
 		
 		
 		

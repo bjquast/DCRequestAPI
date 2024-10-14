@@ -45,7 +45,7 @@
 		<h4>Choose filter</h4>
 		<div id="available_filters">
 			<div tal:repeat="aggs_name default_bucketfields" class="filter-select-box">
-				<details id="filter_key_${aggs_name}" class="filter_selectors" data-filter-key="${aggs_name}" tal:attributes="open 'open' if aggs_name in open_filter_selectors else None">
+				<details id="filter_list_${aggs_name}" class="filter_selectors" data-filter-key="${aggs_name}" tal:attributes="open 'open' if aggs_name in open_filter_selectors else None">
 					<!-- hidden checkbox to submit the state of the details box -->
 					<input type="checkbox" form="search_form" name="open_filter_selectors" class="hidden" value="${aggs_name}" tal:attributes="checked 'checked' if aggs_name in open_filter_selectors else None">
 					<summary class="clickable">${bucketdefs[aggs_name]['en']}</summary>
