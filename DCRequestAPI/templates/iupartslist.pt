@@ -13,6 +13,7 @@
 <metal:js fill-slot="js-head">
 	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/js/AppliedFiltersField.js')}"></script>
 	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/js/BucketsOverlay.js')}"></script>
+	<!--<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/js/FilterLists.js')}"></script>-->
 	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/js/AggsSuggestions.js')}"></script>
 	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/js/StackedSearch.js')}"></script>
 	<script type="text/javascript" src="${request.static_url('DCRequestAPI:static/js/search_form.js')}"></script>

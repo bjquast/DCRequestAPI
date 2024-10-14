@@ -59,6 +59,10 @@ class IUPartsListView():
 		if len(self.search_params['result_table_columns']) > 0:
 			iupartstable.setSelectedSourceFields(self.search_params['result_table_columns'])
 		
+		# makes no sense here
+		#if len(self.search_params['open_filter_selectors']) > 0:
+		#	iupartstable.setSelectedBucketFields(self.search_params['open_filter_selectors'])
+		
 		restrict_to_users_projects = False
 		if 'restrict_to_users_projects' in self.search_params and self.uid is not None:
 			restrict_to_users_projects = True
@@ -113,9 +117,14 @@ class IUPartsListView():
 	@view_config(route_name='iupartslist', accept='text/html', renderer="DCRequestAPI:templates/iupartslist.pt")
 	def IUPartsListHTML(self):
 		
+		#pudb.set_trace()
+		
 		iupartstable = IUPartsTable()
 		if len(self.search_params['result_table_columns']) > 0:
 			iupartstable.setSelectedSourceFields(self.search_params['result_table_columns'])
+		
+		if len(self.search_params['open_filter_selectors']) > 0:
+			iupartstable.setSelectedBucketFields(self.search_params['open_filter_selectors'])
 		
 		restrict_to_users_projects = False
 		if 'restrict_to_users_projects' in self.search_params and self.uid is not None:

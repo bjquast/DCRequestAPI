@@ -37,6 +37,8 @@ class UpdateES_Index:
 
 	def update_from_database(self, dc_params:dict, table_name:str|None = None):
 		#pudb.set_trace()
+		logger.info('index update started for {0}'.format(dc_params['accronym']))
+		
 		data_getter = DataGetter(dc_params, self.last_updated)
 		
 		data_getter.create_deleted_temptable()
@@ -47,7 +49,7 @@ class UpdateES_Index:
 		
 		iuparts_indexer = IUPartsIndexer(self.es_indexer, dc_params, last_updated = self.last_updated, skip_taxa_db = self.skip_taxa_db, multi_threaded_getter = self.multi_threaded_getter)
 		
-		logger.info('update completed')
+		logger.info('index update completed for {0}'.format(dc_params['accronym']))
 
 
 	def update_es_index(self):
@@ -57,8 +59,10 @@ class UpdateES_Index:
 
 
 if __name__ == "__main__":
+	logger.info('indexing started')
 	updater = UpdateES_Index()
 	updater.update_es_index()
+	logger.info('indexing completed')
 	
 	
 	

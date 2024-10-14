@@ -274,11 +274,11 @@ class ES_Searcher():
 		#self.queryConstructor is set in the derived classes
 		self.setQuery()
 		
-		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids)
+		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = self.bucket_fields)
 		aggs = buckets_query.getAggregationsQuery()
 		
 		#logger.debug(self.sort)
-		#logger.debug(json.dumps(aggs))
+		logger.debug(json.dumps(aggs))
 		logger.debug(json.dumps(self.query))
 		#logger.debug(json.dumps(self.sort))
 		

@@ -2,6 +2,7 @@
 
 const appliedfilters = new AppliedFiltersField();
 const bucketsoverlay = new BucketsOverlay(appliedfilters);
+//const filterlists = new FilterList();
 const aggs_suggestions = new AggsSuggestions(appliedfilters, "aggs_search_input", "aggs_search_suggestions_list");
 const stacked_search = new StackedSearch();
 
@@ -12,7 +13,7 @@ $(document).ready( function() {
 	add_filter_events();
 	
 	set_more_button_events();
-	add_collapsible_events();
+	add_collapsible_filters_events();
 	add_column_selector_event();
 	add_columnheader_sorting_events();
 	
@@ -130,15 +131,18 @@ function add_match_query_events() {
 }
 
 
-function add_collapsible_events() {
+function add_collapsible_filters_events() {
 	$('.filter_selectors').each( function () {
 		$(this).on('toggle', function() {
 			set_more_button_events();
 			if ($(this).attr('open') == 'open') {
 				$(this).children('input:checkbox').prop('checked', true);
+				let filter_list_id = $(this).prop('id');
+				filterlist = new FilterList(filter_list_id);
 			}
 			else {
 				$(this).children('input:checkbox').prop('checked', false);
+				$(this).children('ul').remove();
 			}
 		});
 	});

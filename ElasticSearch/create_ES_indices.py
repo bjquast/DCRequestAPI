@@ -299,6 +299,8 @@ if __name__ == "__main__":
 	skip_taxa_db = config.getboolean('taxamergerdb', 'skip_taxa_db', fallback = False)
 	multi_threaded_getter = config.getboolean('default', 'multi_threaded_getter', fallback = False)
 	
+	logger.info('indexing started')
+	
 	es_indexer = ES_Indexer()
 	es_indexer.deleteIndex()
 	es_indexer.createIndex()
