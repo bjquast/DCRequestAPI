@@ -15,7 +15,7 @@ class FilterLists {
 					$(this).children('input:checkbox').prop('checked', true);
 					if ($(this).find('ul').length == 0) {
 						let filter_list_id = $(this).prop('id');
-						filter_list_id = filter_list_id.replace('.', '\\.');
+						filter_list_id = filter_list_id.replace(/\./g, '\\.');
 						self.updateFilterList(filter_list_id);
 					}
 				}
