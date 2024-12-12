@@ -57,9 +57,9 @@ class StackedInnerQuery(QueryConstructor):
 			search_field = self.getStringQuerySearchField(field, self.simple_fields[field])
 			
 			query = {
-				'query_string': {
+				'simple_query_string': {
 					'query': query_string,
-					'default_field': search_field
+					'fields': [search_field]
 				}
 			}
 			self.query_list.append(query)
@@ -77,9 +77,9 @@ class StackedInnerQuery(QueryConstructor):
 						'bool': {
 							'must': [
 								{
-									'query_string': {
+									'simple_query_string': {
 										'query': query_string,
-										'default_field': search_field
+										'fields': [search_field]
 									}
 								}
 							]
@@ -101,9 +101,9 @@ class StackedInnerQuery(QueryConstructor):
 				'bool': {
 					'must': [
 						{
-							'query_string': {
+							'simple_query_string': {
 								'query': query_string,
-								'default_field': search_field
+								'fields': [search_field]
 							}
 						}
 					],
@@ -141,9 +141,9 @@ class StackedInnerQuery(QueryConstructor):
 						'bool': {
 							'must': [
 								{
-									'query_string': {
+									'simple_query_string': {
 										'query': query_string,
-										'default_field': search_field
+										'fields': [search_field]
 									}
 								}
 							],
