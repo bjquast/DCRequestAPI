@@ -656,7 +656,7 @@ class TaxaMatchTable():
 
 	def createTaxaMatchedTable(self):
 		query = """
-		 TABLE IF NOT EXISTS taxa_matched
+		CREATE TABLE IF NOT EXISTS taxa_matched
 		(
 		`specimen_id` INT(10),
 		`taxon_id` INT(10),
