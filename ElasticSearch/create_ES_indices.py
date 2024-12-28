@@ -73,13 +73,14 @@ class DataPage():
 		
 		if not self.skip_taxa_db:
 			logger.info('Match taxa of page {0}'.format(self.page))
-			self.matchedtaxa_dict = self.getMatchedTaxa(self.iuparts_dict)
+			self.setMatchedTaxa(self.iuparts_dict)
 		else:
 			self.matchedtaxa_dict = {}
+			self.synonyms_dict = {}
 		return
 
 
-	def getMatchedTaxa(self, iuparts_dict):
+	def setMatchedTaxa(self, iuparts_dict):
 		self.taxamatcher.createSpecimenTempTable()
 		valuelists = []
 		for idshash in iuparts_dict:
@@ -96,8 +97,10 @@ class DataPage():
 		self.taxamatcher.fillSpecimenTempTable(valuelists)
 		self.taxamatcher.matchTaxa()
 		
-		matchedtaxa_dict = self.taxamatcher.getMatchedTaxaDict()
-		return matchedtaxa_dict
+		self.matchedtaxa_dict = self.taxamatcher.getMatchedTaxaDict()
+		self.matchedsynonyms_dict = self.taxamatcher.getMatchedSynonymsDict()
+		
+		return
 
 
 	def setBarcodeAMPFilterIDS(self):
@@ -180,6 +183,8 @@ class IUPartsIndexer():
 			self.es_indexer.bulkUpdateDocs(data_page.mam_analyses_dict, 'MAM_Measurements', data_page.page)
 		if len(data_page.matchedtaxa_dict) > 0:
 			self.es_indexer.bulkUpdateDocs(data_page.matchedtaxa_dict, 'MatchedTaxa', data_page.page)
+		if len(data_page.matchedsynonyms_dict) > 0:
+			self.es_indexer.bulkUpdateDocs(data_page.matchedsynonyms_dict, 'MatchedSynonyms', data_page.page)
 		
 		return
 

@@ -16,7 +16,6 @@ body {
 @media (min-width: 30em) { 
 	body {
 		grid-template-columns: 1fr minmax(30em, auto);
-		grid-template-rows: 20% 10% 20% 45% 5%;
 	}
 }
 

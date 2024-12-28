@@ -319,8 +319,45 @@ class TaxaMatcher():
 					'TaxonURL': row[9], 'TreeLevel': row[10], 'ParentTaxonURI': row[11]})
 		
 		return matched_taxa_dict
-		
 	
+	
+	def getMatchedSynonymsDict(self):
+		synonyms_dict = {}
+		
+		query = """
+		SELECT cs.`_id`,
+		sm.taxon,
+		sm.author,
+		sm.TaxonNameURI
+		FROM {0} cs
+		INNER JOIN {1} mt
+		ON mt.id = cs.taxon_id
+		INNER JOIN {2} sm
+		ON sm.syn_taxon_id = mt.id
+		;""".format(self.specimentable, self.matchingtable.taxamergetable, self.matchingtable.synonymsmergetable)
+		self.cur.execute(query)
+		rows = self.cur.fetchall()
+		
+		for row in rows:
+			if row[0] not in synonyms_dict:
+				synonyms_dict[row[0]] = {}
+				synonyms_dict[row[0]]['MatchedSynonyms'] = []
+			
+			synonyms_dict[row[0]]['MatchedSynonyms'].append(
+					{
+						'Synonym': row[1],
+						'SynonymAuthor': row[2],
+						'SynonymTaxonURI': row[3]
+					}
+				)
+		
+		return synonyms_dict
+
+
+	def getMatchedVernaculars(self):
+		pass
+
+
 	'''
 	def setWithholdForUnmatchedSpecimens(self):
 		query = """

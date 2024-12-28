@@ -25,6 +25,7 @@ class FieldDefinitions():
 			'Projects.Project',
 			'LastIdentificationCache',
 			'VernacularTerms',
+			'MatchedSynonyms.Synonym',
 			'MatchedTaxaTree',
 			'MatchedTaxaTree.Phylum',
 			'MatchedTaxaTree.Subphylum',
@@ -56,6 +57,7 @@ class FieldDefinitions():
 			#'StableIdentifierURL',
 			'LastIdentificationCache',
 			'VernacularTerms',
+			'MatchedSynonyms.Synonym',
 			#'FamilyCache',
 			#'OrderCache',
 			#'MatchedTaxon',
@@ -95,6 +97,7 @@ class FieldDefinitions():
 			'LastIdentificationCache',
 			'MatchedTaxon',
 			'VernacularTerms',
+			'MatchedSynonyms.Synonym',
 			'TypeStatus',
 			'MatchedTaxaTree',
 			#'MatchedTaxaTree.Phylum',
@@ -192,6 +195,13 @@ class FieldDefinitions():
 					'path': 'MatchedTaxaTree',
 					'root_level': 0 # the level to start the tree or trees (e. g. Animalia, Plantae, Fungi) from
 				}
+			},
+			
+			'MatchedSynonyms.Synonym': {
+				'names': {'en': 'Synonym'},
+				'buckets': {
+					'field_query': 'MatchedSynonyms.Synonym'
+				},
 			},
 			
 			'TypeStatus': {
