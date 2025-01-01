@@ -175,7 +175,7 @@ class FieldDefinitions():
 			'MatchedTaxon': {
 				'names': {'en': 'Taxon in GBIF'},
 				'buckets': {
-					'field_query': 'MatchedTaxon.keyword', 
+					'field_query': 'MatchedTaxon', 
 				},
 			},
 			

@@ -91,7 +91,8 @@
 								</block>
 								
 								<block tal:condition="python: columnkey not in ['PartAccessionNumber', 'StableIdentifierURL']" tal:repeat="iupfield iuparts[columnkey]">
-									${iupfield}
+									<span tal:condition="python: len(iuparts[columnkey]) > 1">${iupfield}<br /></span>
+									<span tal:condition="python: len(iuparts[columnkey]) <= 1">${iupfield}</span>
 								</block>
 							</td>
 						</tr>

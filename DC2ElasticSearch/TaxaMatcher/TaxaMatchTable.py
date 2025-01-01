@@ -31,6 +31,9 @@ class TaxaMatchTable():
 		self.taxamergetable = taxamergetable
 		self.taxarelationtable = "TaxaResultingRelationTable"
 		self.synonymsmergetable = "TaxaSynonymsMergeTable"
+		# self.commonnamesmergetable is not used here but defined here for compabilty with the calls to the other tables 
+		# by TaxaMatcher ()
+		self.commonnamesmergetable = "TaxaCommonNamesTempTable"
 		
 		self.createTempTable()
 

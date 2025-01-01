@@ -354,7 +354,37 @@ class TaxaMatcher():
 		return synonyms_dict
 
 
-	def getMatchedVernaculars(self):
+	def appendMatchedVernaculars(self, vernaculars_dict = {}):
+		# get the vernaculars dict from identifications getter (= vernaculars_dict)
+		# to append the vernaculars not yet set
+		# restrict the vernacular names to english or german
+		
+		vernaculars_dict = vernaculars_dict
+		
+		query = """
+		SELECT cs.`_id`,
+		cn.`name`,
+		cn.`code`
+		FROM {0} cs
+		INNER JOIN {1} mt
+		ON mt.id = cs.taxon_id
+		INNER JOIN {2} cn
+		ON cn.taxon_id = mt.id
+		WHERE cn.`code` IN ('en', 'de')
+		;""".format(self.specimentable, self.matchingtable.taxamergetable, self.matchingtable.commonnamesmergetable)
+		self.cur.execute(query)
+		rows = self.cur.fetchall()
+		
+		for row in rows:
+			if row[0] not in vernaculars_dict:
+				vernaculars_dict[row[0]] = {}
+				vernaculars_dict[row[0]]['VernacularTerms'] = []
+			
+			if row[1] not in vernaculars_dict[row[0]]:
+				vernaculars_dict[row[0]]['VernacularTerms'].append(row[1])
+		
+		return vernaculars_dict
+		
 		pass
 
 

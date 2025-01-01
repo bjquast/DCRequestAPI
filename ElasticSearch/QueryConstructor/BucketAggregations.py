@@ -10,7 +10,7 @@ from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
 class BucketAggregations(QueryConstructor):
-	def __init__(self, users_project_ids = [], source_fields = [], size = 10, buckets_search_term = None, buckets_sort_alphanum = False, buckets_sort_dir = 'asc', prefix_or_match = 'prefix'):
+	def __init__(self, users_project_ids = [], source_fields = [], size = 10, buckets_search_term = None, buckets_sort_alphanum = False, buckets_sort_dir = 'asc', prefix_or_match = 'prefix', add_include_filter = False):
 		#pudb.set_trace()
 		
 		self.users_project_ids = users_project_ids
@@ -24,6 +24,10 @@ class BucketAggregations(QueryConstructor):
 		self.buckets_sort_alphanum = buckets_sort_alphanum
 		self.buckets_sort_dir = buckets_sort_dir.lower()
 		self.prefix_or_match = prefix_or_match
+		
+		self.add_include_filter = add_include_filter
+		#if self.add_include_filter is True:
+		#	self.setIncludeFilter()
 		
 		fielddefs = FieldDefinitions()
 		if len(self.source_fields) <= 0:
@@ -106,12 +110,14 @@ class BucketAggregations(QueryConstructor):
 			if len(search_query) > 0:
 				self.aggs_query[field]['filter']['bool']['must'].append(search_query)
 			
+			if self.include_filter_term is not None:
+				self.aggs_query[field]['aggs']["buckets"]['terms']['include'] = self.include_filter_term
+			
 			sorting_dict = self.getSorting()
 			if len(sorting_dict) > 0:
 				self.aggs_query[field]['aggs']['buckets']['terms']['order'] = sorting_dict
 		
 		return
-
 
 
 	def setNestedAggregationsQuery(self):
@@ -152,6 +158,9 @@ class BucketAggregations(QueryConstructor):
 					'terms': self.subfilters[field]
 				}
 				self.aggs_query[field]['aggs']["buckets"]['filter']['bool']['filter'].append(sub_filter)
+			
+			if self.include_filter_term is not None:
+				self.aggs_query[field]['aggs']["buckets"]['aggs']["buckets"]['terms']['include'] = self.include_filter_term
 			
 			sorting_dict = self.getSorting()
 			if len(sorting_dict) > 0:
@@ -211,6 +220,9 @@ class BucketAggregations(QueryConstructor):
 				}
 				self.aggs_query[field]['aggs']["buckets"]['filter']['bool']['filter'].append(sub_filter)
 			
+			if self.include_filter_term is not None:
+				self.aggs_query[field]['aggs']["buckets"]['aggs']["buckets"]['terms']['include'] = self.include_filter_term
+			
 			sorting_dict = self.getSorting()
 			if len(sorting_dict) > 0:
 				self.aggs_query[field]['aggs']['buckets']['aggs']['buckets']['terms']['order'] = sorting_dict
@@ -253,9 +265,19 @@ class BucketAggregations(QueryConstructor):
 			if len(search_query) > 0:
 				self.aggs_query[field]['filter']['bool']['must'].append(search_query)
 			
+			if self.include_filter_term is not None:
+				self.aggs_query[field]['aggs']["buckets"]['terms']['include'] = self.include_filter_term
+			
 			sorting_dict = self.getSorting()
 			if len(sorting_dict) > 0:
 				self.aggs_query[field]['aggs']['buckets']['terms']['order'] = sorting_dict
+		return
+
+
+	def setIncludeFilter(self):
+		self.include_filter_term = None
+		if self.add_include_filter is True and self.buckets_search_term is not None:
+			self.include_filter_term = '{0}.*'.format(self.buckets_search_term)
 		return
 
 

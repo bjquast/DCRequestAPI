@@ -43,6 +43,7 @@ class Identifications():
 		
 		self.rows = self.cur.fetchall()
 		self.rows2dicts()
+		self.set_vernaculars_dict()
 		
 		
 		return self.identifications_dict
@@ -72,9 +73,11 @@ class Identifications():
 			
 			self.identifications_dict[row[1]]['Identifications'].append(identification)
 			
+			'''
 			if row[5] is not None and row[5] != '':
 				if row[5] not in self.identifications_dict[row[1]]['VernacularTerms']:
 					self.identifications_dict[row[1]]['VernacularTerms'].append(row[5])
+			'''
 			
 			if row[7] is not None and row[7] != '':
 				if row[7] not in self.identifications_dict[row[1]]['TypeStatus']:
@@ -83,8 +86,17 @@ class Identifications():
 		return
 
 
-
-
+	def set_vernaculars_dict(self):
+		self.vernaculars_dict = {}
+		
+		for row in self.rows:
+			if row[1] not in self.vernaculars_dict:
+				self.vernaculars_dict[row[1]] = {}
+				self.vernaculars_dict[row[1]]['VernacularTerms'] = []
+			if row[5] is not None and row[5] != '':
+				if row[5] not in self.vernaculars_dict[row[1]]['VernacularTerms']:
+					self.vernaculars_dict[row[1]]['VernacularTerms'].append(row[5])
+		return
 
 
 

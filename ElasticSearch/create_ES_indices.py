@@ -65,6 +65,9 @@ class DataPage():
 		self.collections_dict = self.collections.get_data_page()
 		self.projects_dict = self.projects.get_data_page()
 		self.identifications_dict = self.identifications.get_data_page()
+		# the common names set in Identifications table, here accessed separately so that they can be updated later with 
+		# common names from the matched taxa
+		self.vernaculars_dict = self.identifications.vernaculars_dict
 		self.collectors_dict = self.collectors.get_data_page()
 		self.images_dict = self.images.get_data_page()
 		self.barcode_analyses_dict = self.barcode_analyses.get_data_page()
@@ -99,6 +102,7 @@ class DataPage():
 		
 		self.matchedtaxa_dict = self.taxamatcher.getMatchedTaxaDict()
 		self.matchedsynonyms_dict = self.taxamatcher.getMatchedSynonymsDict()
+		self.vernaculars_dict = self.taxamatcher.appendMatchedVernaculars(self.vernaculars_dict)
 		
 		return
 
@@ -185,6 +189,9 @@ class IUPartsIndexer():
 			self.es_indexer.bulkUpdateDocs(data_page.matchedtaxa_dict, 'MatchedTaxa', data_page.page)
 		if len(data_page.matchedsynonyms_dict) > 0:
 			self.es_indexer.bulkUpdateDocs(data_page.matchedsynonyms_dict, 'MatchedSynonyms', data_page.page)
+		
+		if len(data_page.vernaculars_dict) > 0:
+			self.es_indexer.bulkUpdateDocs(data_page.vernaculars_dict, 'VernacularTerms', data_page.page)
 		
 		return
 
