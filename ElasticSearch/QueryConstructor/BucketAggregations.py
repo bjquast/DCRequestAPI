@@ -26,8 +26,7 @@ class BucketAggregations(QueryConstructor):
 		self.prefix_or_match = prefix_or_match
 		
 		self.add_include_filter = add_include_filter
-		#if self.add_include_filter is True:
-		#	self.setIncludeFilter()
+		self.setIncludeFilter()
 		
 		fielddefs = FieldDefinitions()
 		if len(self.source_fields) <= 0:
