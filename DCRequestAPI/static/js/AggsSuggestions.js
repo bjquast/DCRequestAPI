@@ -13,19 +13,21 @@ class AggsSuggestions {
 		this.filter_keys = [];
 		this.min_length = 3;
 		this.suggestion_ids = [];
+		this.timeout = null;
+		this.progress_animation = null;
 	}
 	
-	request_suggestions(search_term) {
+	request_suggestions() {
 		let self = this;
 		
 		let form = document.getElementById("search_form");
 		let form_data = new FormData(form);
-		form_data.append('buckets_search_term', search_term);
+		form_data.append('buckets_search_term', self.search_term);
 		// disable the input until the suggestions list is updated to prevent wrong suggestions when the user types 
 		// a new letter before a suggestion request is completed
 		self.block_suggest_input();
 		// hide the suggestions list as long as it is not updated
-		$('#' + self.suggestions_list_id).addClass('hidden');
+		// $('#' + self.suggestions_list_id).addClass('hidden');
 		
 		$.ajax({
 			url: "./aggs_suggestions",
@@ -48,6 +50,7 @@ class AggsSuggestions {
 		})
 		.always( function () {
 			self.unblock_suggest_input();
+			self.remove_progress_animation();
 		})
 	}
 
@@ -58,17 +61,49 @@ class AggsSuggestions {
 		$("#" + self.input_id).off();
 		
 		$("#" + self.input_id).on("keyup", ( function() {
-			let input_val = $(this).val();
+			self.search_term = $(this).val();
 			
-			if ($(this).val().length >= self.min_length) {
-				self.request_suggestions(input_val);
+			if (self.search_term.length >= self.min_length) {
+				self.set_progress_animation();
+				clearTimeout(self.timeout);
+				
+				self.timeout = setTimeout( function() {
+					self.request_suggestions();
+				}
+				, 500);
 			}
 			
-			if ($(this).val().length < self.min_length) {
-				self.delete_suggestions_list();
+			if (self.search_term.length < self.min_length) {
+				
+				self.unblock_suggest_input();
+				clearTimeout(self.timeout);
+				self.timeout = setTimeout( function() {
+					self.remove_progress_animation();
+					self.delete_suggestions_list();
+				}
+				, 500);
 			}
 			
 		}));
+	}
+
+
+	set_progress_animation() {
+		let self = this;
+		
+		if (self.progress_animation === null) {
+			$('#' + self.suggestions_list_id).removeClass('hidden');
+			$('#' + self.suggestions_list_id).prepend('<progress id="progress_animation" aria-label="Content loading…"></progress>');
+			self.progress_animation = $('#progress_animation');
+		}
+	}
+
+
+	remove_progress_animation() {
+		let self = this;
+		
+		$('#progress_animation').remove();
+		self.progress_animation = null;
 	}
 
 
@@ -89,8 +124,6 @@ class AggsSuggestions {
 			
 			self.appliedfilters.add_filter(filter_id, filter_name, filter_key, filter_value);
 		});
-		
-		
 	}
 
 
@@ -138,13 +171,20 @@ class AggsSuggestions {
 	block_suggest_input() {
 		let self = this;
 		$('#' + self.input_id).prop('disabled', true);
+		// prevent backspace from going to the previous page when the input field is disabled
+		$( window ).on("keydown.window.backspace", function(e) {
+			// do nothing if backspace
+			if (e.which == 8) {
+				e.preventDefault();
+			}
+		})
 	}
 
 	unblock_suggest_input() {
 		let self = this;
 		$('#' + self.input_id).prop('disabled', false);
 		$('#' + self.input_id).focus();
+		// reactivate backspace events
+		$( window ).off("keydown.window.backspace");
 	}
-
-
 }
