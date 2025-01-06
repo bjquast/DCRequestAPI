@@ -242,7 +242,7 @@ class ES_Searcher():
 		
 		self.setQuery()
 		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [], size = size, 
-			buckets_search_term = buckets_search_term, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
+			buckets_search_term = buckets_search_term, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir, add_include_filter = True)
 		aggs = buckets_query.getAggregationsQuery()
 		
 		#logger.debug(json.dumps(aggs))
