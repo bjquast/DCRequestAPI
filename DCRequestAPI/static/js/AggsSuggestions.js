@@ -19,13 +19,13 @@ class AggsSuggestions {
 	
 	request_suggestions() {
 		let self = this;
-		
-		let form = document.getElementById("search_form");
-		let form_data = new FormData(form);
-		form_data.append('buckets_search_term', self.search_term);
 		// disable the input until the suggestions list is updated to prevent wrong suggestions when the user types 
 		// a new letter before a suggestion request is completed
 		self.block_suggest_input();
+		let form = document.getElementById("search_form");
+		let form_data = new FormData(form);
+		form_data.append('buckets_search_term', self.search_term);
+		
 		// hide the suggestions list as long as it is not updated
 		// $('#' + self.suggestions_list_id).addClass('hidden');
 		
