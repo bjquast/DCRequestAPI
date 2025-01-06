@@ -275,8 +275,12 @@ class BucketAggregations(QueryConstructor):
 
 	def setIncludeFilter(self):
 		self.include_filter_term = None
-		if self.add_include_filter is True and self.buckets_search_term is not None:
-			self.include_filter_term = '{0}.*'.format(self.buckets_search_term)
+		# a hack because there is no case insensitive flag for the include filter
+		if self.add_include_filter is True and self.buckets_search_term:
+			pattern = ''
+			for letter in self.buckets_search_term:
+				pattern = pattern + '[{0}{1}]'.format(letter.lower(), letter.upper())
+			self.include_filter_term = '{0}.*'.format(pattern)
 		return
 
 

@@ -21,6 +21,11 @@ class AggsSuggestions {
 		let form = document.getElementById("search_form");
 		let form_data = new FormData(form);
 		form_data.append('buckets_search_term', search_term);
+		// disable the input until the suggestions list is updated to prevent wrong suggestions when the user types 
+		// a new letter before a suggestion request is completed
+		self.block_suggest_input();
+		// hide the suggestions list as long as it is not updated
+		$('#' + self.suggestions_list_id).addClass('hidden');
 		
 		$.ajax({
 			url: "./aggs_suggestions",
@@ -40,7 +45,9 @@ class AggsSuggestions {
 			
 			self.delete_suggestions_list()
 			self.fill_suggestions_list()
-			
+		})
+		.always( function () {
+			self.unblock_suggest_input();
 		})
 	}
 
@@ -126,4 +133,18 @@ class AggsSuggestions {
 		$('#' + self.suggestions_list_id + ' > ul').empty();
 		$('#' + self.suggestions_list_id).addClass('hidden');
 	}
+
+
+	block_suggest_input() {
+		let self = this;
+		$('#' + self.input_id).prop('disabled', true);
+	}
+
+	unblock_suggest_input() {
+		let self = this;
+		$('#' + self.input_id).prop('disabled', false);
+		$('#' + self.input_id).focus();
+	}
+
+
 }

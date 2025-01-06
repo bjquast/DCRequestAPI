@@ -223,7 +223,7 @@ class ES_Searcher():
 			buckets_search_term = buckets_search_term, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
 		aggs = buckets_query.getAggregationsQuery()
 		
-		logger.debug(json.dumps(aggs))
+		#logger.debug(json.dumps(aggs))
 		#logger.debug(json.dumps(self.query))
 		
 		source_fields = False
