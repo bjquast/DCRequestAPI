@@ -80,11 +80,11 @@
 						</th>
 					</thead>
 					<tbody>
-						<block tal:repeat="iuparts iupartslist" >
+						<block tal:repeat="iuparts iupartslist" tal:omit-tag="">
 							<tr tal:define="row_number repeat.iuparts.number" id="iupart_row_${row_number}" class="iupart_row">
-								<block tal:repeat="columnkey selected_sourcefields" >
+								<block tal:repeat="columnkey selected_sourcefields" tal:omit-tag="">
 									<td tal:define="column_number repeat.columnkey.number" id="cell_${column_number}_${row_number}">
-										<div tal:condition="python: columnkey == 'PartAccessionNumber'" class="acc_nr_col" id="acc_nr_field_${column_number}_${row_number}" data-rownum="${row_number}">
+										<div tal:condition="python: columnkey == 'PartAccessionNumber'" class="acc_nr_col">
 											${structure:iuparts['PartAccessionNumber'][0]}
 										</div>
 										
@@ -92,10 +92,10 @@
 											${structure:iuparts['StableIdentifierURL'][0]}
 										</div>
 										
-										<div tal:condition="python: columnkey not in ['PartAccessionNumber', 'StableIdentifierURL']" class="td_list" data-rownum="${row_number}"  data-colnum="${column_number}"
+										<div tal:condition="python: columnkey not in ['PartAccessionNumber', 'StableIdentifierURL']" class="td_list"
 											tal:attributes="class 'td_list y-scroll td_long_list td_long_list_%s' %row_number if len(iuparts[columnkey]) > 3 else 'td_list'">
+											<img tal:condition="python: len(iuparts[columnkey]) > 3" id="td_list_button_${column_number}_${row_number}" class="td_list_button td_list_button_${row_number}" src="./static/buttons/open_row_fields.png" data-rownum="${row_number}"  data-colnum="${column_number}">
 											<p tal:condition="python: len(iuparts[columnkey]) > 1" tal:repeat="iupfield iuparts[columnkey]">
-												<img tal:condition="python: len(iuparts[columnkey]) > 3 and repeat.iupfield.number == 1" id="td_list_button_${column_number}_${row_number}" class="td_list_button td_list_button_${row_number}" src="./static/buttons/open_row_fields.png">
 												${iupfield}
 											</p>
 											<span tal:condition="python: len(iuparts[columnkey]) == 1">${iuparts[columnkey][0]}</span>

@@ -17,7 +17,7 @@ class TDListOverlay {
 
 	addCellOpenButtons() {
 		let self = this;
-		$('.td_long_list').each( function () {
+		$('.td_list_button').each( function () {
 			let row_number = $(this).data('rownum');
 			let column_number = $(this).data('colnum');
 			let button_id = "#td_list_button_" + column_number + '_' + row_number;

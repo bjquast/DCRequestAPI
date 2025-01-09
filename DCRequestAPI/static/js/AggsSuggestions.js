@@ -21,7 +21,7 @@ class AggsSuggestions {
 		let self = this;
 		// disable the input until the suggestions list is updated to prevent wrong suggestions when the user types 
 		// a new letter before a suggestion request is completed
-		self.block_suggest_input();
+		//self.block_suggest_input();
 		let form = document.getElementById("search_form");
 		let form_data = new FormData(form);
 		form_data.append('buckets_search_term', self.search_term);
@@ -45,11 +45,11 @@ class AggsSuggestions {
 			self.suggestions = data['buckets'];
 			self.filter_keys = Object.keys(self.suggestions);
 			
-			self.delete_suggestions_list()
-			self.fill_suggestions_list()
+			self.delete_suggestions_list();
+			self.fill_suggestions_list();
 		})
 		.always( function () {
-			self.unblock_suggest_input();
+			//self.unblock_suggest_input();
 			self.remove_progress_animation();
 		})
 	}
@@ -75,7 +75,7 @@ class AggsSuggestions {
 			
 			if (self.search_term.length < self.min_length) {
 				
-				self.unblock_suggest_input();
+				//self.unblock_suggest_input();
 				clearTimeout(self.timeout);
 				self.timeout = setTimeout( function() {
 					self.remove_progress_animation();

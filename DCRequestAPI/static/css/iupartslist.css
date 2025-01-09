@@ -5,9 +5,11 @@
 }
 
 .listview table {
-	width: 100%;
+	/*width: 100%;
 	overflow: auto;
+	*/
 	border-collapse: collapse;
+	height: 100%;
 }
 
 .listview th {
@@ -28,6 +30,7 @@
 	padding-left: 0.5em;
 	padding-right: 0.5em;
 	border-bottom: 1px solid #ddd;
+	/*width: 15em;*/
 }
 
 .listview td table,td td,td th {
@@ -82,7 +85,6 @@
 .td_list_button {
 	float: right;
 	margin-right: 1em;
-	display: inline-block;
 	cursor: pointer;
 	width: 12px;
 	height: 12px;
