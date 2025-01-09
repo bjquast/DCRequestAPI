@@ -17,35 +17,33 @@ class TDListOverlay {
 
 	addCellOpenButtons() {
 		let self = this;
-		$('.td_list_long').each( function () { 
-			let list_id = $(this).prop('id');
-			$('#' + list_id + ' p').first().prepend('<img id="td_list_button_' + list_id + '" class="td_list_button" src="./static/buttons/open_overlay.png"> ');
-			$("#td_list_button_" + list_id).off();
-			$("#td_list_button_" + list_id).on('click', function() {
-				let longlist_div = $('#' + list_id);
-				self.toggleOpener(longlist_div);
+		$('.td_long_list').each( function () {
+			let row_number = $(this).data('rownum');
+			let column_number = $(this).data('colnum');
+			$('#td_long_list_' + column_number + '_' + row_number + ' p').first().prepend('<img id="td_list_button_' + column_number + '_' + row_number + '" class="td_list_button td_list_button_' + row_number + '" src="./static/buttons/open_row_fields.png">');
+			
+			$("#td_list_button_"  + column_number + '_' + row_number).off();
+			$("#td_list_button_"  + column_number + '_' + row_number).on('click', function() {
+				self.toggleOpener(row_number);
 			});
-			
-			
 		});
 	}
 
-	toggleOpener(longlist_div) {
+	toggleOpener(row_number) {
 		let self = this;
-		console.log(longlist_div)
-		if (longlist_div.hasClass('y-scroll')) {
-			console.log('a');
-			longlist_div.removeClass('y-scroll');
-			longlist_div.addClass('y-overlap');
-		}
-		else {
-			console.log('b');
-			longlist_div.addClass('y-scroll');
-			longlist_div.removeClass('y-overlap');
-		}
+		console.log(row_number);
+		$('.td_long_list_' + row_number).each( function () {
+			let iupart_row = $(this);
+			if (iupart_row.hasClass('y-scroll')) {
+				iupart_row.removeClass('y-scroll');
+				$('.td_list_button_' + row_number).attr('src', './static/buttons/close_row_fields.png');
+			}
+			else {
+				iupart_row.addClass('y-scroll');
+				$('.td_list_button_' + row_number).attr('src', './static/buttons/open_row_fields.png');
+			}
+		});
 	}
-
-
 }
 
 

@@ -80,27 +80,28 @@
 						</th>
 					</thead>
 					<tbody>
-						<tr tal:repeat="iuparts iupartslist">
-							<block tal:define="part_number repeat.iuparts.number">
+						<block tal:repeat="iuparts iupartslist" >
+							<tr tal:define="row_number repeat.iuparts.number" id="iupart_row_${row_number}" class="iupart_row">
 								<block tal:repeat="columnkey selected_sourcefields" >
-									<td tal:define="column_number repeat.columnkey.number" id="cell_${column_number}_${part_number}">
-										<block tal:condition="python: columnkey == 'PartAccessionNumber'">
+									<td tal:define="column_number repeat.columnkey.number" id="cell_${column_number}_${row_number}">
+										<div tal:condition="python: columnkey == 'PartAccessionNumber'" class="acc_nr_col" id="acc_nr_field_${column_number}_${row_number}" data-rownum="${row_number}">
 											${structure:iuparts['PartAccessionNumber'][0]}
-										</block>
+										</div>
 										
-										<block tal:condition="python: columnkey == 'StableIdentifierURL'">
+										<div tal:condition="python: columnkey == 'StableIdentifierURL'">
 											${structure:iuparts['StableIdentifierURL'][0]}
-										</block>
+										</div>
 										
-										<div id="${column_number}_${part_number}" tal:condition="python: columnkey not in ['PartAccessionNumber', 'StableIdentifierURL']" tal:attributes="class 'td_list_long td_list y-scroll' if len(iuparts[columnkey]) > 3 else 'td_list' if len(iuparts[columnkey]) < 4 and len(iuparts[columnkey]) > 1 else None">
+										<div tal:condition="python: columnkey not in ['PartAccessionNumber', 'StableIdentifierURL']" id="td_long_list_${column_number}_${row_number}" data-rownum="${row_number}"  data-colnum="${column_number}"
+											tal:attributes="class 'y-scroll td_long_list td_long_list_%s' %row_number if len(iuparts[columnkey]) > 3 else None">
 											<p tal:condition="python: len(iuparts[columnkey]) > 1" tal:repeat="iupfield iuparts[columnkey]">${iupfield}</p>
 											<span tal:condition="python: len(iuparts[columnkey]) == 1">${iuparts[columnkey][0]}</span>
 											<span tal:condition="python: len(iuparts[columnkey]) <= 0"></span>
 										</div>
 									</td>
 								</block>
-							</block>
-						</tr>
+							</tr>
+						</block>
 					</tbody>
 				</table>
 			</div>
