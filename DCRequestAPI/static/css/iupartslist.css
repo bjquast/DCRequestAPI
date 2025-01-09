@@ -69,9 +69,17 @@
 	cursor: pointer;
 }
 
-.td_list {
+.td_list.y-scroll{
 	height: 5em;
-	overflow-y: scroll
+	overflow-y: scroll;
+	z-index: 0;
+}
+
+.td_list.y-overlap{
+	height: 5em;
+	overflow-y: visible;
+	z-index: 5;
+	background: white;
 }
 
 .td_list p {

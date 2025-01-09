@@ -12,17 +12,40 @@ $(document).ready( function() {
 
 class TDListOverlay {
 	constructor () {
-		this.addCellOverlayHandlers();
+		this.addCellOpenButtons();
 	}
 
-	addCellOverlayHandlers() {
+	addCellOpenButtons() {
 		let self = this;
 		$('.td_list_long').each( function () { 
 			let list_id = $(this).prop('id');
-			
 			$('#' + list_id + ' p').first().prepend('<img id="td_list_button_' + list_id + '" class="td_list_button" src="./static/buttons/open_overlay.png"> ');
+			$("#td_list_button_" + list_id).off();
+			$("#td_list_button_" + list_id).on('click', function() {
+				let longlist_div = $('#' + list_id);
+				self.toggleOpener(longlist_div);
+			});
+			
+			
 		});
 	}
+
+	toggleOpener(longlist_div) {
+		let self = this;
+		console.log(longlist_div)
+		if (longlist_div.hasClass('y-scroll')) {
+			console.log('a');
+			longlist_div.removeClass('y-scroll');
+			longlist_div.addClass('y-overlap');
+		}
+		else {
+			console.log('b');
+			longlist_div.addClass('y-scroll');
+			longlist_div.removeClass('y-overlap');
+		}
+	}
+
+
 }
 
 
