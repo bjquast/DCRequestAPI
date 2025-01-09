@@ -20,10 +20,11 @@ class TDListOverlay {
 		$('.td_long_list').each( function () {
 			let row_number = $(this).data('rownum');
 			let column_number = $(this).data('colnum');
-			$('#td_long_list_' + column_number + '_' + row_number + ' p').first().prepend('<img id="td_list_button_' + column_number + '_' + row_number + '" class="td_list_button td_list_button_' + row_number + '" src="./static/buttons/open_row_fields.png">');
+			let button_id = "#td_list_button_" + column_number + '_' + row_number;
 			
-			$("#td_list_button_"  + column_number + '_' + row_number).off();
-			$("#td_list_button_"  + column_number + '_' + row_number).on('click', function() {
+			//$(button_id).removeClass('display_none');
+			$(button_id).off();
+			$(button_id).on('click', function() {
 				self.toggleOpener(row_number);
 			});
 		});
@@ -31,7 +32,6 @@ class TDListOverlay {
 
 	toggleOpener(row_number) {
 		let self = this;
-		console.log(row_number);
 		$('.td_long_list_' + row_number).each( function () {
 			let iupart_row = $(this);
 			if (iupart_row.hasClass('y-scroll')) {
