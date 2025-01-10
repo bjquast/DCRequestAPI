@@ -13,6 +13,16 @@ class StackedSearch {
 			});
 		});
 		
+		// hide the .delete_subsearch_label labels when using javascript
+		// because the input field can be cleared with input_clearbutton
+		// deactivated in stacked_queries macro now
+		/*
+		$('.delete_subsearch_label').each( function () {
+			$(this).addClass('hidden');
+		});
+		*/
+		
+		/*
 		$('.delete_subsearch_label').each( function () {
 			$(this).off();
 			$(this).click( function () {
@@ -21,6 +31,7 @@ class StackedSearch {
 				$("#search_form").submit();
 			});
 		});
+		*/
 	}
 	
 	/*

@@ -168,3 +168,30 @@ input{
 .add_subsearch_label:hover , .delete_subsearch_label:hover {
 	background-color: lightgray;
 }
+
+span.input_delete_wrapper {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+}
+
+span.delete_icon {
+	position: absolute;
+	display: block;
+	right: 3px;
+	width: 15px;
+	height: 15px;
+	border-radius: 50%;
+	color: #fff;
+	background-color: #ccc;
+	font: 13px monospace;
+	text-align: center;
+	line-height: 1em;
+	cursor: pointer;
+}
+
+span.input_delete_wrapper input {
+	padding-right: 18px;
+	box-sizing: border-box;
+}
+

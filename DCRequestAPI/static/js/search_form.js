@@ -10,17 +10,18 @@ const stacked_search = new StackedSearch();
 
 $(document).ready( function() {
 	
+	stacked_search.add_subsearch_events();
+	
 	filterlists.add_filter_events();
 	filterlists.set_more_button_events();
 	filterlists.add_collapsible_filters_events();
 	add_column_selector_event();
 	add_columnheader_sorting_events();
 	
-	add_match_query_events();
-	
 	aggs_suggestions.add_suggestion_events();
 	appliedfilters.add_remove_filter_events();
-	stacked_search.add_subsearch_events();
+	
+	set_input_clearbuttons();
 	
 	add_users_projects_restriction_event();
 	
@@ -78,7 +79,7 @@ function add_logout_event() {
 	});
 }
 
-
+/*
 function add_match_query_events() {
 	$('.match_query_checkbox').each( function () {
 		$(this).off();
@@ -88,6 +89,18 @@ function add_match_query_events() {
 				$("#search_form").submit();
 			}
 		});
+	});
+}
+*/
+
+function set_input_clearbuttons() {
+	$('.input_delete_wrapper').remove();
+	$('.delete_icon').remove();
+	$('input.with_clearbutton').each( function() {
+		
+		$(this).wrap('<span class="input_delete_wrapper"></span>').after($('<span class="delete_icon">x</span>').click(function() {
+			$(this).prev('input').val('').trigger('change').focus();
+		}));
 	});
 }
 
