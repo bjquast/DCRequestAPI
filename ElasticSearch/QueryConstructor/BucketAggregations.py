@@ -10,7 +10,7 @@ from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
 class BucketAggregations(QueryConstructor):
-	def __init__(self, users_project_ids = [], source_fields = [], size = 10, buckets_search_term = None, buckets_sort_alphanum = False, buckets_sort_dir = 'asc', prefix_or_match = 'prefix', add_include_filter = False):
+	def __init__(self, users_project_ids = [], source_fields = [], size = 10, buckets_search_term = None, buckets_sort_alphanum = False, buckets_sort_dir = None, prefix_or_match = 'prefix', add_include_filter = False):
 		#pudb.set_trace()
 		
 		self.users_project_ids = users_project_ids
@@ -22,7 +22,13 @@ class BucketAggregations(QueryConstructor):
 			self.buckets_search_term = None
 		
 		self.buckets_sort_alphanum = buckets_sort_alphanum
-		self.buckets_sort_dir = buckets_sort_dir.lower()
+		
+		# keep buckets_sort_dir None if it is not set 
+		# so that the default directions asc and desc can be used for _key and _count, respectively
+		self.buckets_sort_dir = buckets_sort_dir
+		if self.buckets_sort_dir is not None:
+			self.buckets_sort_dir = self.buckets_sort_dir.lower()
+		
 		self.prefix_or_match = prefix_or_match
 		
 		self.add_include_filter = add_include_filter
@@ -77,9 +83,11 @@ class BucketAggregations(QueryConstructor):
 		if self.buckets_sort_alphanum is True:
 			if self.buckets_sort_dir not in ['asc', 'desc']:
 				self.buckets_sort_dir = 'asc'
-			
 			sorting = {"_key": self.buckets_sort_dir}
-			
+		else:
+			if self.buckets_sort_dir not in ['asc', 'desc']:
+				self.buckets_sort_dir = 'desc'
+			sorting = {"_count": self.buckets_sort_dir}
 		return sorting
 
 

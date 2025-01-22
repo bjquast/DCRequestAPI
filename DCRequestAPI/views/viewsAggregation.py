@@ -73,7 +73,7 @@ class AggregationView():
 		if 'buckets_sort_dir' in self.search_params:
 			buckets_sort_dir = self.search_params['buckets_sort_dir']
 		else:
-			buckets_sort_dir = 'asc'
+			buckets_sort_dir = None
 		
 		if 'buckets_size' in self.search_params:
 			buckets_size = self.search_params['buckets_size']

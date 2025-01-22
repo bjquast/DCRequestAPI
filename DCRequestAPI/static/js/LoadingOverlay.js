@@ -19,12 +19,10 @@ class LoadingOverlay {
 	}
 	
 	add_loading_overlay() {
-		console.log('adding overlay');
 		$('html').append('<div id="loading_overlay"><div id="loading_overlay_image"></div></div>');
 	}
 
 	remove_loading_overlay() {
-		console.log('removing overlay');
 		$('#loading_overlay').remove();
 	}
 }

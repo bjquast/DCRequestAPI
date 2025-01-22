@@ -6,6 +6,8 @@ class BucketsOverlay {
 		this.agg_key = '';
 		this.buckets_search_term = '';
 		
+		this.buckets_sort = 'alphanum:asc';
+		
 		/*
 		this.buckets_sort_dir = 'asc';
 		this.buckets_sort_alphanum = true;
@@ -19,7 +21,8 @@ class BucketsOverlay {
 		let form = document.getElementById("buckets_overlay_form");
 		self.overlay_form_data = new FormData(form);
 		
-		let sort_params = self.overlay_form_data.get('overlay_sort_select').split(':');
+		self.buckets_sort = self.overlay_form_data.get('overlay_sort_select');
+		let sort_params = self.buckets_sort.split(':');
 		if (sort_params[0] == 'alphanum') {
 			self.overlay_form_data.append('buckets_sort_alphanum', true);
 		}
@@ -81,6 +84,15 @@ class BucketsOverlay {
 		self.buckets = [];
 		
 		self.form_data.append('aggregation', self.agg_key);
+		// set the sort parameters for the first request
+		let sort_params = self.buckets_sort.split(':');
+		if (sort_params[0] == 'alphanum') {
+			self.form_data.append('buckets_sort_alphanum', true);
+		}
+		else {
+			self.form_data.append('buckets_sort_alphanum', false);
+		}
+		self.form_data.append('buckets_sort_dir', sort_params[1]);
 		
 		$.ajax({
 			url: "./aggregation",
@@ -142,9 +154,13 @@ class BucketsOverlay {
 		$('#buckets-overlay-headline').append('<div id="overlay_sort_div"></div>');
 		$('#overlay_sort_div').append('<label for="overlay_sort_select">sort by: </label>');
 		$('#overlay_sort_div').append('<select id="overlay_sort_select" form="buckets_overlay_form" class="update_params" name="overlay_sort_select"></select>');
-		$('#overlay_sort_select').append('<option value="count:desc">count &darr;</option>');
 		$('#overlay_sort_select').append('<option value="alphanum:asc">a-z &uarr;</option>');
 		$('#overlay_sort_select').append('<option value="alphanum:desc">z-a &darr;</option>');
+		$('#overlay_sort_select').append('<option value="count:desc">9-1 &darr;</option>');
+		$('#overlay_sort_select').append('<option value="count:asc">1-9 &uarr;</option>');
+		// self.buckets_sort is set as default sort param in constructor, thus changing it there should change the selected entry here, too
+		// when the overlay is initiated
+		$('#overlay_sort_select option[value="' + self.buckets_sort + '"]').prop('selected', 'selected');
 		
 		$('#buckets-overlay-headline').append('<div class="buttons-right-position"></div>');
 		$('#buckets-overlay-headline .buttons-right-position').append('<button id="buckets-overlay-cancel-button">cancel</button>');
