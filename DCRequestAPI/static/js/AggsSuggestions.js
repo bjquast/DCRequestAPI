@@ -15,19 +15,18 @@ class AggsSuggestions {
 		this.suggestion_ids = [];
 		this.timeout = null;
 		this.progress_animation = null;
+		
+		this.current_search_term = '';
 	}
 	
 	request_suggestions() {
 		let self = this;
-		// disable the input until the suggestions list is updated to prevent wrong suggestions when the user types 
-		// a new letter before a suggestion request is completed
-		//self.block_suggest_input();
+		
+		$("#" + self.input_id).off();
+		
 		let form = document.getElementById("search_form");
 		let form_data = new FormData(form);
 		form_data.append('buckets_search_term', self.search_term);
-		
-		// hide the suggestions list as long as it is not updated
-		// $('#' + self.suggestions_list_id).addClass('hidden');
 		
 		$.ajax({
 			url: "./aggs_suggestions",
@@ -49,9 +48,45 @@ class AggsSuggestions {
 			self.fill_suggestions_list();
 		})
 		.always( function () {
-			//self.unblock_suggest_input();
 			self.remove_progress_animation();
+			// check if search_term has been changed during request
+			// if so send the next request with the new search term
+			
+			self.search_term = $("#" + self.input_id).val();
+			if (self.search_term != self.current_search_term) {
+				self.handle_input_change();
+			}
+			else {
+				self.add_suggestion_events();
+			}
 		})
+	}
+
+
+	handle_input_change() {
+		let self = this;
+		
+		if (self.search_term.length >= self.min_length) {
+			self.set_progress_animation();
+			clearTimeout(self.timeout);
+			
+			self.timeout = setTimeout( function() {
+				self.current_search_term = self.search_term;
+				self.request_suggestions();
+			}
+			, 500);
+		}
+		
+		if (self.search_term.length < self.min_length) {
+			
+			//self.unblock_suggest_input();
+			clearTimeout(self.timeout);
+			self.timeout = setTimeout( function() {
+				self.remove_progress_animation();
+				self.delete_suggestions_list();
+			}
+			, 500);
+		}
 	}
 
 
@@ -61,29 +96,9 @@ class AggsSuggestions {
 		$("#" + self.input_id).off();
 		
 		$("#" + self.input_id).on("keyup", ( function() {
+			self.search_term = $("#" + self.input_id).val();
 			self.search_term = $(this).val();
-			
-			if (self.search_term.length >= self.min_length) {
-				self.set_progress_animation();
-				clearTimeout(self.timeout);
-				
-				self.timeout = setTimeout( function() {
-					self.request_suggestions();
-				}
-				, 500);
-			}
-			
-			if (self.search_term.length < self.min_length) {
-				
-				//self.unblock_suggest_input();
-				clearTimeout(self.timeout);
-				self.timeout = setTimeout( function() {
-					self.remove_progress_animation();
-					self.delete_suggestions_list();
-				}
-				, 500);
-			}
-			
+			self.handle_input_change();
 		}));
 	}
 
@@ -167,24 +182,4 @@ class AggsSuggestions {
 		$('#' + self.suggestions_list_id).addClass('hidden');
 	}
 
-
-	block_suggest_input() {
-		let self = this;
-		$('#' + self.input_id).prop('disabled', true);
-		// prevent backspace from going to the previous page when the input field is disabled
-		$( window ).on("keydown.window.backspace", function(e) {
-			// do nothing if backspace
-			if (e.which == 8) {
-				e.preventDefault();
-			}
-		})
-	}
-
-	unblock_suggest_input() {
-		let self = this;
-		$('#' + self.input_id).prop('disabled', false);
-		$('#' + self.input_id).focus();
-		// reactivate backspace events
-		$( window ).off("keydown.window.backspace");
-	}
 }

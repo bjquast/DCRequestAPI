@@ -135,9 +135,14 @@ class IUPartsListView():
 		selected_bucketfields = iupartstable.selected_bucketfields
 		default_bucketfields = iupartstable.default_bucketfields
 		
+		# the selected_bucketfields contain only the fields found in self.search_params['open_filter_selectors']
+		# the fields from self.search_params['term_filters'] must be added, otherwise their results are not mentioned when their filter selector is not opened
+		for term_filter_field in self.search_params['term_filters']:
+			if term_filter_field not in selected_bucketfields:
+				selected_bucketfields.append(term_filter_field)
+		
 		coldefs = iupartstable.coldefs
 		bucketdefs = iupartstable.bucketdefs
-		
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids, restrict_to_users_projects = restrict_to_users_projects)
 		es_searcher.setSourceFields(selected_sourcefields)

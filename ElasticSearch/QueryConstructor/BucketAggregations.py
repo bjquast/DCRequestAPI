@@ -287,7 +287,10 @@ class BucketAggregations(QueryConstructor):
 		if self.add_include_filter is True and self.buckets_search_term:
 			pattern = ''
 			for letter in self.buckets_search_term:
-				pattern = pattern + '[{0}{1}]'.format(letter.lower(), letter.upper())
+				if letter.isalpha():
+					pattern = pattern + '[{0}{1}]'.format(letter.lower(), letter.upper())
+				else:
+					pattern = pattern + letter
 			self.include_filter_term = '{0}.*'.format(pattern)
 		return
 
