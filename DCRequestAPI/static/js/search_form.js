@@ -5,11 +5,11 @@ const filterlists = new FilterLists(appliedfilters);
 const bucketsoverlay = new BucketsOverlay(appliedfilters);
 const aggs_suggestions = new AggsSuggestions(appliedfilters, "aggs_search_input", "aggs_search_suggestions_list");
 const stacked_search = new StackedSearch();
-
+// load the overlay when the page is loading
+const loading_overlay = new LoadingOverlay();
 
 
 $(document).ready( function() {
-	
 	stacked_search.add_subsearch_events();
 	
 	filterlists.add_filter_events();
@@ -27,6 +27,9 @@ $(document).ready( function() {
 	
 	add_logout_event();
 	add_submit_events();
+	
+	loading_overlay.remove_loading_overlay();
+	loading_overlay.add_loading_overlay_event();
 } );
 
 
@@ -119,3 +122,5 @@ function add_users_projects_restriction_event() {
 		$("#search_form").submit();
 	});
 }
+
+

@@ -31,3 +31,23 @@ header, message_box, search_box, footer {
 	width: 100%;
 	/*overflow-x: hidden;*/
 }
+
+#loading_overlay {
+	background: none repeat scroll 0 0;
+	height:100%;
+	width:100%;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	z-index:199;
+}
+
+#loading_overlay_image {
+	background: url(../images/loading.gif) repeat scroll 0 0;
+	height:300px;
+	width:300px;
+	position: fixed;
+	right: 50%;
+	top: 50%;
+	z-index:200;
+}
