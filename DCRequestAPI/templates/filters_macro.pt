@@ -4,7 +4,7 @@
 	<fieldset>
 		<legend>Filters</legend>
 		<div class="flex-space-between">
-			<div><h4>Selected filters</h4></div>
+			<div><h4>Applied filters</h4></div>
 			<div class="align-self-center">
 				<label for="term_filters_connector">connector</label>
 				<select id="term_filters_connector" form="search_form" name="term_filters_connector">
@@ -42,9 +42,13 @@
 			</div>-->
 		</div>
 		
-		<h4>Choose filter</h4>
+		<div class="flex-space-between">
+			<h4>Filters</h4>
+			<div metal:use-macro="load: DCRequestAPI:templates/filter_selector_macro.pt"></div>
+		</div>
 		<div id="available_filters">
-			<div tal:repeat="aggs_name default_bucketfields" class="filter-select-box">
+			<div tal:repeat="aggs_name selected_filter_sections" class="filter-select-box">
+			<!--<div tal:repeat="aggs_name default_bucketfields" class="filter-select-box">-->
 				<details id="filter_list_${aggs_name}" class="filter_selectors" data-filter-key="${aggs_name}" tal:attributes="open 'open' if aggs_name in open_filter_selectors else None">
 					<!-- hidden checkbox to submit the state of the details box -->
 					<input type="checkbox" form="search_form" name="open_filter_selectors" class="hidden" value="${aggs_name}" tal:attributes="checked 'checked' if aggs_name in open_filter_selectors else None">

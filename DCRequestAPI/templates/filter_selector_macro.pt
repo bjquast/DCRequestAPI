@@ -1,0 +1,9 @@
+<details id="filter_preferences" class="align-self-center">
+	<summary class="clickable">Select Shown Filters</summary>
+	<ul class="ul-no-bullet">
+		<li tal:repeat="bucketkey default_bucketfields">
+			<input id="filter_section_checkbox_${bucketkey}" type="checkbox" form="search_form" name="selected_filter_sections" value="${bucketkey}" tal:attributes="checked 'checked' if bucketkey in selected_filter_sections else None">
+			<label for="filter_section_checkbox_${bucketkey}">${bucketdefs[bucketkey]['en']}</label>
+		</li>
+	</ul>
+</details>

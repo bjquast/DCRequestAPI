@@ -17,6 +17,7 @@ $(document).ready( function() {
 	filterlists.add_collapsible_filters_events();
 	add_column_selector_event();
 	add_columnheader_sorting_events();
+	add_filter_sections_selector_event();
 	
 	aggs_suggestions.add_suggestion_events();
 	appliedfilters.add_remove_filter_events();
@@ -110,6 +111,14 @@ function set_input_clearbuttons() {
 
 function add_column_selector_event() {
 	$('#column_preferences').on('toggle', function() {
+		if (!$(this).attr('open')) {
+			$("#search_form").submit();
+		}
+	})
+}
+
+function add_filter_sections_selector_event() {
+	$('#filter_preferences').on('toggle', function() {
 		if (!$(this).attr('open')) {
 			$("#search_form").submit();
 		}

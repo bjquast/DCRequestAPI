@@ -125,6 +125,7 @@ class IUPartsListView():
 		
 		#if len(self.search_params['open_filter_selectors']) > 0:
 		iupartstable.setSelectedBucketFields(self.search_params['open_filter_selectors'])
+		iupartstable.setSelectedFilterSections(self.search_params['selected_filter_sections'])
 		
 		restrict_to_users_projects = False
 		if 'restrict_to_users_projects' in self.search_params and self.uid is not None:
@@ -134,12 +135,21 @@ class IUPartsListView():
 		default_sourcefields = iupartstable.default_sourcefields
 		selected_bucketfields = iupartstable.selected_bucketfields
 		default_bucketfields = iupartstable.default_bucketfields
+		selected_filter_sections = iupartstable.selected_filter_sections
 		
 		# the selected_bucketfields contain only the fields found in self.search_params['open_filter_selectors']
 		# the fields from self.search_params['term_filters'] must be added, otherwise their results are not mentioned when their filter selector is not opened
 		for term_filter_field in self.search_params['term_filters']:
 			if term_filter_field not in selected_bucketfields:
 				selected_bucketfields.append(term_filter_field)
+		
+		# add the opened_filter_selectors to the selected filtersections
+		# which here also includes the fields from the applied filters in self.search_params['term_filters']
+		# because they are in selected_bucketfields
+		# is that usefull?
+		for selected_bucketfield in selected_bucketfields:
+			if selected_bucketfield not in selected_filter_sections:
+				selected_filter_sections.append(selected_bucketfield)
 		
 		coldefs = iupartstable.coldefs
 		bucketdefs = iupartstable.bucketdefs
@@ -167,8 +177,9 @@ class IUPartsListView():
 			'default_sourcefields': default_sourcefields,
 			'selected_sourcefields': selected_sourcefields, 
 			'default_bucketfields': default_bucketfields,
-			'selected_bucketfields': selected_bucketfields, 
+			'selected_bucketfields': selected_bucketfields,
 			'open_filter_selectors': self.search_params['open_filter_selectors'],
+			'selected_filter_sections': selected_filter_sections,
 			'authenticated_user': self.uid,
 			'messages': self.messages
 		}
