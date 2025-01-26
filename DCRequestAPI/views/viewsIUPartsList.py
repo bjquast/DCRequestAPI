@@ -136,6 +136,9 @@ class IUPartsListView():
 		selected_bucketfields = iupartstable.selected_bucketfields
 		default_bucketfields = iupartstable.default_bucketfields
 		selected_filter_sections = iupartstable.selected_filter_sections
+		default_filter_sections = iupartstable.default_filter_sections
+		
+		open_filter_selectors = self.search_params['open_filter_selectors']
 		
 		# the selected_bucketfields contain only the fields found in self.search_params['open_filter_selectors']
 		# the fields from self.search_params['term_filters'] must be added, otherwise their results are not mentioned when their filter selector is not opened
@@ -146,10 +149,14 @@ class IUPartsListView():
 		# add the opened_filter_selectors to the selected filtersections
 		# which here also includes the fields from the applied filters in self.search_params['term_filters']
 		# because they are in selected_bucketfields
-		# is that usefull?
-		for selected_bucketfield in selected_bucketfields:
-			if selected_bucketfield not in selected_filter_sections:
-				selected_filter_sections.append(selected_bucketfield)
+		# order the fields by default_bucketfields
+		sorted_filter_sections = []
+		for bucketfield in default_bucketfields:
+			if bucketfield in selected_bucketfields or bucketfield in selected_filter_sections:
+				sorted_filter_sections.append(bucketfield)
+			if bucketfield in selected_bucketfields and bucketfield not in open_filter_selectors:
+				open_filter_selectors.append(bucketfield)
+		selected_filter_sections = sorted_filter_sections
 		
 		coldefs = iupartstable.coldefs
 		bucketdefs = iupartstable.bucketdefs
@@ -178,7 +185,7 @@ class IUPartsListView():
 			'selected_sourcefields': selected_sourcefields, 
 			'default_bucketfields': default_bucketfields,
 			'selected_bucketfields': selected_bucketfields,
-			'open_filter_selectors': self.search_params['open_filter_selectors'],
+			'open_filter_selectors': open_filter_selectors,
 			'selected_filter_sections': selected_filter_sections,
 			'authenticated_user': self.uid,
 			'messages': self.messages

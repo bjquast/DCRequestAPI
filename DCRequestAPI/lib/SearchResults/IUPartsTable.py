@@ -18,6 +18,7 @@ class IUPartsTable():
 		self.fieldnames = fielddefs.fieldnames
 		self.bucketfields = fielddefs.bucketfields
 		self.fielddefinitions = fielddefs.fielddefinitions
+		self.default_filter_sections = fielddefs.default_filter_sections
 		
 		self.readFieldDefinitions()
 		self.readBucketDefinitions()
@@ -45,13 +46,17 @@ class IUPartsTable():
 		return
 
 
-	def setSelectedFilterSections(self, filtersections = []):
+	def setSelectedFilterSections(self, filter_sections = []):
 		self.selected_filter_sections = []
 		
-		for filtersection in filtersections:
-			# check that filtersection is available in FieldDefinitions().bucketfields
-			if filtersection in self.bucketfields:
-				self.selected_filter_sections.append(filtersection)
+		if len(filter_sections) <= 0:
+			for filter_section in self.default_filter_sections:
+				self.selected_filter_sections.append(filter_section)
+		else:
+			for filter_section in filter_sections:
+				# check that filter_section is available in FieldDefinitions().bucketfields
+				if filter_section in self.bucketfields:
+					self.selected_filter_sections.append(filter_section)
 		return
 
 

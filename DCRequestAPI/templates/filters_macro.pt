@@ -42,7 +42,7 @@
 			</div>-->
 		</div>
 		
-		<div class="flex-space-between">
+		<div id="filter_sections_header" class="flex-space-between">
 			<h4>Filters</h4>
 			<div metal:use-macro="load: DCRequestAPI:templates/filter_selector_macro.pt"></div>
 		</div>

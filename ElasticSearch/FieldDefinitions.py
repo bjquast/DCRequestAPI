@@ -123,6 +123,40 @@ class FieldDefinitions():
 			'Barcodes.Methods.region',
 		]
 		
+		self.default_filter_sections = [
+			'DatabaseAccronym',
+			#'CollectionsTree.CollectionName',
+			#'CollectionName',
+			'CollectionsTree',
+			'Projects.Project',
+			'LastIdentificationCache',
+			'VernacularTerms',
+			'MatchedSynonyms.Synonym',
+			'MatchedTaxaTree',
+			#'MatchedTaxaTree.Phylum',
+			#'MatchedTaxaTree.Subphylum',
+			#'MatchedTaxaTree.Class',
+			#'MatchedTaxaTree.Subclass',
+			#'MatchedTaxaTree.Order',
+			#'MatchedTaxaTree.Suborder',
+			#'MatchedTaxaTree.Family',
+			#'MatchedTaxaTree.Subfamily',
+			#'MatchedTaxaTree.Genus',
+			#'MatchedTaxaTree.Subgenus',
+			#'TypeStatus',
+			'CountryCache',
+			#'CollectingMethod',
+			#'CollectionAgents.CollectorsName',
+			'LocalityVerbatim',
+			'LocalityDescription',
+			#'HabitatDescription',
+			#'MaterialCategory',
+			#'LifeStage',
+			#'Gender',
+			#'NumberOfUnits',
+			#'Barcodes.Methods.region',
+			'ImageAvailable'
+		]
 		return
 
 
