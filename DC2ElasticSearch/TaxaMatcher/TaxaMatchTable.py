@@ -560,17 +560,16 @@ class TaxaMatchTable():
 		self.matchSynonymInFamily()
 		self.matchSynonymToScientificName()
 		
-		self.matchGenusNameInFamilyOrderRegnum()
-		
-		self.matchFamilyInOrderAndRegnum()
 		self.matchScientificNameInOrderAndRegnum()
 		self.matchTaxonNameInOrderAndRegnum()
-		
-		#self.matchGenusNameInFamilyAndRegnum()
-		
 		self.matchScientificNameInRegnum()
 		#self.matchTaxonNameInRegnum()
-		#self.matchFamilyInRegnum()
+		
+		self.matchGenusNameInFamilyOrderRegnum()
+		self.matchGenusNameInFamilyAndRegnum()
+		
+		self.matchFamilyInOrderAndRegnum()
+		self.matchFamilyInRegnum()
 		
 		return
 		
