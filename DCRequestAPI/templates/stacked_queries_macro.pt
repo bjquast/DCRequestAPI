@@ -97,7 +97,7 @@
 						<!-- field selector -->
 						<select form="search_form" name="stack_query_fields_${i}_0" class="width-8em">
 							<option value="all fields">all fields</option>
-							<option tal:repeat="source_field default_sourcefields" value="${source_field}">
+							<option tal:repeat="source_field stacked_query_fields" value="${source_field}">
 								${coldefs[source_field]['en']}
 							</option>
 						</select>

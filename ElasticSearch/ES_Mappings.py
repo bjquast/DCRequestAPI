@@ -31,11 +31,26 @@ MappingsDict['iuparts'] = {
 		'idshash':
 			{'type': 'keyword'},
 		'IdentificationUnitID':
-			{'type': 'long'},
+			{
+				'type': 'long',
+				'fields': {
+					'keyword': {'type': 'keyword', 'ignore_above': 256}
+				}
+			},
 		'SpecimenPartID':
-			{'type': 'long'},
+			{
+				'type': 'long',
+				'fields': {
+					'keyword': {'type': 'keyword', 'ignore_above': 256}
+				}
+			},
 		'CollectionSpecimenID':
-			{'type': 'long'},
+			{
+				'type': 'long',
+				'fields': {
+					'keyword': {'type': 'keyword', 'ignore_above': 256}
+				}
+			},
 		'DatabaseURI':
 			{'type': 'keyword'},
 		'DatabaseAccronym': 

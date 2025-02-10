@@ -137,6 +137,7 @@ class IUPartsListView():
 		default_bucketfields = iupartstable.default_bucketfields
 		selected_filter_sections = iupartstable.selected_filter_sections
 		default_filter_sections = iupartstable.default_filter_sections
+		stacked_query_fields = iupartstable.stacked_query_fields
 		
 		open_filter_selectors = self.search_params['open_filter_selectors']
 		
@@ -187,6 +188,7 @@ class IUPartsListView():
 			'selected_bucketfields': selected_bucketfields,
 			'open_filter_selectors': open_filter_selectors,
 			'selected_filter_sections': selected_filter_sections,
+			'stacked_query_fields': stacked_query_fields,
 			'authenticated_user': self.uid,
 			'messages': self.messages
 		}

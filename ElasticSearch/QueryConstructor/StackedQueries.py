@@ -53,13 +53,15 @@ class StackedInnerQuery(QueryConstructor):
 
 
 	def appendSimpleStringQueries(self, query_string):
+		search_fields = []
 		for field in self.simple_fields:
-			search_field = self.getStringQuerySearchField(field, self.simple_fields[field])
-			
+			search_fields.append(self.getStringQuerySearchField(field, self.simple_fields[field]))
+		
+		if len(search_fields) > 0:
 			query = {
-				'simple_query_string': {
+				'query_string': {
 					'query': query_string,
-					'fields': [search_field]
+					'fields': search_fields
 				}
 			}
 			self.query_list.append(query)
@@ -67,9 +69,11 @@ class StackedInnerQuery(QueryConstructor):
 
 
 	def appendNestedStringQueries(self, query_string):
+		search_fields = []
 		for field in self.nested_fields:
-			search_field = self.getStringQuerySearchField(field, self.nested_fields[field])
-			
+			search_fields.append(self.getStringQuerySearchField(field, self.nested_fields[field]))
+		
+		if len(search_fields) > 0:
 			query = {
 				'nested': {
 					'path': self.nested_fields[field]['path'],
@@ -77,9 +81,9 @@ class StackedInnerQuery(QueryConstructor):
 						'bool': {
 							'must': [
 								{
-									'simple_query_string': {
+									'query_string': {
 										'query': query_string,
-										'fields': [search_field]
+										'fields': search_fields
 									}
 								}
 							]
@@ -93,6 +97,8 @@ class StackedInnerQuery(QueryConstructor):
 
 
 	def appendSimpleRestrictedStringQueries(self, query_string):
+		# restricted fileds must be queried one by one because they all have their own withholdterms
+		# that can not be queried together in one question
 		for field in self.simple_restricted_fields:
 			search_field = self.getStringQuerySearchField(field, self.simple_restricted_fields[field])
 			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.simple_restricted_fields[field]['withholdflags']]
@@ -101,7 +107,7 @@ class StackedInnerQuery(QueryConstructor):
 				'bool': {
 					'must': [
 						{
-							'simple_query_string': {
+							'query_string': {
 								'query': query_string,
 								'fields': [search_field]
 							}
@@ -129,6 +135,8 @@ class StackedInnerQuery(QueryConstructor):
 
 
 	def appendNestedRestrictedStringQueries(self, query_string):
+		# restricted fileds must be queried one by one because they all have their own withholdterms
+		# that can not be queried together in one question
 		for field in self.nested_restricted_fields:
 			search_field = self.getStringQuerySearchField(field, self.nested_restricted_fields[field])
 			
@@ -141,7 +149,7 @@ class StackedInnerQuery(QueryConstructor):
 						'bool': {
 							'must': [
 								{
-									'simple_query_string': {
+									'query_string': {
 										'query': query_string,
 										'fields': [search_field]
 									}

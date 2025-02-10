@@ -85,6 +85,35 @@ class FieldDefinitions():
 			'DatabaseAccronym',
 		]
 		
+		self.stacked_query_fields = [
+			'PartAccessionNumber',
+			'LastIdentificationCache',
+			'VernacularTerms',
+			'MatchedSynonyms.Synonym',
+			#'FamilyCache',
+			#'OrderCache',
+			#'MatchedTaxon',
+			'MatchedParentTaxa',
+			'TypeStatus',
+			'MaterialCategory',
+			'LocalityVerbatim',
+			'LocalityDescription',
+			'HabitatDescription',
+			'CollectingMethod',
+			'CountryCache',
+			'CollectionAgents.CollectorsName',
+			'LifeStage',
+			'Gender',
+			'NumberOfUnits',
+			'CollectionName',
+			'Projects.Project',
+			'CollectionSpecimenID',
+			'IdentificationUnitID',
+			'SpecimenPartID',
+			'Barcodes.Methods.region',
+			'DatabaseAccronym',
+		]
+		
 		self.tree_query_fields = [
 			'MatchedTaxaTree',
 			'CollectionsTree'
@@ -379,14 +408,23 @@ class FieldDefinitions():
 			
 			'CollectionSpecimenID': {
 				'names': {'en': 'CollectionSpecimenID'},
+				'buckets': {
+					'field_query': 'CollectionSpecimenID'
+				},
 			},
 			
 			'IdentificationUnitID': {
 				'names': {'en': 'IdentificationUnitID'},
+				'buckets': {
+					'field_query': 'IdentificationUnitID'
+				},
 			},
 			
 			'SpecimenPartID': {
 				'names': {'en': 'SpecimenPartID'},
+				'buckets': {
+					'field_query': 'SpecimenPartID'
+				},
 			},
 			
 			'Barcodes.Methods.region': {

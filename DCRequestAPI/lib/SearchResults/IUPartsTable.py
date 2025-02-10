@@ -14,11 +14,14 @@ class IUPartsTable():
 		self.default_bucketfields = []
 		self.selected_bucketfields = []
 		
+		self.non_text_fields = []
+		
 		fielddefs = FieldDefinitions()
 		self.fieldnames = fielddefs.fieldnames
 		self.bucketfields = fielddefs.bucketfields
 		self.fielddefinitions = fielddefs.fielddefinitions
 		self.default_filter_sections = fielddefs.default_filter_sections
+		self.stacked_query_fields = fielddefs.stacked_query_fields
 		
 		self.readFieldDefinitions()
 		self.readBucketDefinitions()
