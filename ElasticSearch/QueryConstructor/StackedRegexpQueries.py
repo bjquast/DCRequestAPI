@@ -18,9 +18,10 @@ class StackedInnerQuery(QueryConstructor):
 		self.source_fields = fielddefs.fieldnames
 		
 		self.readQueryDict()
-		self.query_type = 'simple_query_string'
 		
 		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.query_dict['fields'])
+		
+
 
 
 	def readQueryDict(self):
@@ -51,56 +52,46 @@ class StackedInnerQuery(QueryConstructor):
 		return
 
 
-	def setQueryType(self, querystring):
-		if querystring.startswith('*') or querystring.startswith('?') or querystring.startswith('%'):
-			self.querytype = 'query_string'
-			self.escapeReservedCharacters
-		else:
-			self.querytype = 'simple_query_string'
-		return
-
-
 	def escapeReservedCharacters(self, query_string):
-		reserved_characters = ['+', '-', '=', '&', '|', '!', '(', ')', '{', '}', '[', ']', '^', '~', ':', '/']
+		reserved_characters = ['+', '-', '&', '|', '!', '(', ')', '{', '}', '[', ']', '@', '~', '#', '>', '<']
 		count = query_string.count('"')
 		if count % 2 != 0:
 			reserved_characters.append('"')
 		
 		for character in reserved_characters:
-			#pass
 			query_string = query_string.replace(character, r'\{0}'.format(character))
-		for character in ['>', '<']:
-			#pass
-			query_string = query_string.replace(character, ' ')
 		
 		return query_string
 
 
 	def replaceWildcards(self, query_string):
-		wildcards = ['%']
+		# first replace *, otherwise the % replaced by * will be replaced again leading to : ..*
+		wildcards = ['*', '%', '?']
 		
 		for character in wildcards:
-			query_string = query_string.replace(character, r'*')
+			if character == '?':
+				query_string = query_string.replace(character, r'.?')
+			else:
+				query_string = query_string.replace(character, r'.*')
 		
 		return query_string
 
 
 	def appendSimpleStringQueries(self, query_string):
-		self.setQueryType(query_string)
-		if self.querytype == 'query_string':
-			query_string = self.escapeReservedCharacters(query_string)
+		query_string = self.escapeReservedCharacters(query_string)
 		query_string = self.replaceWildcards(query_string)
 		
-		search_fields = []
 		for field in self.simple_fields:
-			search_fields.append(self.getStringQuerySearchField(field, self.simple_fields[field]))
-		
-		if len(search_fields) > 0:
+			
+			search_field = self.getStringQuerySearchField(field, self.simple_fields[field])
+			case_insensitive = self.getCaseInsensitiveValue(search_field)
+			
 			query = {
-				self.querytype: {
-					'query': query_string,
-					'fields': search_fields,
-					'default_operator': 'AND'
+				'regexp': {
+					search_field: {
+					'value': query_string,
+					'case_insensitive': case_insensitive
+					}
 				}
 			}
 			self.query_list.append(query)
@@ -108,17 +99,13 @@ class StackedInnerQuery(QueryConstructor):
 
 
 	def appendNestedStringQueries(self, query_string):
-		self.setQueryType(query_string)
-		if self.querytype == 'query_string':
-			query_string = self.escapeReservedCharacters(query_string)
-		
+		query_string = self.escapeReservedCharacters(query_string)
 		query_string = self.replaceWildcards(query_string)
 		
-		search_fields = []
 		for field in self.nested_fields:
-			search_fields.append(self.getStringQuerySearchField(field, self.nested_fields[field]))
-		
-		if len(search_fields) > 0:
+			search_field = self.getStringQuerySearchField(field, self.nested_fields[field])
+			case_insensitive = self.getCaseInsensitiveValue(search_field)
+			
 			query = {
 				'nested': {
 					'path': self.nested_fields[field]['path'],
@@ -126,10 +113,11 @@ class StackedInnerQuery(QueryConstructor):
 						'bool': {
 							'must': [
 								{
-									self.querytype: {
-										'query': query_string,
-										'fields': search_fields,
-										'default_operator': 'AND'
+									'regexp': {
+										search_field: {
+											'value': query_string,
+											'case_insensitive': case_insensitive
+										}
 									}
 								}
 							]
@@ -143,26 +131,23 @@ class StackedInnerQuery(QueryConstructor):
 
 
 	def appendSimpleRestrictedStringQueries(self, query_string):
-		self.setQueryType(query_string)
-		if self.querytype == 'query_string':
-			query_string = self.escapeReservedCharacters(query_string)
-		
+		query_string = self.escapeReservedCharacters(query_string)
 		query_string = self.replaceWildcards(query_string)
 		
-		# restricted fields must be queried one by one because they all have their own withholdterms
-		# that can not be queried together in one question
 		for field in self.simple_restricted_fields:
 			search_field = self.getStringQuerySearchField(field, self.simple_restricted_fields[field])
 			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.simple_restricted_fields[field]['withholdflags']]
+			case_insensitive = self.getCaseInsensitiveValue(search_field)
 			
 			query = {
 				'bool': {
 					'must': [
 						{
-							self.querytype: {
-								'query': query_string,
-								'fields': [search_field],
-								'default_operator': 'AND'
+							'regexp': {
+								search_field: {
+									'value': query_string,
+									'case_insensitive': case_insensitive
+								}
 							}
 						}
 					],
@@ -188,18 +173,13 @@ class StackedInnerQuery(QueryConstructor):
 
 
 	def appendNestedRestrictedStringQueries(self, query_string):
-		self.setQueryType(query_string)
-		if self.querytype == 'query_string':
-			query_string = self.escapeReservedCharacters(query_string)
-		
+		query_string = self.escapeReservedCharacters(query_string)
 		query_string = self.replaceWildcards(query_string)
 		
-		# restricted fields must be queried one by one because they all have their own withholdterms
-		# that can not be queried together in one question
 		for field in self.nested_restricted_fields:
 			search_field = self.getStringQuerySearchField(field, self.nested_restricted_fields[field])
-			
 			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.nested_restricted_fields[field]['withholdflags']]
+			case_insensitive = self.getCaseInsensitiveValue(search_field)
 			
 			query = {
 				'nested': {
@@ -208,10 +188,11 @@ class StackedInnerQuery(QueryConstructor):
 						'bool': {
 							'must': [
 								{
-									self.querytype: {
-										'query': query_string,
-										'fields': [search_field],
-										'default_operator': 'AND'
+									'regexp': {
+										search_field: {
+											'value': query_string,
+											'case_insensitive': case_insensitive
+										}
 									}
 								}
 							],

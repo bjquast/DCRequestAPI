@@ -277,7 +277,7 @@ class FieldDefinitions():
 			'MaterialCategory': {
 				'names': {'en': 'Material category'},
 				'buckets': {
-					'field_query': 'MaterialCategory',
+					'field_query': 'MaterialCategory.keyword',
 					'withholdflags': ['PartWithhold'],
 				},
 			},

@@ -128,7 +128,11 @@ MappingsDict['iuparts'] = {
 			"format": "yyyy-MM-dd HH:mm:ss",
 			'ignore_malformed': True
 		},
-		'MaterialCategory': {'type': 'keyword'},
+		'MaterialCategory': {'type': 'text', 'fields': {
+					'keyword': {'type': 'keyword', 'ignore_above': 256},
+					'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
+				}
+			},
 		'StorageLocation': {'type': 'text', 'fields': {
 					'keyword': {'type': 'keyword', 'ignore_above': 256},
 					'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}

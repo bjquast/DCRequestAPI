@@ -28,6 +28,7 @@ class RequestParams():
 					self.params_dict[key].append(json_params[key])
 		except:
 			self.params_dict = self.request.params.dict_of_lists()
+		return
 
 
 	def read_stack_queries_params(self):
