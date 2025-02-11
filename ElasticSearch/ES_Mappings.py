@@ -53,8 +53,12 @@ MappingsDict['iuparts'] = {
 			},
 		'DatabaseURI':
 			{'type': 'keyword'},
-		'DatabaseAccronym': 
-			{'type': 'keyword'},
+		'DatabaseAccronym': {
+			'type': 'text', 'fields': {
+				'keyword': {'type': 'keyword', 'ignore_above': 256},
+				'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
+			}
+		},
 		'DatabaseID': 
 			{'type': 'keyword'},
 		'PartAccessionNumber':
@@ -295,7 +299,8 @@ MappingsDict['iuparts'] = {
 				'embargo_anonymize_determiner': {'type': 'boolean'}
 			}
 		},
-		'LastIdentificationCache': {'type': 'text', 'fields': {
+		'LastIdentificationCache': {
+			'type': 'text', 'fields': {
 				'keyword': {'type': 'keyword', 'ignore_above': 256},
 				'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
 			}
@@ -314,8 +319,18 @@ MappingsDict['iuparts'] = {
 		'TaxonNameURI': {'type': 'keyword', 'ignore_above': 256},
 		'TaxonNameURI_sha': {'type': 'keyword', 'ignore_above': 256},
 		'OnlyObserved': {'type': 'boolean'},
-		'LifeStage': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
-		'Gender': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+		'LifeStage': {
+			'type': 'text', 'fields': {
+				'keyword': {'type': 'keyword', 'ignore_above': 256},
+				'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
+			}
+		},
+		'Gender': {
+			'type': 'text', 'fields': {
+				'keyword': {'type': 'keyword', 'ignore_above': 256},
+				'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
+			}
+		},
 		'NumberOfUnits': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		'NumberOfUnitsModifier': {'type': 'keyword'},
 		'UnitIdentifier': {'type': 'keyword'},
@@ -355,7 +370,12 @@ MappingsDict['iuparts'] = {
 		'MatchedTaxonRank': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		'MatchedTaxonURI': {'type': 'keyword'},
 		'MatchedTaxonURL': {'type': 'keyword'},
-		'MatchedParentTaxa': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+		'MatchedParentTaxa': {
+			'type': 'text', 'fields': {
+				'keyword': {'type': 'keyword', 'ignore_above': 256},
+				'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
+			}
+		},
 		'MatchedParentTaxaURIs': {'type': 'keyword'},
 		'MatchedTaxaTree': {
 			'type': 'nested',
@@ -371,15 +391,22 @@ MappingsDict['iuparts'] = {
 		
 		'MatchedSynonyms': {
 			'properties': {
-				'Synonym': {'type': 'keyword', 'fields': 
-					{'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}
+				'Synonym': {'type': 'text', 'fields': {
+						'keyword': {'type': 'keyword', 'ignore_above': 256},
+						'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
+					}
 				},
 				'SynonymTaxonURI': {'type': 'keyword'}
 			}
 		},
 		
 		'CollectionID': {'type': 'integer'},
-		'CollectionName': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+		'CollectionName': {
+			'type': 'text', 'fields': {
+				'keyword': {'type': 'keyword', 'ignore_above': 256},
+				'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
+			}
+		},
 		'CollectionAcronym': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		
 		'CollectionsTree': {
@@ -397,7 +424,12 @@ MappingsDict['iuparts'] = {
 			'properties': {
 				'DB_ProjectID': {'type': 'keyword'}, # key combined of database key taken from config.in and ProjectID
 				'ProjectID': {'type': 'integer'},
-				'Project': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+				'Project': {
+					'type': 'text', 'fields': {
+						'keyword': {'type': 'keyword', 'ignore_above': 256},
+						'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
+					}
+				},
 				'ProjectURI': {'type': 'keyword'},
 			}
 		},
@@ -571,9 +603,18 @@ MappingsDict['iuparts'] = {
 		# flat mappings of existing nested structures
 		
 		# Identifications
-		'VernacularTerms': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
-		'TypeStatus':  {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
-		
+		'VernacularTerms': {
+			'type': 'text', 'fields': {
+				'keyword': {'type': 'keyword', 'ignore_above': 256},
+				'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
+			}
+		},
+		'TypeStatus': {
+			'type': 'text', 'fields': {
+				'keyword': {'type': 'keyword', 'ignore_above': 256},
+				'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
+			}
+		},
 		# Images
 		'NumberOfSpecimenImages': {'type': 'integer', 'null_value': 0},
 		

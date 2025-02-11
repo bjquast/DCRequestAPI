@@ -52,11 +52,11 @@ class StackedInnerQuery(QueryConstructor):
 
 
 	def setQueryType(self, querystring):
-		#if querystring.startswith('*') or querystring.startswith('?') or querystring.startswith('%'):
-		self.querytype = 'query_string'
-		#	self.escapeReservedCharacters
-		#else:
-		#self.querytype = 'simple_query_string'
+		if querystring.startswith('*') or querystring.startswith('?') or querystring.startswith('%'):
+			self.querytype = 'query_string'
+			#self.escapeReservedCharacters
+		else:
+			self.querytype = 'simple_query_string'
 		return
 
 
@@ -69,7 +69,8 @@ class StackedInnerQuery(QueryConstructor):
 		for character in reserved_characters:
 			#pass
 			query_string = query_string.replace(character, r'\{0}'.format(character))
-		for character in ['>', '<', ' ']:
+		for character in ['>', '<']:
+			query_string = query_string.replace(character, '?')
 			pass
 			#query_string = query_string.replace(character, '*')
 		

@@ -217,7 +217,7 @@ class FieldDefinitions():
 			'VernacularTerms': {
 				'names': {'en': 'Vernacular name'},
 				'buckets': {
-					'field_query': 'VernacularTerms',
+					'field_query': 'VernacularTerms.keyword',
 				},
 			},
 			
@@ -263,14 +263,14 @@ class FieldDefinitions():
 			'MatchedSynonyms.Synonym': {
 				'names': {'en': 'Synonym'},
 				'buckets': {
-					'field_query': 'MatchedSynonyms.Synonym'
+					'field_query': 'MatchedSynonyms.Synonym.keyword'
 				},
 			},
 			
 			'TypeStatus': {
 				'names': {'en': 'Type status'},
 				'buckets': {
-					'field_query': 'TypeStatus'
+					'field_query': 'TypeStatus.keyword'
 				},
 			},
 			
@@ -340,14 +340,14 @@ class FieldDefinitions():
 			'LifeStage': {
 				'names': {'en': 'Life stage'},
 				'buckets': {
-					'field_query': 'LifeStage',
+					'field_query': 'LifeStage.keyword',
 				},
 			},
 			
 			'Gender': {
 				'names': {'en': 'Sex'},
 				'buckets': {
-					'field_query': 'Gender',
+					'field_query': 'Gender.keyword',
 				},
 			},
 			
@@ -377,7 +377,7 @@ class FieldDefinitions():
 			'CollectionName': {
 				'names': {'en': 'Collection'},
 				'buckets': {
-					'field_query': 'CollectionName',
+					'field_query': 'CollectionName.keyword',
 				},
 			},
 			
@@ -395,14 +395,14 @@ class FieldDefinitions():
 			'Projects.Project': {
 				'names': {'en': 'Project(s)'},
 				'buckets': {
-					'field_query': 'Projects.Project',
+					'field_query': 'Projects.Project.keyword',
 				},
 			},
 			
 			'DatabaseAccronym': {
 				'names': {'en': 'Database'},
 				'buckets': {
-					'field_query': 'DatabaseAccronym',
+					'field_query': 'DatabaseAccronym.keyword',
 				},
 			},
 			

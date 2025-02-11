@@ -101,7 +101,6 @@ class WithholdFilters():
 		
 		
 		for doc in docs:
-			
 			source = doc['_source']
 			project_ids = [project['DB_ProjectID'] for project in source['Projects']]
 			
@@ -148,7 +147,7 @@ class WithholdFilters():
 				else:
 					doc_element[key] = self.filterElements(doc_element[key], path_list, filter_name)
 		elif len(path_list) == 1:
-			key = path_list.pop(0)
+			key = path_list[0]
 			if key in doc_element and doc_element[key] == 'true':
 				if 'fields' in self.filter_definitions[filter_name] and len(self.filter_definitions[filter_name]['fields']) > 0:
 					for field_name in self.filter_definitions[filter_name]['fields']:
