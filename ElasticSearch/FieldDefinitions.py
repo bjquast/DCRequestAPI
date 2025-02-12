@@ -49,7 +49,7 @@ class FieldDefinitions():
 			'Gender',
 			'NumberOfUnits',
 			'Barcodes.Methods.region',
-			'ImageAvailable' # not working with prefix query
+			'ImagesAvailable' # not working with prefix query
 		]
 		
 		self.fieldnames = [
@@ -184,7 +184,7 @@ class FieldDefinitions():
 			#'Gender',
 			#'NumberOfUnits',
 			#'Barcodes.Methods.region',
-			'ImageAvailable'
+			'ImagesAvailable'
 		]
 		return
 
@@ -367,12 +367,12 @@ class FieldDefinitions():
 				},
 			},
 			
-			'ImageAvailable': {
-				# this field is in iuparts object, not in Images
-				'names': {'en': 'Image(s) available'},
+			'ImagesAvailable': {
+				'names': {'en': 'Image(s)'},
 				'buckets': {
-					'field_query': 'ImageAvailable',
-					'type': 'boolean'
+					'field_query': 'ImagesAvailable',
+					'type': 'boolean',
+					'withholdflags': ['ImagesWithhold']
 				},
 			},
 			

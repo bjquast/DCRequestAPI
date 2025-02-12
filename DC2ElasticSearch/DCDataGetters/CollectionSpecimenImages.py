@@ -121,7 +121,8 @@ class CollectionSpecimenImages():
 				self.images_dict[row[1]] = {}
 				self.images_dict[row[1]]['Images'] = []
 				self.images_dict[row[1]]['NumberOfSpecimenImages'] = 0
-				self.images_dict[row[1]]['ImageAvailable'] = True
+				self.images_dict[row[1]]['ImagesAvailable'] = True
+				self.images_dict[row[1]]['ImagesWithhold'] = 'true'
 			
 			image = {
 				'URI': row[2],
@@ -140,6 +141,10 @@ class CollectionSpecimenImages():
 				'ImageWithholdingReason': row[15],
 				'ImageWithhold': row[16]
 			}
+			
+			# set ImagesWithhold flag to 'false' if there is at least one image without an Withhold flag 
+			if image['ImageWithhold'] == 'false':
+				self.images_dict[row[1]]['ImagesWithhold'] = 'false'
 			
 			self.images_dict[row[1]]['Images'].append(image)
 			self.images_dict[row[1]]['NumberOfSpecimenImages'] += 1
