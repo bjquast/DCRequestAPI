@@ -371,7 +371,6 @@ class FieldDefinitions():
 				'names': {'en': 'Image(s)'},
 				'buckets': {
 					'field_query': 'ImagesAvailable',
-					'type': 'boolean',
 					'withholdflags': ['ImagesWithhold']
 				},
 			},

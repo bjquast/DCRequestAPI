@@ -174,7 +174,7 @@ class IdentificationUnitParts():
 
 
 	def set_initial_default_values(self, iu_part_dict):
-		iu_part_dict['ImagesAvailable'] = False
+		iu_part_dict['ImagesAvailable'] = 'not available'
 		iu_part_dict['ImagesWithhold'] = 'false'
 		return iu_part_dict
 

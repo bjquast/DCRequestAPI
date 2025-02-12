@@ -619,8 +619,8 @@ MappingsDict['iuparts'] = {
 		# Images
 		'NumberOfSpecimenImages': {'type': 'integer', 'null_value': 0},
 		
-		'ImagesAvailable': {'type': 'boolean', 'null_value': "false"},
-		'ImagesWithhold': {'type': 'boolean', 'null_value': "false"},
+		'ImagesAvailable': {'type': 'keyword', 'ignore_above': 256},
+		'ImagesWithhold': {'type': 'keyword', 'ignore_above': 256},
 		
 	}
 }

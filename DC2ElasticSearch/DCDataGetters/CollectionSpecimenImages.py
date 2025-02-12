@@ -121,7 +121,7 @@ class CollectionSpecimenImages():
 				self.images_dict[row[1]] = {}
 				self.images_dict[row[1]]['Images'] = []
 				self.images_dict[row[1]]['NumberOfSpecimenImages'] = 0
-				self.images_dict[row[1]]['ImagesAvailable'] = True
+				self.images_dict[row[1]]['ImagesAvailable'] = 'available'
 				self.images_dict[row[1]]['ImagesWithhold'] = 'true'
 			
 			image = {
