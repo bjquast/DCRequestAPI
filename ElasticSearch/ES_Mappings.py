@@ -446,7 +446,8 @@ MappingsDict['iuparts'] = {
 		#},
 		
 		'Images': {
-			#'type': 'nested',
+			# must be nested because of the withhold
+			'type': 'nested',
 			'properties': {
 				'URI': {'type': 'keyword'},
 				'ResourceURI': {'type': 'keyword'},

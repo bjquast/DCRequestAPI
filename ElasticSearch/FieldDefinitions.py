@@ -359,6 +359,7 @@ class FieldDefinitions():
 			},
 			
 			'NumberOfSpecimenImages': {
+				# this field is in iuparts object, not in Images
 				'names': {'en': 'Number of images'},
 				'buckets': {
 					'field_query': 'NumberOfSpecimenImages',
@@ -367,6 +368,7 @@ class FieldDefinitions():
 			},
 			
 			'ImageAvailable': {
+				# this field is in iuparts object, not in Images
 				'names': {'en': 'Image(s) available'},
 				'buckets': {
 					'field_query': 'ImageAvailable',
