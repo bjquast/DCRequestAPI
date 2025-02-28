@@ -83,20 +83,6 @@ function add_logout_event() {
 	});
 }
 
-/*
-function add_match_query_events() {
-	$('.match_query_checkbox').each( function () {
-		$(this).off();
-		
-		$(this).change( function () {
-			if (!$(this).prop('checked')) {
-				$("#search_form").submit();
-			}
-		});
-	});
-}
-*/
-
 function set_input_clearbuttons() {
 	$('.input_delete_wrapper').remove();
 	$('.delete_icon').remove();

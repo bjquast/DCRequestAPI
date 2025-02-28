@@ -1,0 +1,26 @@
+
+<div id="tree_filters">
+	
+	<hr>
+	
+	<div id="tree_filter_sections_header" class="flex-space-between">
+		<h4>Trees</h4>
+	</div>
+	<div id="available_trees">
+		<div tal:repeat="tree_name tree_filter_fields" class="tree-filter-select-box">
+			<details id="tree_filter_list_${tree_name}" class="tree_filter_selectors" data-tree-filter-key="${tree_name}">
+				<summary class="clickable">${treefilterdefs[tree_name]['en']}</summary>
+				<ul tal:condition="python: tree_name in tree_aggregations" class="ul-no-bullet">
+					<li tal:repeat="bucket tree_aggregations[tree_name]" class="tree_entry clickable" 
+						data-tree-filter-id="filter_${tree_name}_${bucket['key']}" 
+						data-tree-filter-name="${treefilterdefs[tree_name]['en']}"
+						data-tree-filter-key="${tree_name}"
+						data-tree-filter-value="${bucket['key']}">
+						${bucket['key']} (${bucket['doc_count']})
+					</li>
+				</ul>
+			</details>
+		</div>
+	</div>
+	
+</div>

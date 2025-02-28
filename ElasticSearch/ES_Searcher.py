@@ -14,7 +14,6 @@ from ElasticSearch.ES_Mappings import MappingsDict
 from ElasticSearch.WithholdFilters import WithholdFilters
 from ElasticSearch.QueryConstructor.BucketAggregations import BucketAggregations
 from ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
-from ElasticSearch.QueryConstructor.MatchQuery import MatchQuery
 from ElasticSearch.QueryConstructor.TreeQueries import TreeQueries
 from ElasticSearch.QueryConstructor.StackedQueries import StackedInnerQuery, StackedOuterQuery
 
@@ -150,15 +149,10 @@ class ES_Searcher():
 			filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids, source_fields = self.bucket_fields, connector = connector).getTermFilterQueries(self.search_params['term_filters'])
 			self.query['bool']["filter"].extend(filter_queries)
 		
-		if 'match_query' in self.search_params:
-			connector = 'AND'
-			if 'match_queries_connector' in self.search_params:
-				connector = self.search_params['match_queries_connector']
-			
-			match_query_obj = MatchQuery(users_project_ids = self.users_project_ids, connector = connector)
-			match_query = match_query_obj.getMatchQuery(self.search_params['match_query'])
-			if match_query is not None:
-				self.query['bool']['must'].append(match_query)
+		if 'open_tree_selectors' in self.search_params:
+			for tree_filter in self.search_params['open_tree_selectors']:
+				
+				self.singleTreeAggregationSearch(tree_filter, )
 		
 		#pudb.set_trace()
 		outer_query = StackedOuterQuery()
@@ -197,13 +191,13 @@ class ES_Searcher():
 
 
 	def singleTreeAggregationSearch(self, aggregation_name, parent_ids):
-		#pudb.set_trace()
+		pudb.set_trace()
 		self.setQuery()
 		buckets_query = TreeQueries(aggregation_name, parent_ids = parent_ids, users_project_ids = self.users_project_ids) #, buckets_sort_alphanum = True)
 		aggs = buckets_query.getTreeQuery()
 		
-		#logger.debug(json.dumps(aggs))
-		#logger.debug(json.dumps(self.query))
+		logger.debug(json.dumps(aggs))
+		logger.debug(json.dumps(self.query))
 		
 		source_fields = False
 		
@@ -401,7 +395,7 @@ if __name__ == "__main__":
 			'Projects.Project': ['Section Mammalia ZFMK'],
 			'CountryCache': ['Germany', ]
 		},
-		'match_query': 'Rulik',
+		'stack_queries': 'Rulik',
 	}
 	
 	

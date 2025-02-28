@@ -8,7 +8,7 @@ from ElasticSearch.ES_Mappings import MappingsDict
 
 class FieldDefinitions():
 	def __init__(self):
-		self.setFieldNames()
+		self.setFields()
 		self.setFieldDefinitions()
 		self.appendTaxonRankDefinitions()
 		
@@ -17,6 +17,42 @@ class FieldDefinitions():
 
 
 	def setFieldNames(self):
+		self.fieldnames = [
+			'PartAccessionNumber',
+			#'StableIdentifierURL',
+			'LastIdentificationCache',
+			'VernacularTerms',
+			'MatchedSynonyms.Synonym',
+			#'FamilyCache',
+			#'OrderCache',
+			#'MatchedTaxon',
+			'MatchedParentTaxa',
+			'TypeStatus',
+			'MaterialCategory',
+			'LocalityVerbatim',
+			'LocalityDescription',
+			'HabitatDescription',
+			'CollectingMethod',
+			'CountryCache',
+			'WGS84_Coordinate',
+			'CollectionAgents.CollectorsName',
+			'LifeStage',
+			'Gender',
+			'NumberOfUnits',
+			# NumberOfSpecimenImages does not work. because it is a numeric type it can not be set to case_insensitiv in TermFilterQuery. Think about RangeQuery implementation 
+			# 'NumberOfSpecimenImages',
+			'CollectionName',
+			'Projects.Project',
+			'CollectionSpecimenID',
+			'IdentificationUnitID',
+			'SpecimenPartID',
+			'Barcodes.Methods.region',
+			'DatabaseAccronym',
+		]
+		return
+
+
+	def setBucketFields(self):
 		self.bucketfields = [
 			'DatabaseAccronym',
 			#'CollectionsTree.CollectionName',
@@ -51,107 +87,10 @@ class FieldDefinitions():
 			'Barcodes.Methods.region',
 			'ImagesAvailable' # not working with prefix query
 		]
-		
-		self.fieldnames = [
-			'PartAccessionNumber',
-			#'StableIdentifierURL',
-			'LastIdentificationCache',
-			'VernacularTerms',
-			'MatchedSynonyms.Synonym',
-			#'FamilyCache',
-			#'OrderCache',
-			#'MatchedTaxon',
-			'MatchedParentTaxa',
-			'TypeStatus',
-			'MaterialCategory',
-			'LocalityVerbatim',
-			'LocalityDescription',
-			'HabitatDescription',
-			'CollectingMethod',
-			'CountryCache',
-			'WGS84_Coordinate',
-			'CollectionAgents.CollectorsName',
-			'LifeStage',
-			'Gender',
-			'NumberOfUnits',
-			# NumberOfSpecimenImages does not work. because it is a numeric type it can not be set to case_insensitiv in TermFilterQuery. Think about RangeQuery implementation 
-			# 'NumberOfSpecimenImages',
-			'CollectionName',
-			'Projects.Project',
-			'CollectionSpecimenID',
-			'IdentificationUnitID',
-			'SpecimenPartID',
-			'Barcodes.Methods.region',
-			'DatabaseAccronym',
-		]
-		
-		self.stacked_query_fields = [
-			'PartAccessionNumber',
-			'LastIdentificationCache',
-			'VernacularTerms',
-			'MatchedSynonyms.Synonym',
-			#'FamilyCache',
-			#'OrderCache',
-			#'MatchedTaxon',
-			'MatchedParentTaxa',
-			'TypeStatus',
-			'MaterialCategory',
-			'LocalityVerbatim',
-			'LocalityDescription',
-			'HabitatDescription',
-			'CollectingMethod',
-			'CountryCache',
-			'CollectionAgents.CollectorsName',
-			'LifeStage',
-			'Gender',
-			'NumberOfUnits',
-			'CollectionName',
-			'Projects.Project',
-			'CollectionSpecimenID',
-			'IdentificationUnitID',
-			'SpecimenPartID',
-			'Barcodes.Methods.region',
-			'DatabaseAccronym',
-		]
-		
-		self.tree_query_fields = [
-			'MatchedTaxaTree',
-			'CollectionsTree'
-		]
-		
-		self.suggestion_fields = [
-			#'CollectionsTree.CollectionName',
-			'CollectionName',
-			'Projects.Project',
-			'LastIdentificationCache',
-			'MatchedTaxon',
-			'VernacularTerms',
-			'MatchedSynonyms.Synonym',
-			'TypeStatus',
-			'MatchedTaxaTree',
-			#'MatchedTaxaTree.Phylum',
-			#'MatchedTaxaTree.Subphylum',
-			#'MatchedTaxaTree.Class',
-			#'MatchedTaxaTree.Subclass',
-			#'MatchedTaxaTree.Order',
-			#'MatchedTaxaTree.Suborder',
-			#'MatchedTaxaTree.Family',
-			#'MatchedTaxaTree.Subfamily',
-			#'MatchedTaxaTree.Genus',
-			#'MatchedTaxaTree.Subgenus',
-			'MaterialCategory',
-			'LocalityVerbatim',
-			'LocalityDescription',
-			'HabitatDescription',
-			'CountryCache',
-			'CollectingMethod',
-			'CollectionAgents.CollectorsName',
-			'MaterialCategory',
-			'LifeStage',
-			'Gender',
-			'Barcodes.Methods.region',
-		]
-		
+		return
+
+
+	def setDefaultFilterSections(self):
 		self.default_filter_sections = [
 			'DatabaseAccronym',
 			#'CollectionsTree.CollectionName',
@@ -186,6 +125,93 @@ class FieldDefinitions():
 			#'Barcodes.Methods.region',
 			'ImagesAvailable'
 		]
+		return
+
+
+	def setStackedQueryFields(self):
+		self.stacked_query_fields = [
+			'PartAccessionNumber',
+			'LastIdentificationCache',
+			'VernacularTerms',
+			'MatchedSynonyms.Synonym',
+			#'FamilyCache',
+			#'OrderCache',
+			#'MatchedTaxon',
+			'MatchedParentTaxa',
+			'TypeStatus',
+			'MaterialCategory',
+			'LocalityVerbatim',
+			'LocalityDescription',
+			'HabitatDescription',
+			'CollectingMethod',
+			'CountryCache',
+			'CollectionAgents.CollectorsName',
+			'LifeStage',
+			'Gender',
+			'NumberOfUnits',
+			'CollectionName',
+			'Projects.Project',
+			'CollectionSpecimenID',
+			'IdentificationUnitID',
+			'SpecimenPartID',
+			'Barcodes.Methods.region',
+			'DatabaseAccronym',
+		]
+		return
+
+
+	def setTreeQueryFields(self):
+		self.tree_query_fields = [
+			'MatchedTaxaTree',
+			'CollectionsTree'
+		]
+		return
+
+
+	def setSuggestionFields(self):
+		self.suggestion_fields = [
+			#'CollectionsTree.CollectionName',
+			'CollectionName',
+			'Projects.Project',
+			'LastIdentificationCache',
+			'MatchedTaxon',
+			'VernacularTerms',
+			'MatchedSynonyms.Synonym',
+			'TypeStatus',
+			'MatchedTaxaTree',
+			#'MatchedTaxaTree.Phylum',
+			#'MatchedTaxaTree.Subphylum',
+			#'MatchedTaxaTree.Class',
+			#'MatchedTaxaTree.Subclass',
+			#'MatchedTaxaTree.Order',
+			#'MatchedTaxaTree.Suborder',
+			#'MatchedTaxaTree.Family',
+			#'MatchedTaxaTree.Subfamily',
+			#'MatchedTaxaTree.Genus',
+			#'MatchedTaxaTree.Subgenus',
+			'MaterialCategory',
+			'LocalityVerbatim',
+			'LocalityDescription',
+			'HabitatDescription',
+			'CountryCache',
+			'CollectingMethod',
+			'CollectionAgents.CollectorsName',
+			'MaterialCategory',
+			'LifeStage',
+			'Gender',
+			'Barcodes.Methods.region',
+		]
+		return
+
+
+	def setFields(self):
+		self.setFieldNames()
+		self.setBucketFields()
+		self.setDefaultFilterSections()
+		self.setStackedQueryFields()
+		self.setTreeQueryFields()
+		self.setSuggestionFields()
+		
 		return
 
 
@@ -390,7 +416,7 @@ class FieldDefinitions():
 					'id_field_for_tree': 'CollectionsTree.CollectionID',
 					'parent_id_field_for_tree': 'CollectionsTree.ParentCollectionID',
 					'root_level': 0 # the level to start the tree or trees
-				},
+				}
 			},
 			
 			'Projects.Project': {

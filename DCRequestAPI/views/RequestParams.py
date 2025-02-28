@@ -97,8 +97,8 @@ class RequestParams():
 		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'aggregation', 'tree', 'match_queries_connector', 
 							'term_filters_connector', 'buckets_search_term', 'overlay_remaining_all_select', 'buckets_sort_dir', 'buckets_size'
 						]
-		complex_params = ['term_filters',]
-		list_params = ['open_filter_selectors', 'result_table_columns', 'selected_filter_sections', 'parent_ids', 'match_query']
+		complex_params = ['term_filters', 'tree_parent_ids',]
+		list_params = ['open_filter_selectors', 'result_table_columns', 'selected_filter_sections', 'open_tree_selectors']
 		
 		for param_name in boolean_params:
 			if param_name in self.params_dict:

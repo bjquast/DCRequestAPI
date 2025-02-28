@@ -141,6 +141,8 @@ class IUPartsListView():
 		
 		open_filter_selectors = self.search_params['open_filter_selectors']
 		
+		tree_filter_fields = iupartstable.tree_query_fields
+		
 		# the selected_bucketfields contain only the fields found in self.search_params['open_filter_selectors']
 		# the fields from self.search_params['term_filters'] must be added, otherwise their results are not mentioned when their filter selector is not opened
 		for term_filter_field in self.search_params['term_filters']:
@@ -161,12 +163,14 @@ class IUPartsListView():
 		
 		coldefs = iupartstable.coldefs
 		bucketdefs = iupartstable.bucketdefs
+		treefilterdefs = iupartstable.treefilterdefs
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids, restrict_to_users_projects = restrict_to_users_projects)
 		es_searcher.setSourceFields(selected_sourcefields)
 		es_searcher.setBucketFields(selected_bucketfields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
 		aggregations = es_searcher.getParsedAggregations()
+		tree_aggregations = []
 		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs])
 		
 		pagecontent = {
@@ -180,8 +184,10 @@ class IUPartsListView():
 			'search_params': self.search_params,
 			'iupartslist': iupartslist,
 			'aggregations': aggregations,
+			'tree_aggregations': tree_aggregations,
 			'coldefs': coldefs,
 			'bucketdefs': bucketdefs,
+			'treefilterdefs': treefilterdefs,
 			'default_sourcefields': default_sourcefields,
 			'selected_sourcefields': selected_sourcefields, 
 			'default_bucketfields': default_bucketfields,
@@ -189,6 +195,7 @@ class IUPartsListView():
 			'open_filter_selectors': open_filter_selectors,
 			'selected_filter_sections': selected_filter_sections,
 			'stacked_query_fields': stacked_query_fields,
+			'tree_filter_fields': tree_filter_fields,
 			'authenticated_user': self.uid,
 			'messages': self.messages
 		}
