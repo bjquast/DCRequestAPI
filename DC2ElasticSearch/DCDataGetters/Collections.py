@@ -216,13 +216,15 @@ class Collections():
 					'CollectionAcronym': row[4]
 				}
 				self.collections_dict[row[1]]['CollectionsTree'] = []
+				self.collections_dict[row[1]]['ParentCollections'] = []
 			
-			parentcollection = {
+			collection_tree_dict = {
 				'CollectionID': row[5],
 				'CollectionName': row[6],
 				'TreeLevel': row[7],
 				'ParentCollectionID': row[8]
 			}
-			self.collections_dict[row[1]]['CollectionsTree'].append(parentcollection)
+			self.collections_dict[row[1]]['CollectionsTree'].append(collection_tree_dict)
+			self.collections_dict[row[1]]['ParentCollections'].append(row[6])
 		
 		return

@@ -408,7 +408,7 @@ MappingsDict['iuparts'] = {
 			}
 		},
 		'CollectionAcronym': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
-		
+		'ParentCollections': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		'CollectionsTree': {
 			'type': 'nested',
 			'properties': {

@@ -295,28 +295,29 @@ class TaxaMatcher():
 		ON (anc.id = tr.AncestorID AND anc.taxon != 'root') -- AND anc.id != cs.taxon_id)
 		INNER JOIN {1} p_anc
 		ON (p_anc.id = anc.parent_id)
+		ORDER BY cs.`_id`, anc.taxon_tree_level
 		;""".format(self.specimentable, self.matchingtable.taxamergetable, self.matchingtable.taxarelationtable)
 		self.cur.execute(query)
 		rows = self.cur.fetchall()
 		
 		for row in rows:
-				if row[0] not in matched_taxa_dict:
-					matched_taxa_dict[row[0]] = {}
-					matched_taxa_dict[row[0]]['MatchedTaxon'] = row[1]
-					matched_taxa_dict[row[0]]['MatchedTaxonAuthor'] = row[2]
-					matched_taxa_dict[row[0]]['MatchedTaxonRank'] = row[3]
-					matched_taxa_dict[row[0]]['MatchedTaxonURI'] = row[4]
-					matched_taxa_dict[row[0]]['MatchedTaxonURL'] = row[5]
-					
-					matched_taxa_dict[row[0]]['MatchedParentTaxa'] = []
-					matched_taxa_dict[row[0]]['MatchedParentTaxaURIs'] = []
-					matched_taxa_dict[row[0]]['MatchedTaxaTree'] = []
-					
-				matched_taxa_dict[row[0]]['MatchedParentTaxa'].append(row[6])
-				matched_taxa_dict[row[0]]['MatchedParentTaxaURIs'].append(row[8])
-				matched_taxa_dict[row[0]]['MatchedTaxaTree'].append({
-					'Taxon': row[6], 'Rank': row[7], 'TaxonURI': row[8],
-					'TaxonURL': row[9], 'TreeLevel': row[10], 'ParentTaxonURI': row[11]})
+			if row[0] not in matched_taxa_dict:
+				matched_taxa_dict[row[0]] = {}
+				matched_taxa_dict[row[0]]['MatchedTaxon'] = row[1]
+				matched_taxa_dict[row[0]]['MatchedTaxonAuthor'] = row[2]
+				matched_taxa_dict[row[0]]['MatchedTaxonRank'] = row[3]
+				matched_taxa_dict[row[0]]['MatchedTaxonURI'] = row[4]
+				matched_taxa_dict[row[0]]['MatchedTaxonURL'] = row[5]
+				
+				matched_taxa_dict[row[0]]['MatchedParentTaxa'] = []
+				matched_taxa_dict[row[0]]['MatchedParentTaxaURIs'] = []
+				matched_taxa_dict[row[0]]['MatchedTaxaTree'] = []
+				
+			matched_taxa_dict[row[0]]['MatchedParentTaxa'].append(row[6])
+			matched_taxa_dict[row[0]]['MatchedParentTaxaURIs'].append(row[8])
+			matched_taxa_dict[row[0]]['MatchedTaxaTree'].append({
+				'Taxon': row[6], 'Rank': row[7], 'TaxonURI': row[8],
+				'TaxonURL': row[9], 'TreeLevel': row[10], 'ParentTaxonURI': row[11]})
 		
 		return matched_taxa_dict
 	

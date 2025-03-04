@@ -29,7 +29,7 @@
 
 <metal:js fill-slot="search_form">
 	<form id="search_form" action="${request.application_url}/list" method="GET" >
-		<div metal:use-macro="load: ./stacked_queries_macro.pt"></div>
+		<div metal:use-macro="load: DCRequestAPI:templates/stacked_queries_macro.pt"></div>
 	</form>
 	<div id="buckets-overlay-slot"></div>
 </metal:js>
@@ -54,7 +54,7 @@
 					</div>
 					<div metal:use-macro="load: DCRequestAPI:templates/paging_macro.pt"></div>
 				</div>
-				<div metal:use-macro="load: ./column_selector_macro.pt"></div>
+				<div metal:use-macro="load: DCRequestAPI:templates/column_selector_macro.pt"></div>
 			</div>
 			
 			<div class="flex-space-between">

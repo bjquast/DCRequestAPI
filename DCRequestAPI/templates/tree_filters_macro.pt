@@ -18,6 +18,9 @@
 						data-tree-filter-value="${bucket['key']}">
 						${bucket['key']} (${bucket['doc_count']})
 					</li>
+					<block>
+						
+					</block>
 				</ul>
 			</details>
 		</div>
