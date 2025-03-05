@@ -227,4 +227,7 @@ class Collections():
 			self.collections_dict[row[1]]['CollectionsTree'].append(collection_tree_dict)
 			self.collections_dict[row[1]]['ParentCollections'].append(row[6])
 		
+		for key in self.collections_dict:
+			self.collections_dict[key]['CollectionHierarchyString'] = '>'.join(self.collections_dict[key]['ParentCollections'])
+		
 		return

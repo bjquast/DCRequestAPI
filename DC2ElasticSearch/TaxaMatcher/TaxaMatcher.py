@@ -319,6 +319,9 @@ class TaxaMatcher():
 				'Taxon': row[6], 'Rank': row[7], 'TaxonURI': row[8],
 				'TaxonURL': row[9], 'TreeLevel': row[10], 'ParentTaxonURI': row[11]})
 		
+		for key in matched_taxa_dict:
+			matched_taxa_dict[key]['MatchedTaxaHierarchyString'] = '>'.join(matched_taxa_dict[key]['MatchedParentTaxa'])
+		
 		return matched_taxa_dict
 	
 	

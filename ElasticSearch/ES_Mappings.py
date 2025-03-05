@@ -16,6 +16,23 @@ MappingsDict['settings'] = {
 			'whitespace_lc': {
 				'tokenizer': 'whitespace',
 				'filter': ['lowercase']
+			},
+			'tree_hierarchy': {
+				'tokenizer': 'hierarchy_splitter'
+			},
+			'tree_hierarchy_reverse': {
+				'tokenizer': 'hierarchy_splitter_reverse'
+			}
+		},
+		'tokenizer': {
+			'hierarchy_splitter': {
+				'type': 'path_hierarchy',
+				'delimiter': '>'
+			},
+			'hierarchy_splitter_reverse': {
+				'type': 'path_hierarchy',
+				'delimiter': '>',
+				'reverse': 'true'
 			}
 		}
 	}
@@ -370,12 +387,15 @@ MappingsDict['iuparts'] = {
 		'MatchedTaxonRank': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		'MatchedTaxonURI': {'type': 'keyword'},
 		'MatchedTaxonURL': {'type': 'keyword'},
+		
 		'MatchedParentTaxa': {
 			'type': 'text', 'fields': {
 				'keyword': {'type': 'keyword', 'ignore_above': 256},
 				'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
 			}
 		},
+		'MatchedTaxaHierarchyString': {'type': 'text', 'fields': {'facet': {'type': 'text', 'analyzer': 'tree_hierarchy', 'fielddata': 'true'}}},
+		
 		'MatchedParentTaxaURIs': {'type': 'keyword'},
 		'MatchedTaxaTree': {
 			'type': 'nested',
@@ -409,6 +429,7 @@ MappingsDict['iuparts'] = {
 		},
 		'CollectionAcronym': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		'ParentCollections': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+		'CollectionHierarchyString': {'type': 'text', 'fields': {'facet': {'type': 'text', 'analyzer': 'tree_hierarchy', 'fielddata': 'true'}}},
 		'CollectionsTree': {
 			'type': 'nested',
 			'properties': {
