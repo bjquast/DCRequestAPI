@@ -406,6 +406,7 @@ MappingsDict['iuparts'] = {
 				'Rank': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 				'TreeLevel': {'type': 'integer'},
 				'ParentTaxonURI': {'type': 'keyword'},
+				'HierarchyString': {'type': 'text', 'fields': {'facet': {'type': 'text', 'analyzer': 'tree_hierarchy', 'fielddata': 'true'}}}
 			}
 		},
 		
@@ -436,7 +437,8 @@ MappingsDict['iuparts'] = {
 				'CollectionID': {'type': 'integer'},
 				'CollectionName': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 				'TreeLevel': {'type': 'integer'},
-				'ParentCollectionID': {'type': 'integer'}
+				'ParentCollectionID': {'type': 'integer'},
+				'HierarchyString': {'type': 'text', 'fields': {'facet': {'type': 'text', 'analyzer': 'tree_hierarchy', 'fielddata': 'true'}}}
 			}
 		},
 		

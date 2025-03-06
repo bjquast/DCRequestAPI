@@ -317,7 +317,9 @@ class TaxaMatcher():
 			matched_taxa_dict[row[0]]['MatchedParentTaxaURIs'].append(row[8])
 			matched_taxa_dict[row[0]]['MatchedTaxaTree'].append({
 				'Taxon': row[6], 'Rank': row[7], 'TaxonURI': row[8],
-				'TaxonURL': row[9], 'TreeLevel': row[10], 'ParentTaxonURI': row[11]})
+				'TaxonURL': row[9], 'TreeLevel': row[10], 'ParentTaxonURI': row[11],
+				'HierarchyString': '>'.join(matched_taxa_dict[row[0]]['MatchedParentTaxa'])
+			})
 		
 		for key in matched_taxa_dict:
 			matched_taxa_dict[key]['MatchedTaxaHierarchyString'] = '>'.join(matched_taxa_dict[key]['MatchedParentTaxa'])

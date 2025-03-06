@@ -192,7 +192,7 @@ class Collections():
 			GROUP BY tcr.[DescendantID]
 		) tl
 			ON tl.[DescendantID] = c.[CollectionID]
-		ORDER BY tc.[rownumber], tl.[TreeLevel]
+		ORDER BY tc.[_id], tl.[TreeLevel]
 		;"""
 		
 		self.cur.execute(query)
@@ -218,14 +218,16 @@ class Collections():
 				self.collections_dict[row[1]]['CollectionsTree'] = []
 				self.collections_dict[row[1]]['ParentCollections'] = []
 			
+			self.collections_dict[row[1]]['ParentCollections'].append(row[6])
+			
 			collection_tree_dict = {
 				'CollectionID': row[5],
 				'CollectionName': row[6],
 				'TreeLevel': row[7],
-				'ParentCollectionID': row[8]
+				'ParentCollectionID': row[8],
+				'HierarchyString': '>'.join(self.collections_dict[row[1]]['ParentCollections'])
 			}
 			self.collections_dict[row[1]]['CollectionsTree'].append(collection_tree_dict)
-			self.collections_dict[row[1]]['ParentCollections'].append(row[6])
 		
 		for key in self.collections_dict:
 			self.collections_dict[key]['CollectionHierarchyString'] = '>'.join(self.collections_dict[key]['ParentCollections'])
