@@ -395,6 +395,7 @@ MappingsDict['iuparts'] = {
 			}
 		},
 		'MatchedTaxaHierarchyString': {'type': 'text', 'fields': {'facet': {'type': 'text', 'analyzer': 'tree_hierarchy', 'fielddata': 'true'}}},
+		'MatchedTaxaHierarchyLength': {'type': 'integer'},
 		
 		'MatchedParentTaxaURIs': {'type': 'keyword'},
 		'MatchedTaxaTree': {
@@ -431,6 +432,8 @@ MappingsDict['iuparts'] = {
 		'CollectionAcronym': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		'ParentCollections': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 		'CollectionHierarchyString': {'type': 'text', 'fields': {'facet': {'type': 'text', 'analyzer': 'tree_hierarchy', 'fielddata': 'true'}}},
+		'CollectionHierarchyLength': {'type': 'integer'},
+		
 		'CollectionsTree': {
 			'type': 'nested',
 			'properties': {

@@ -231,5 +231,6 @@ class Collections():
 		
 		for key in self.collections_dict:
 			self.collections_dict[key]['CollectionHierarchyString'] = '>'.join(self.collections_dict[key]['ParentCollections'])
+			self.collections_dict[key]['CollectionHierarchyLength'] = len(self.collections_dict[key]['ParentCollections'])
 		
 		return

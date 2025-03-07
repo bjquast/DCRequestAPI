@@ -323,6 +323,7 @@ class TaxaMatcher():
 		
 		for key in matched_taxa_dict:
 			matched_taxa_dict[key]['MatchedTaxaHierarchyString'] = '>'.join(matched_taxa_dict[key]['MatchedParentTaxa'])
+			matched_taxa_dict[key]['MatchedTaxaHierarchyLength'] = len(matched_taxa_dict[key]['MatchedParentTaxa'])
 		
 		return matched_taxa_dict
 	
