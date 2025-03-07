@@ -160,10 +160,10 @@ class FieldDefinitions():
 		return
 
 
-	def setTreeQueryFields(self):
-		self.tree_query_fields = [
-			'MatchedTaxaTree',
-			'CollectionsTree'
+	def setHierarchyQueryFields(self):
+		self.hierarchy_query_fields = [
+			'MatchedTaxaHierarchyPath',
+			'CollectionHierarchyPath'
 		]
 		return
 
@@ -209,7 +209,7 @@ class FieldDefinitions():
 		self.setBucketFields()
 		self.setDefaultFilterSections()
 		self.setStackedQueryFields()
-		self.setTreeQueryFields()
+		self.setHierarchyQueryFields()
 		self.setSuggestionFields()
 		
 		return
@@ -281,8 +281,14 @@ class FieldDefinitions():
 					'field_query': 'MatchedTaxaTree.Taxon',
 					'id_field_for_tree': 'MatchedTaxaTree.TaxonURI',
 					'parent_id_field_for_tree': 'MatchedTaxaTree.ParentTaxonURI',
-					'path': 'MatchedTaxaTree',
-					'root_level': 0 # the level to start the tree or trees (e. g. Animalia, Plantae, Fungi) from
+					'path': 'MatchedTaxaTree'
+				}
+			},
+			
+			'MatchedTaxaHierarchyPath': {
+				'names': {'en': 'Taxonomy'},
+				'buckets': {
+					'path_hierarchy_field': 'MatchedTaxaHierarchyString.facet'
 				}
 			},
 			
@@ -414,8 +420,14 @@ class FieldDefinitions():
 					'field_query': 'CollectionsTree.CollectionName',
 					'path': 'CollectionsTree',
 					'id_field_for_tree': 'CollectionsTree.CollectionID',
-					'parent_id_field_for_tree': 'CollectionsTree.ParentCollectionID',
-					'root_level': 0 # the level to start the tree or trees
+					'parent_id_field_for_tree': 'CollectionsTree.ParentCollectionID'
+				}
+			},
+			
+			'CollectionHierarchyPath': {
+				'names': {'en': 'Collection(s)'},
+				'buckets': {
+					'path_hierarchy_field': 'CollectionHierarchyString.facet'
 				}
 			},
 			

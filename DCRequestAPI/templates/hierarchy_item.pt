@@ -5,7 +5,7 @@
 		<block tal:condition="python: 'childs' in sibling_item" tal:omit-tag="">
 			<block tal:define="siblings sibling_item['childs']" tal:omit-tag="">
 				<!--recursively call this macro again-->
-				<block metal:use-macro="load: DCRequestAPI:templates/tree_item.pt" tal:omit-tag=""></block>
+				<block metal:use-macro="load: DCRequestAPI:templates/hierarchy_item.pt" tal:omit-tag=""></block>
 			</block>
 		</block>
 	</li>

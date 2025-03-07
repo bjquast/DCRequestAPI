@@ -14,7 +14,7 @@ from ElasticSearch.ES_Mappings import MappingsDict
 from ElasticSearch.WithholdFilters import WithholdFilters
 from ElasticSearch.QueryConstructor.BucketAggregations import BucketAggregations
 from ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
-from ElasticSearch.QueryConstructor.TreeQueries import TreeQueries
+from ElasticSearch.QueryConstructor.HierarchyQueries import HierarchyQueries
 from ElasticSearch.QueryConstructor.StackedQueries import StackedInnerQuery, StackedOuterQuery
 
 class ES_Searcher():
@@ -149,10 +149,10 @@ class ES_Searcher():
 			filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids, source_fields = self.bucket_fields, connector = connector).getTermFilterQueries(self.search_params['term_filters'])
 			self.query['bool']["filter"].extend(filter_queries)
 		
-		if 'open_tree_selectors' in self.search_params:
-			for tree_filter in self.search_params['open_tree_selectors']:
+		if 'open_hierarchy_selectors' in self.search_params:
+			for hierarchy_filter in self.search_params['open_hierarchy_selectors']:
 				
-				self.singleTreeAggregationSearch(tree_filter, )
+				self.singleHierarchyAggregationSearch(hierarchy_filter, )
 		
 		#pudb.set_trace()
 		outer_query = StackedOuterQuery()
@@ -190,11 +190,11 @@ class ES_Searcher():
 		self.client.indices.put_settings(index=self.index, body=body)
 
 
-	def singleTreeAggregationSearch(self, aggregation_name, parent_ids):
+	def singleHierarchyAggregationSearch(self, aggregation_name, parent_ids):
 		pudb.set_trace()
 		self.setQuery()
-		buckets_query = TreeQueries(aggregation_name, parent_ids = parent_ids, users_project_ids = self.users_project_ids) #, buckets_sort_alphanum = True)
-		aggs = buckets_query.getTreeQuery()
+		buckets_query = HierarchyQueries(aggregation_name, parent_ids = parent_ids, users_project_ids = self.users_project_ids) #, buckets_sort_alphanum = True)
+		aggs = buckets_query.getHierarchyQuery()
 		
 		logger.debug(json.dumps(aggs))
 		logger.debug(json.dumps(self.query))

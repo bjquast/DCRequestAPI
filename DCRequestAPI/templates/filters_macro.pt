@@ -67,7 +67,7 @@
 			</div>
 		</div>
 		
-		<div metal:use-macro="load: DCRequestAPI:templates/tree_filters_macro.pt"></div>
+		<div metal:use-macro="load: DCRequestAPI:templates/hierarchy_filters_macro.pt"></div>
 		
 	</fieldset>
 	

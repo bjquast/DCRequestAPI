@@ -7,7 +7,7 @@ class IUPartsTable():
 	def __init__(self):
 		self.coldefs = {}
 		self.bucketdefs = {}
-		self.treefilterdefs = {}
+		self.hierarchyfilterdefs = {}
 		self.default_sourcefields = []
 		self.selected_sourcefields = []
 		self.required_sourcefields = ['StableIdentifierURL', ]
@@ -23,18 +23,18 @@ class IUPartsTable():
 		self.fielddefinitions = fielddefs.fielddefinitions
 		self.default_filter_sections = fielddefs.default_filter_sections
 		self.stacked_query_fields = fielddefs.stacked_query_fields
-		self.tree_query_fields = fielddefs.tree_query_fields
+		self.hierarchy_query_fields = fielddefs.hierarchy_query_fields
 		
 		self.readFieldDefinitions()
 		self.readBucketDefinitions()
-		self.readTreeFilterDefinitions()
+		self.readHierarchyFilterDefinitions()
 		#self.setSourceFields()
 
 
-	def readTreeFilterDefinitions(self):
-		for tree_filter in self.tree_query_fields:
-			if tree_filter in self.fielddefinitions:
-				self.treefilterdefs[tree_filter] = self.fielddefinitions[tree_filter]['names']
+	def readHierarchyFilterDefinitions(self):
+		for hierarchy_filter in self.hierarchy_query_fields:
+			if hierarchy_filter in self.fielddefinitions:
+				self.hierarchyfilterdefs[hierarchy_filter] = self.fielddefinitions[hierarchy_filter]['names']
 
 
 	def readBucketDefinitions(self):
