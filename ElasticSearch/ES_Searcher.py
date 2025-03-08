@@ -30,6 +30,7 @@ class ES_Searcher():
 		self.index = 'iuparts'
 		self.source_fields = []
 		self.bucket_fields = []
+		self.hierarchy_fields = []
 		
 		self.pagesize = 1000
 		self.start = 0
@@ -107,6 +108,12 @@ class ES_Searcher():
 
 	def setBucketFields(self, bucket_fields = []):
 		self.bucket_fields = list(bucket_fields)
+		return
+
+
+	def setHierarchyFields(self, hierarchy_fields = []):
+		self.hierarchy_fields = list(hierarchy_fields)
+		return
 
 
 	def addUserLimitation(self):
@@ -148,11 +155,6 @@ class ES_Searcher():
 			
 			filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids, source_fields = self.bucket_fields, connector = connector).getTermFilterQueries(self.search_params['term_filters'])
 			self.query['bool']["filter"].extend(filter_queries)
-		
-		if 'open_hierarchy_selectors' in self.search_params:
-			for hierarchy_filter in self.search_params['open_hierarchy_selectors']:
-				
-				self.singleHierarchyAggregationSearch(hierarchy_filter, )
 		
 		#pudb.set_trace()
 		outer_query = StackedOuterQuery()

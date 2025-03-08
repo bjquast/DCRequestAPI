@@ -1,6 +1,6 @@
 'use strict'
 
-/* Create overlay for tbale cells that contain more than on row 
+/* Create overlay for table cells that contain more than on row 
  * e. g. Vernaculars or Taxonomy
 */
 
