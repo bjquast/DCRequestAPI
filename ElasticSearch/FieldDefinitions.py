@@ -162,8 +162,8 @@ class FieldDefinitions():
 
 	def setHierarchyQueryFields(self):
 		self.hierarchy_query_fields = [
-			'MatchedTaxaHierarchyPath',
-			'CollectionHierarchyPath'
+			'MatchedTaxaHierarchyString',
+			'CollectionHierarchyString'
 		]
 		return
 
@@ -285,7 +285,7 @@ class FieldDefinitions():
 				}
 			},
 			
-			'MatchedTaxaHierarchyPath': {
+			'MatchedTaxaHierarchyString': {
 				'names': {'en': 'Taxonomy'},
 				'buckets': {
 					'path_hierarchy_field': 'MatchedTaxaHierarchyString.facet'
@@ -424,7 +424,7 @@ class FieldDefinitions():
 				}
 			},
 			
-			'CollectionHierarchyPath': {
+			'CollectionHierarchyString': {
 				'names': {'en': 'Collection(s)'},
 				'buckets': {
 					'path_hierarchy_field': 'CollectionHierarchyString.facet'

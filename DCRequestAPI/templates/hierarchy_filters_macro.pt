@@ -10,8 +10,8 @@
 		<div tal:repeat="hierarchy_name hierarchy_filter_fields" class="hierarchy-filter-select-box">
 			<details id="hierarchy_filter_list_${hierarchy_name}" class="hierarchy_filter_selectors" data-hierarchy-filter-key="${hierarchy_name}">
 				<summary class="clickable">${hierarchyfilterdefs[hierarchy_name]['en']}</summary>
-				<ul tal:condition="python: hierarchy_name in hierarchy_aggregations" class="ul-no-bullet">
-					<li tal:repeat="bucket hierarchy_aggregations[hierarchy_name]" class="hierarchy_entry clickable" 
+				<ul tal:condition="python: hierarchy_name in aggregations and hierarchy_name in open_hierarchy_selectors" class="ul-no-bullet">
+					<li tal:repeat="bucket aggregations[hierarchy_name]" class="hierarchy_entry clickable" 
 						data-hierarchy-filter-id="filter_${hierarchy_name}_${bucket['key']}" 
 						data-hierarchy-filter-name="${hierarchyfilterdefs[hierarchy_name]['en']}"
 						data-hierarchy-filter-key="${hierarchy_name}"

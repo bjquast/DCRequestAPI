@@ -6,10 +6,11 @@ logger = logging.getLogger('elastic_queries')
 import pudb
 
 from ElasticSearch.FieldDefinitions import FieldDefinitions
+from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 class HierarchyQueries():
-	def __init__(self, hierarchy_pathes = {}, users_project_ids = [], source_fields = [], size = 1000):
-		self.hierarchy_pathes = hierarchy_pathes
+	def __init__(self, hierarchy_pathes_dict = {}, users_project_ids = [], source_fields = [], size = 1000):
+		self.hierarchy_pathes_dict = hierarchy_pathes_dict
 		self.users_project_ids = users_project_ids
 		
 		self.source_fields = source_fields
@@ -65,7 +66,7 @@ class HierarchyQueries():
 		self.setSimpleHierarchiesQuery()
 		self.setRestrictedHierarchiesQuery()
 		self.setNestedHierarchiesQuery()
-		self.setRestrictedNestedHierarchiesQuery()
+		self.setNestedRestrictedHierarchiesQuery()
 		return
 
 
@@ -77,21 +78,19 @@ class HierarchyQueries():
 
 	def setSimpleHierarchiesQuery(self):
 		for field in self.simple_fields:
-		
-			path_regex = ''
-			for hierarchy_path in self.hierarchy_pathes[field]:
-				path_regex += '({0})?'.hierarchy_path
-			path_regex += '>?[^>]*'
-			
+			if field in self.hierarchy_pathes_dict:
+				path_regex = ''
+				for hierarchy_path in self.hierarchy_pathes_dict[field]:
+					path_regex += '({0})?'.format(hierarchy_path)
+				path_regex += '>?[^>]*'
+			else:
+				path_regex = '>?[^>]*'
+				
 			self.hierarchies_query[field] = {
-				"aggs": {
-					"buckets": {
-						"terms": {
-							"field": self.simple_fields[field]['path_hierarchy_field'],
-							'size': self.size,
-							'include': path_regex
-						}
-					}
+				"terms": {
+					"field": self.simple_fields[field]['path_hierarchy_field'],
+					'size': self.size,
+					'include': path_regex
 				}
 			}
 		return
@@ -99,11 +98,13 @@ class HierarchyQueries():
 
 	def setRestrictedHierarchiesQuery(self):
 		for field in self.simple_restricted_fields:
-		
-			path_regex = ''
-			for hierarchy_path in self.hierarchy_pathes[field]:
-				path_regex += '({0})?'.hierarchy_path
-			path_regex += '>?[^>]*'
+			if field in self.hierarchy_pathes_dict:
+				path_regex = ''
+				for hierarchy_path in self.hierarchy_pathes_dict[field]:
+					path_regex += '({0})?'.format(hierarchy_path)
+				path_regex += '>?[^>]*'
+			else:
+				path_regex = '>?[^>]*'
 			
 			self.hierarchies_query[field] = {
 				"filter": {
@@ -136,11 +137,13 @@ class HierarchyQueries():
 
 	def setNestedHierarchiesQuery(self):
 		for field in self.nested_fields:
-		
-			path_regex = ''
-			for hierarchy_path in self.hierarchy_pathes[field]:
-				path_regex += '({0})?'.hierarchy_path
-			path_regex += '>?[^>]*'
+			if field in self.hierarchy_pathes_dict:
+				path_regex = ''
+				for hierarchy_path in self.hierarchy_pathes_dict[field]:
+					path_regex += '({0})?'.format(hierarchy_path)
+				path_regex += '>?[^>]*'
+			else:
+				path_regex = '>?[^>]*'
 			
 			self.hierarchies_query[field] = {
 				"nested": {
@@ -162,11 +165,13 @@ class HierarchyQueries():
 
 	def setNestedRestrictedHierarchiesQuery(self):
 		for field in self.nested_restricted_fields:
-		
-			path_regex = ''
-			for hierarchy_path in self.hierarchy_pathes[field]:
-				path_regex += '({0})?'.hierarchy_path
-			path_regex += '>?[^>]*'
+			if field in self.hierarchy_pathes_dict:
+				path_regex = ''
+				for hierarchy_path in self.hierarchy_pathes_dict[field]:
+					path_regex += '({0})?'.format(hierarchy_path)
+				path_regex += '>?[^>]*'
+			else:
+				path_regex = '>?[^>]*'
 			
 			self.hierarchies_query[field] = {
 				"nested": {
@@ -261,9 +266,7 @@ class HierarchyQueries():
 				}
 			}
 		'''
-		
-		return
 
 
-	def getTreeQuery(self):
+	def getHierarchiesQuery(self):
 		return self.hierarchies_query

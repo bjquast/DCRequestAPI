@@ -26,7 +26,7 @@ def main(global_config, **settings):
 	
 	config.add_route('iupartslist', '/list')
 	config.add_route('aggregation', '/aggregation')
-	config.add_route('tree_aggregation', '/tree_aggregation')
+	config.add_route('hierarchy_aggregation', '/hierarchy_aggregation')
 	config.add_route('aggs_suggestions', '/aggs_suggestions')
 	config.add_route('help', '/')
 	

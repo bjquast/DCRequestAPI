@@ -141,8 +141,6 @@ class IUPartsListView():
 		
 		open_filter_selectors = self.search_params['open_filter_selectors']
 		
-		hierarchy_filter_fields = iupartstable.hierarchy_query_fields
-		
 		# the selected_bucketfields contain only the fields found in self.search_params['open_filter_selectors']
 		# the fields from self.search_params['term_filters'] must be added, otherwise their results are not mentioned when their filter selector is not opened
 		for term_filter_field in self.search_params['term_filters']:
@@ -161,6 +159,13 @@ class IUPartsListView():
 				open_filter_selectors.append(bucketfield)
 		selected_filter_sections = sorted_filter_sections
 		
+		hierarchy_filter_fields = iupartstable.hierarchy_query_fields
+		open_hierarchy_selectors = self.search_params['open_hierarchy_selectors']
+		
+		for hierarchy_field in self.search_params['hierarchies']:
+			if hierarchy_field not in open_hierarchy_selectors:
+				open_hierarchy_selectors.append(hierarchy_field)
+		
 		coldefs = iupartstable.coldefs
 		bucketdefs = iupartstable.bucketdefs
 		hierarchyfilterdefs = iupartstable.hierarchyfilterdefs
@@ -168,6 +173,9 @@ class IUPartsListView():
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids, restrict_to_users_projects = restrict_to_users_projects)
 		es_searcher.setSourceFields(selected_sourcefields)
 		es_searcher.setBucketFields(selected_bucketfields)
+		es_searcher.setHierarchyFields(open_hierarchy_selectors)
+		
+		#pudb.set_trace()
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
 		aggregations = es_searcher.getParsedAggregations()
 		hierarchy_aggregations = []
@@ -183,8 +191,9 @@ class IUPartsListView():
 			'requestparamsstring': self.requeststring,
 			'search_params': self.search_params,
 			'iupartslist': iupartslist,
+			# hierarchy pathes are within the aggregations an should be filtered out by the template?
 			'aggregations': aggregations,
-			'hierarchy_aggregations': hierarchy_aggregations,
+			#'hierarchy_aggregations': hierarchy_aggregations,
 			'coldefs': coldefs,
 			'bucketdefs': bucketdefs,
 			'hierarchyfilterdefs': hierarchyfilterdefs,
@@ -196,6 +205,7 @@ class IUPartsListView():
 			'selected_filter_sections': selected_filter_sections,
 			'stacked_query_fields': stacked_query_fields,
 			'hierarchy_filter_fields': hierarchy_filter_fields,
+			'open_hierarchy_selectors': open_hierarchy_selectors,
 			'authenticated_user': self.uid,
 			'messages': self.messages
 		}

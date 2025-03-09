@@ -31,6 +31,7 @@ class ES_Searcher():
 		self.source_fields = []
 		self.bucket_fields = []
 		self.hierarchy_fields = []
+		self.hierarchy_pathes_dict = {}
 		
 		self.pagesize = 1000
 		self.start = 0
@@ -116,6 +117,11 @@ class ES_Searcher():
 		return
 
 
+	def setHierarchyPathesDict(self, hierarchy_pathes_dict = {}):
+		self.hierarchy_pathes_dict = hierarchy_pathes_dict
+		return
+
+
 	def addUserLimitation(self):
 		# prepare the query as a subquery to the must-queries, so that it is guarantied that it is AND connected. 
 		# this is in contrast to should filters where the addition of other should filters might disable the AND connection
@@ -192,11 +198,11 @@ class ES_Searcher():
 		self.client.indices.put_settings(index=self.index, body=body)
 
 
-	def singleHierarchyAggregationSearch(self, aggregation_name, parent_ids):
-		pudb.set_trace()
+	def singleHierarchyAggregationSearch(self, hierarchy_name, hierarchy_pathes_dict = {}):
+		
 		self.setQuery()
-		buckets_query = HierarchyQueries(aggregation_name, parent_ids = parent_ids, users_project_ids = self.users_project_ids) #, buckets_sort_alphanum = True)
-		aggs = buckets_query.getHierarchyQuery()
+		buckets_query = HierarchyQueries(hierarchy_pathes_dict = hierarchy_pathes_dict, users_project_ids = self.users_project_ids, source_fields = [hierarchy_name]) #, buckets_sort_alphanum = True)
+		aggs = buckets_query.getHierarchiesQuery()
 		
 		logger.debug(json.dumps(aggs))
 		logger.debug(json.dumps(self.query))
@@ -208,8 +214,13 @@ class ES_Searcher():
 		buckets = []
 		if 'aggregations' in response:
 			self.raw_aggregations = response['aggregations']
-			buckets = self.getBucketListFromCompositeAggregation(self.raw_aggregations[aggregation_name])
+			buckets = self.getBucketListFromAggregation(self.raw_aggregations[hierarchy_name])
 		
+		'''
+		if 'aggregations' in response:
+			self.raw_aggregations = response['aggregations']
+			buckets = self.getBucketListFromCompositeAggregation(self.raw_aggregations[aggregation_name])
+		'''
 		return buckets
 
 
@@ -273,6 +284,13 @@ class ES_Searcher():
 		if len(self.bucket_fields) > 0:
 			buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = self.bucket_fields)
 			aggs = buckets_query.getAggregationsQuery()
+		
+		if len(self.hierarchy_fields) > 0:
+			hierarchies_query = HierarchyQueries(hierarchy_pathes_dict = self.hierarchy_pathes_dict, users_project_ids = self.users_project_ids, source_fields = self.hierarchy_fields)
+			if aggs is not None:
+				aggs.update(hierarchies_query.getHierarchiesQuery())
+			else:
+				aggs = hierarchies_query.getHierarchiesQuery()
 		
 		#logger.debug(self.sort)
 		logger.debug(json.dumps(aggs))

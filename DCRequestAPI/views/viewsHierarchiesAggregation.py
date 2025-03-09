@@ -16,7 +16,7 @@ import pudb
 import json
 
 
-class TreeView():
+class HierarchiesView():
 	def __init__(self, request):
 		
 		self.request = request
@@ -53,33 +53,36 @@ class TreeView():
 		self.fielddefinitions = FieldDefinitions().fielddefinitions
 
 
-	@view_config(route_name='tree_aggregation', accept='application/json', renderer="json")
-	def viewTreeAggregationJSON(self):
+	@view_config(route_name='hierarchy_aggregation', accept='application/json', renderer="json")
+	def viewHierarchyAggregationJSON(self):
 		
-		#pudb.set_trace()
-		
-		if 'tree' in self.search_params:
-			agg_key = self.search_params['tree']
-		
-		parent_ids = []
-		if 'parent_ids' in self.search_params:
-			parent_ids = self.search_params['parent_ids']
-		
-		
-		if agg_key not in self.fielddefinitions:
+		if 'hierarchies' not in self.search_params or len(self.search_params['hierarchies']) <= 0:
 			return {
-				'message': '{0} is not available as tree aggregation'.format(agg_key),
+				'message': 'parameter hierarchies=hierarchy_name:path is missing',
 				'buckets': {}
 			}
 		
+		if 'hierarchies' not in self.search_params or len(self.search_params['hierarchies']) > 1:
+			return {
+				'message': 'only one parameter hierarchies=hierarchy_name:path is supported by route {0}/hierarchy_aggregation'.format(self.request.application_uri),
+				'buckets': {}
+			}
+		
+		for key in self.search_params['hierarchies']:
+			if not (isinstance(self.search_params['hierarchies'][key], tuple) or isinstance(self.search_params['hierarchies'][key], list)):
+				return {
+					'message': '{0} parameter contains no hierarchy:path parameter'.format(key),
+					'buckets': {}
+				}
+			else:
+				hierarchy_name = key
+		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
-		buckets = es_searcher.singleTreeAggregationSearch(agg_key, parent_ids)
-		
-		
+		buckets = es_searcher.singleHierarchyAggregationSearch(hierarchy_name, self.search_params['hierarchies'])
 		
 		buckets_dict = {
-			'aggregation': agg_key,
-			'aggregation_names': self.fielddefinitions[agg_key].get('names', {'en', None}),
+			'aggregation': hierarchy_name,
+			'aggregation_names': self.fielddefinitions[hierarchy_name].get('names', {'en', None}),
 			'buckets': buckets
 		}
 		
