@@ -288,7 +288,7 @@ class FieldDefinitions():
 			'MatchedTaxaHierarchyString': {
 				'names': {'en': 'Taxonomy'},
 				'buckets': {
-					'path_hierarchy_field': 'MatchedTaxaHierarchyString.facet'
+					'field_query': 'MatchedTaxaHierarchyString.facet'
 				}
 			},
 			
@@ -427,7 +427,7 @@ class FieldDefinitions():
 			'CollectionHierarchyString': {
 				'names': {'en': 'Collection(s)'},
 				'buckets': {
-					'path_hierarchy_field': 'CollectionHierarchyString.facet'
+					'field_query': 'CollectionHierarchyString.facet'
 				}
 			},
 			

@@ -43,16 +43,16 @@ class HierarchyQueries():
 			if fieldname in self.fielddefinitions:
 				if 'buckets' in self.fielddefinitions[fieldname] \
 					and 'path' in self.fielddefinitions[fieldname]['buckets'] \
-					and 'path_hierarchy_field' in self.fielddefinitions[fieldname]['buckets'] \
+					and 'field_query' in self.fielddefinitions[fieldname]['buckets'] \
 					and 'withholdflags' in self.fielddefinitions[fieldname]['buckets']:
 					self.nested_restricted_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
 				elif 'buckets' in self.fielddefinitions[fieldname] \
 					and 'path' in self.fielddefinitions[fieldname]['buckets'] \
-					and 'path_hierarchy_field' in self.fielddefinitions[fieldname]['buckets'] \
+					and 'field_query' in self.fielddefinitions[fieldname]['buckets'] \
 					and 'withholdflags' not in self.fielddefinitions[fieldname]['buckets']:
 					self.nested_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
 				elif 'buckets' in self.fielddefinitions[fieldname] \
-					and 'path_hierarchy_field' in self.fielddefinitions[fieldname]['buckets'] \
+					and 'field_query' in self.fielddefinitions[fieldname]['buckets'] \
 					and 'withholdflags' in self.fielddefinitions[fieldname]['buckets']:
 					self.simple_restricted_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
 				elif 'buckets' in self.fielddefinitions[fieldname]:
@@ -88,7 +88,7 @@ class HierarchyQueries():
 				
 			self.hierarchies_query[field] = {
 				"terms": {
-					"field": self.simple_fields[field]['path_hierarchy_field'],
+					"field": self.simple_fields[field]['field_query'],
 					'size': self.size,
 					'include': path_regex
 				}
@@ -124,7 +124,7 @@ class HierarchyQueries():
 				"aggs": {
 					"buckets": {
 						"terms": {
-							"field": self.simple_restricted_fields[field]['path_hierarchy_field'],
+							"field": self.simple_restricted_fields[field]['field_query'],
 							'size': self.size,
 							'include': path_regex
 						}
@@ -152,7 +152,7 @@ class HierarchyQueries():
 				"aggs": {
 					"buckets": {
 						"terms": {
-							"field": self.nested_fields[field]['path_hierarchy_field'],
+							"field": self.nested_fields[field]['field_query'],
 							'size': self.size,
 							'include': path_regex
 						}
@@ -196,7 +196,7 @@ class HierarchyQueries():
 						"aggs": {
 							"buckets": {
 								"terms": {
-									"field": self.nested_restricted_fields[field]['path_hierarchy_field'],
+									"field": self.nested_restricted_fields[field]['field_query'],
 									'size': self.size,
 									'include': path_regex
 								}

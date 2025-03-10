@@ -8,7 +8,7 @@
 	</div>
 	<div id="available_hierarchys">
 		<div tal:repeat="hierarchy_name hierarchy_filter_fields" class="hierarchy-filter-select-box">
-			<details id="hierarchy_filter_list_${hierarchy_name}" class="hierarchy_filter_selectors" data-hierarchy-filter-key="${hierarchy_name}">
+			<details id="hierarchy_list_${hierarchy_name}" class="hierarchy_selectors" data-hierarchy-filter-key="${hierarchy_name}" tal:attributes="open 'open' if hierarchy_name in open_hierarchy_selectors else None">
 				<summary class="clickable">${hierarchyfilterdefs[hierarchy_name]['en']}</summary>
 				<ul tal:condition="python: hierarchy_name in aggregations and hierarchy_name in open_hierarchy_selectors" class="ul-no-bullet">
 					<li tal:repeat="bucket aggregations[hierarchy_name]" class="hierarchy_entry clickable" 
@@ -16,11 +16,11 @@
 						data-hierarchy-filter-name="${hierarchyfilterdefs[hierarchy_name]['en']}"
 						data-hierarchy-filter-key="${hierarchy_name}"
 						data-hierarchy-filter-value="${bucket['key']}">
+						<span class="hierarchy_open_button"> + </span>
 						${bucket['key']} (${bucket['doc_count']})
+						<block>
+						</block>
 					</li>
-					<block>
-						
-					</block>
 				</ul>
 			</details>
 		</div>

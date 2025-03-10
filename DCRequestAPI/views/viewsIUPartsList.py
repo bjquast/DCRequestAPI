@@ -138,14 +138,18 @@ class IUPartsListView():
 		selected_filter_sections = iupartstable.selected_filter_sections
 		default_filter_sections = iupartstable.default_filter_sections
 		stacked_query_fields = iupartstable.stacked_query_fields
+		hierarchy_filter_fields = iupartstable.hierarchy_query_fields
 		
 		open_filter_selectors = self.search_params['open_filter_selectors']
+		open_hierarchy_selectors = self.search_params['open_hierarchy_selectors']
 		
 		# the selected_bucketfields contain only the fields found in self.search_params['open_filter_selectors']
 		# the fields from self.search_params['term_filters'] must be added, otherwise their results are not mentioned when their filter selector is not opened
 		for term_filter_field in self.search_params['term_filters']:
-			if term_filter_field not in selected_bucketfields:
+			if term_filter_field in selected_bucketfields and term_filter_field not in selected_bucketfields:
 				selected_bucketfields.append(term_filter_field)
+			if term_filter_field in hierarchy_filter_fields and term_filter_field not in open_hierarchy_selectors:
+				open_hierarchy_selectors.append(term_filter_field)
 		
 		# add the opened_filter_selectors to the selected filtersections
 		# which here also includes the fields from the applied filters in self.search_params['term_filters']
@@ -158,9 +162,6 @@ class IUPartsListView():
 			if bucketfield in selected_bucketfields and bucketfield not in open_filter_selectors:
 				open_filter_selectors.append(bucketfield)
 		selected_filter_sections = sorted_filter_sections
-		
-		hierarchy_filter_fields = iupartstable.hierarchy_query_fields
-		open_hierarchy_selectors = self.search_params['open_hierarchy_selectors']
 		
 		for hierarchy_field in self.search_params['hierarchies']:
 			if hierarchy_field not in open_hierarchy_selectors:

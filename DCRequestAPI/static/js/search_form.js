@@ -2,6 +2,7 @@
 
 const appliedfilters = new AppliedFiltersField();
 const filterlists = new FilterLists(appliedfilters);
+const hierarchylists = new HierarchyLists(appliedfilters);
 const bucketsoverlay = new BucketsOverlay(appliedfilters);
 const aggs_suggestions = new AggsSuggestions(appliedfilters, "aggs_search_input", "aggs_search_suggestions_list");
 const stacked_search = new StackedSearch();
@@ -15,6 +16,10 @@ $(document).ready( function() {
 	filterlists.add_filter_events();
 	filterlists.set_more_button_events();
 	filterlists.add_collapsible_filters_events();
+	
+	
+	hierarchylists.add_collapsible_hierarchies_events();
+	
 	add_column_selector_event();
 	add_columnheader_sorting_events();
 	add_filter_sections_selector_event();

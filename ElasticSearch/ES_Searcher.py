@@ -117,9 +117,11 @@ class ES_Searcher():
 		return
 
 
+	'''
 	def setHierarchyPathesDict(self, hierarchy_pathes_dict = {}):
 		self.hierarchy_pathes_dict = hierarchy_pathes_dict
 		return
+	'''
 
 
 	def addUserLimitation(self):
