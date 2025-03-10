@@ -62,9 +62,24 @@ class HierarchiesView():
 				'buckets': {}
 			}
 		
-		if 'hierarchies' not in self.search_params or len(self.search_params['hierarchies']) > 1:
+		hierarchy_name = self.request.matchdict['hierarchy_name']
+		
+		if hierarchy_name not in self.search_params['hierarchies']:
 			return {
-				'message': 'only one parameter hierarchies=hierarchy_name:path is supported by route {0}/hierarchy_aggregation'.format(self.request.application_uri),
+				'message': 'hierarchy name {0} can not be found in parameters'.format(hierarchy_name),
+				'buckets': {}
+			}
+		
+		if not (isinstance(self.search_params['hierarchies'][hierarchy_name], tuple) or isinstance(self.search_params['hierarchies'][hierarchy_name], list)):
+				return {
+					'message': '{0} parameter contains no hierarchy:path parameter'.format(hierarchy_name),
+					'buckets': {}
+				}
+		
+		'''
+		if len(self.search_params['hierarchies']) > 1:
+			return {
+				'message': 'only one parameter hierarchies=hierarchy_name:path is supported by route {0}/hierarchy_aggregation'.format(self.request.application_url),
 				'buckets': {}
 			}
 		
@@ -76,6 +91,7 @@ class HierarchiesView():
 				}
 			else:
 				hierarchy_name = key
+		'''
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
 		buckets = es_searcher.singleHierarchyAggregationSearch(hierarchy_name, self.search_params['hierarchies'])

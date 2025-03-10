@@ -143,13 +143,24 @@ class IUPartsListView():
 		open_filter_selectors = self.search_params['open_filter_selectors']
 		open_hierarchy_selectors = self.search_params['open_hierarchy_selectors']
 		
+		hierarchy_pathes_dict = self.search_params['hierarchies']
+		
+		
+		for hierarchy_field in self.search_params['hierarchies']:
+			if hierarchy_field not in open_hierarchy_selectors:
+				open_hierarchy_selectors.append(hierarchy_field)
+		
 		# the selected_bucketfields contain only the fields found in self.search_params['open_filter_selectors']
 		# the fields from self.search_params['term_filters'] must be added, otherwise their results are not mentioned when their filter selector is not opened
+		
 		for term_filter_field in self.search_params['term_filters']:
 			if term_filter_field in selected_bucketfields and term_filter_field not in selected_bucketfields:
 				selected_bucketfields.append(term_filter_field)
 			if term_filter_field in hierarchy_filter_fields and term_filter_field not in open_hierarchy_selectors:
 				open_hierarchy_selectors.append(term_filter_field)
+				if term_filter_field not in hierarchy_pathes_dict:
+					hierarchy_pathes_dict[term_filter_field] = []
+				hierarchy_pathes_dict[term_filter_field].extend(self.search_params['term_filters'][term_filter_field])
 		
 		# add the opened_filter_selectors to the selected filtersections
 		# which here also includes the fields from the applied filters in self.search_params['term_filters']
@@ -163,10 +174,6 @@ class IUPartsListView():
 				open_filter_selectors.append(bucketfield)
 		selected_filter_sections = sorted_filter_sections
 		
-		for hierarchy_field in self.search_params['hierarchies']:
-			if hierarchy_field not in open_hierarchy_selectors:
-				open_hierarchy_selectors.append(hierarchy_field)
-		
 		coldefs = iupartstable.coldefs
 		bucketdefs = iupartstable.bucketdefs
 		hierarchyfilterdefs = iupartstable.hierarchyfilterdefs
@@ -176,7 +183,8 @@ class IUPartsListView():
 		es_searcher.setBucketFields(selected_bucketfields)
 		es_searcher.setHierarchyFields(open_hierarchy_selectors)
 		
-		#pudb.set_trace()
+		es_searcher.setHierarchyPathesDict(hierarchy_pathes_dict)
+		
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
 		aggregations = es_searcher.getParsedAggregations()
 		hierarchy_aggregations = []
@@ -207,6 +215,7 @@ class IUPartsListView():
 			'stacked_query_fields': stacked_query_fields,
 			'hierarchy_filter_fields': hierarchy_filter_fields,
 			'open_hierarchy_selectors': open_hierarchy_selectors,
+			'hierarchy_pathes_dict': hierarchy_pathes_dict,
 			'authenticated_user': self.uid,
 			'messages': self.messages
 		}

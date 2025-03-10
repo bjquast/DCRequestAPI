@@ -17,7 +17,7 @@ $(document).ready( function() {
 	filterlists.set_more_button_events();
 	filterlists.add_collapsible_filters_events();
 	
-	
+	hierarchylists.add_hierarchy_filter_events();
 	hierarchylists.add_collapsible_hierarchies_events();
 	
 	add_column_selector_event();

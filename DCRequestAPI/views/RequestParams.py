@@ -32,7 +32,6 @@ class RequestParams():
 
 
 	def read_stack_queries_params(self):
-		#pudb.set_trace()
 		
 		terms_pattern = re.compile(r'stack_query_terms_(\d+)_(\d+)$')
 		
@@ -127,8 +126,10 @@ class RequestParams():
 						if query[0] not in self.search_params[param_name]:
 							self.search_params[param_name][query[0]] = []
 						self.search_params[param_name][query[0]].append(query[1])
+					else:
+						self.search_params[param_name] = {}
 			else:
-				self.search_params[param_name] = []
+				self.search_params[param_name] = {}
 		
 		for param_name in list_params:
 			if param_name in self.params_dict:
