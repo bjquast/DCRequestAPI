@@ -97,7 +97,6 @@ class HierarchyLists {
 		
 		
 		self.form_data.append('hierarchies', hierarchy_filter_key + ':');
-		console.log('333333333333333333333', hierarchy_filter_key);
 		self.form_data.append('buckets_size', 1000);
 		
 		$.ajax({
@@ -114,7 +113,6 @@ class HierarchyLists {
 		})
 		.done( function(data) {
 			buckets = data;
-			console.log('4444444444444444', buckets);
 			self.createFilterList(hierarchy_list_id, buckets);
 			//self.add_hierarchy_opener_event();
 			self.add_hierarchy_filter_events();

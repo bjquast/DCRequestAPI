@@ -6,6 +6,7 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPSeeOther
 from ElasticSearch.ES_Searcher import ES_Searcher
 
 from DCRequestAPI.lib.SearchResults.IUPartsTable import IUPartsTable
+from DCRequestAPI.lib.SearchResults.HierarchyAggregations import HierarchyAggregations
 from DCRequestAPI.lib.UserLogin.UserLogin import UserLogin
 
 from DCRequestAPI.views.RequestParams import RequestParams
@@ -184,10 +185,11 @@ class IUPartsListView():
 		es_searcher.setHierarchyFields(open_hierarchy_selectors)
 		
 		es_searcher.setHierarchyPathesDict(hierarchy_pathes_dict)
-		
+		#pudb.set_trace()
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
 		aggregations = es_searcher.getParsedAggregations()
-		hierarchy_aggregations = []
+		hierarchies_dict = HierarchyAggregations(aggregations).calcHierarchiesDict()
+		
 		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs])
 		
 		pagecontent = {
@@ -200,9 +202,8 @@ class IUPartsListView():
 			'requestparamsstring': self.requeststring,
 			'search_params': self.search_params,
 			'iupartslist': iupartslist,
-			# hierarchy pathes are within the aggregations an should be filtered out by the template?
 			'aggregations': aggregations,
-			#'hierarchy_aggregations': hierarchy_aggregations,
+			'hierarchies_dict': hierarchies_dict,
 			'coldefs': coldefs,
 			'bucketdefs': bucketdefs,
 			'hierarchyfilterdefs': hierarchyfilterdefs,

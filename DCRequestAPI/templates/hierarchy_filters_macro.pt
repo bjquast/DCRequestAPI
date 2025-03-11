@@ -8,23 +8,32 @@
 	</div>
 	<div id="available_hierarchies">
 		<block tal:repeat="key hierarchy_pathes_dict" tal:omit-tag="">
-			<input tal:repeat="path hierarchy_pathes_dict[key]" type="checkbox" name="hierarchies" form="search_form" class="hidden" value="${key}:${path}" tal:attributes="checked 'checked'">
+			<input tal:repeat="path hierarchy_pathes_dict[key]" type="checkbox" name="hierarchies_test" form="search_form" class="__hidden" value="${key}:${path}" tal:attributes="checked 'checked'">
 		</block>
 		<div tal:repeat="hierarchy_name hierarchy_filter_fields" class="hierarchy-filter-select-box">
 			<details id="hierarchy_list_${hierarchy_name}" class="hierarchy_selectors" data-hierarchy-filter-key="${hierarchy_name}" tal:attributes="open 'open' if hierarchy_name in open_hierarchy_selectors else None">
 				<summary class="clickable">${hierarchyfilterdefs[hierarchy_name]['en']}</summary>
-				<ul tal:condition="python: hierarchy_name in aggregations and hierarchy_name in open_hierarchy_selectors" class="ul-no-bullet">
-					<li tal:repeat="bucket aggregations[hierarchy_name]" class="hierarchy_entry clickable" 
-						data-hierarchy-filter-id="filter_${hierarchy_name}_${bucket['key']}" 
-						data-hierarchy-filter-name="${hierarchyfilterdefs[hierarchy_name]['en']}"
-						data-hierarchy-filter-key="${hierarchy_name}"
-						data-hierarchy-filter-value="${bucket['key']}">
-						<span class="hierarchy_open_button"> + </span>
-						${bucket['key']} (${bucket['doc_count']})
-						<block>
-						</block>
-					</li>
-				</ul>
+				<block tal:condition="python: hierarchy_name in hierarchies_dict and hierarchy_name in open_hierarchy_selectors" tal:omit-tag="">
+					<block tal:repeat="h_key hierarchies_dict[hierarchy_name]" tal:omit-tag="">
+						<ul tal:define="bucket hierarchies_dict[hierarchy_name][h_key]" class="ul-no-bullet">
+							<li
+								data-hierarchy-filter-id="filter_${hierarchy_name}_${bucket['key']}" 
+								data-hierarchy-filter-name="${hierarchyfilterdefs[hierarchy_name]['en']}"
+								data-hierarchy-filter-key="${hierarchy_name}"
+								data-hierarchy-filter-value="${bucket['key']}">
+								<span class="hierarchy_open_button"> + </span>
+								<span class="hierarchy_entry clickable">${bucket['key']} (${bucket['doc_count']})</span>
+							</li>
+							<block tal:repeat="sub_key bucket" tal:omit-tag="">
+								<block tal:condition="python: sub_key != 'key' and sub_key != 'doc_count'  and sub_key != 'taxon' and isinstance(bucket[sub_key], dict)" tal:omit-tag="">
+									<block tal:define="child_bucket bucket[sub_key]" tal:omit-tag="">
+										<block metal:use-macro="load: DCRequestAPI:templates/hierarchy_item.pt" tal:omit-tag=""></block>
+									</block>
+								</block>
+							</block>
+						</ul>
+					</block>
+				</block>
 			</details>
 		</div>
 	</div>

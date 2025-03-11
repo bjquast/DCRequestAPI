@@ -4,6 +4,7 @@ logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('elastic_queries')
 
 import pudb
+import re
 
 from ElasticSearch.FieldDefinitions import FieldDefinitions
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
@@ -70,19 +71,30 @@ class HierarchyQueries():
 		return
 
 
-	def setRestrictedHierarchiesQuery(self):
+	def getPathRegexp(self, field):
+		path_regex = ''
+		sub_pathes = []
 		
 		
-		return
+		for hierarchy_path in self.hierarchy_pathes_dict[field]:
+			sub_pathes.append('({0})?>?[^>]*'.format(hierarchy_path))
+			
+			path_elements = hierarchy_path.split('>')
+			
+			while len(path_elements) > 2:
+				path_elements.pop()
+				sub_pathes.append('>'.join(path_elements))
+		
+		for hierarchy_path in sub_pathes:
+			path_regex += '({0})?'.format(hierarchy_path)
+		
+		return path_regex
 
 
 	def setSimpleHierarchiesQuery(self):
 		for field in self.simple_fields:
 			if field in self.hierarchy_pathes_dict:
-				path_regex = ''
-				for hierarchy_path in self.hierarchy_pathes_dict[field]:
-					path_regex += '({0})?'.format(hierarchy_path)
-				path_regex += '>?[^>]*'
+				path_regex = self.getPathRegexp(field)
 			else:
 				path_regex = '>?[^>]*'
 				
@@ -99,10 +111,7 @@ class HierarchyQueries():
 	def setRestrictedHierarchiesQuery(self):
 		for field in self.simple_restricted_fields:
 			if field in self.hierarchy_pathes_dict:
-				path_regex = ''
-				for hierarchy_path in self.hierarchy_pathes_dict[field]:
-					path_regex += '({0})?'.format(hierarchy_path)
-				path_regex += '>?[^>]*'
+				path_regex = self.getPathRegexp(field)
 			else:
 				path_regex = '>?[^>]*'
 			
@@ -138,10 +147,7 @@ class HierarchyQueries():
 	def setNestedHierarchiesQuery(self):
 		for field in self.nested_fields:
 			if field in self.hierarchy_pathes_dict:
-				path_regex = ''
-				for hierarchy_path in self.hierarchy_pathes_dict[field]:
-					path_regex += '({0})?'.format(hierarchy_path)
-				path_regex += '>?[^>]*'
+				path_regex = self.getPathRegexp(field)
 			else:
 				path_regex = '>?[^>]*'
 			
@@ -166,10 +172,7 @@ class HierarchyQueries():
 	def setNestedRestrictedHierarchiesQuery(self):
 		for field in self.nested_restricted_fields:
 			if field in self.hierarchy_pathes_dict:
-				path_regex = ''
-				for hierarchy_path in self.hierarchy_pathes_dict[field]:
-					path_regex += '({0})?'.format(hierarchy_path)
-				path_regex += '>?[^>]*'
+				path_regex = self.getPathRegexp(field)
 			else:
 				path_regex = '>?[^>]*'
 			
