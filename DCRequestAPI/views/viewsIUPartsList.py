@@ -151,6 +151,8 @@ class IUPartsListView():
 			if hierarchy_field not in open_hierarchy_selectors:
 				open_hierarchy_selectors.append(hierarchy_field)
 		
+		self.search_params['term_filters'] = self.reduce_hierarchical_term_filters(self.search_params['term_filters'], hierarchy_filter_fields)
+		
 		# the selected_bucketfields contain only the fields found in self.search_params['open_filter_selectors']
 		# the fields from self.search_params['term_filters'] must be added, otherwise their results are not mentioned when their filter selector is not opened
 		
@@ -223,6 +225,56 @@ class IUPartsListView():
 		return pagecontent
 
 
+	def reduce_hierarchical_term_filters(self, term_filters, hierarchy_filter_fields):
+		# when term_filters that are used with hierarchies filter out the term_filters that are parents of other term_filters
+		# to have a specific search
+		new_term_filters = {}
+		for key in term_filters:
+			if key in hierarchy_filter_fields:
+				
+				filter_dict = {}
+				
+				for filter_entry in term_filters[key]:
+					element_list = [element.strip() for element in filter_entry.split('>')]
+					self.set_reduced_hierarchy_dict(filter_dict, element_list)
+				
+				self.reduced_hierarchy_pathes = []
+				self.set_reduced_hierarchy_pathes(filter_dict)
+				
+				if len(self.reduced_hierarchy_pathes) > 0:
+					new_term_filters[key] = []
+					for hierarchy_path in self.reduced_hierarchy_pathes:
+						new_term_filters[key].append('>'.join(hierarchy_path))
+				
+			else:
+				new_term_filters[key] = term_filters[key]
+		
+		return new_term_filters
 
 
+	def set_reduced_hierarchy_dict(self, subdict, element_list):
+		if len(element_list) <= 0:
+			return
+		element = element_list.pop(0)
+		if element in subdict.keys():
+			self.set_reduced_hierarchy_dict(subdict[element], element_list)
+		else:
+			subdict[element] = {}
+			self.set_reduced_hierarchy_dict(subdict[element], element_list)
+		return
 
+
+	def set_reduced_hierarchy_pathes(self, sub_dict, path = None):
+		if path is None:
+			path = []
+		for key in sub_dict:
+			if isinstance(sub_dict[key], dict) and len(sub_dict[key]) > 0:
+				path.append(key)
+				self.set_reduced_hierarchy_pathes(sub_dict[key], path)
+			elif isinstance(sub_dict[key], dict) and len(sub_dict[key]) <= 0:
+				path.append(key)
+				self.reduced_hierarchy_pathes.append(path)
+				return
+		return
+	
+	

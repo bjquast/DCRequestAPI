@@ -38,8 +38,6 @@ class HierarchyLists {
 				let hierarchy_filter_key = $(this).data('hierarchy-filter-key');
 				let hierarchy_filter_value = $(this).data('hierarchy-filter-value');
 				
-				console.log(hierarchy_filter_id, hierarchy_filter_name, hierarchy_filter_key, hierarchy_filter_value);
-				
 				self.appliedfilters.add_filter(hierarchy_filter_id, hierarchy_filter_name, hierarchy_filter_key, hierarchy_filter_value);
 			});
 		});
@@ -70,10 +68,13 @@ class HierarchyLists {
 			let list_entry = $('<li></li>');
 			unordered_list.append(list_entry);
 			
-			let open_button = $('<span class="hierarchy_open_button clickable"> + <span>').appendTo(list_entry);
-			let hierarchy_entry = $('<span class="hierarchy_entry clickable"> + <span>').appendTo(list_entry);
+			let open_button = $('<span class="hierarchy_open_button clickable"><span>').appendTo(list_entry);
+			open_button.html('+ ' + buckets['buckets'][i][0] + ' ');
+			open_button.attr('data-hierarchy-filter-id', 'filter_' + buckets['aggregation'] + '_' + buckets['buckets'][i][0]);
+			open_button.attr('data-hierarchy-filter-key', buckets['aggregation']);
+			open_button.attr('data-hierarchy-filter-value', buckets['buckets'][i][0]);
 			
-			hierarchy_entry.html(buckets['buckets'][i][0] + ' (' + buckets['buckets'][i][1] + ')');
+			let hierarchy_entry = $('<span class="hierarchy_entry clickable"><i>(' + buckets['buckets'][i][1] + ')</i><span>').appendTo(list_entry);
 			hierarchy_entry.attr('data-hierarchy-filter-id', 'filter_' + buckets['aggregation'] + '_' + buckets['buckets'][i][0]);
 			hierarchy_entry.attr('data-hierarchy-filter-key', buckets['aggregation']);
 			hierarchy_entry.attr('data-hierarchy-filter-value', buckets['buckets'][i][0]);

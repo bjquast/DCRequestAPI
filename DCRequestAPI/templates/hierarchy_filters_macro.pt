@@ -17,13 +17,19 @@
 					<block tal:repeat="h_key hierarchies_dict[hierarchy_name]" tal:omit-tag="">
 						<ul tal:define="bucket hierarchies_dict[hierarchy_name][h_key]" class="ul-no-bullet">
 							<li>
-								<span class="hierarchy_open_button"> + </span>
+								<span class="hierarchy_open_button clickable"
+									data-hierarchy-filter-id="filter_${hierarchy_name}_${bucket['key']}" 
+									data-hierarchy-filter-name="${hierarchyfilterdefs[hierarchy_name]['en']}"
+									data-hierarchy-filter-key="${hierarchy_name}"
+									data-hierarchy-filter-value="${bucket['key']}">
+								+ ${bucket['key']} 
+								</span>
 								<span class="hierarchy_entry clickable"
 									data-hierarchy-filter-id="filter_${hierarchy_name}_${bucket['key']}" 
 									data-hierarchy-filter-name="${hierarchyfilterdefs[hierarchy_name]['en']}"
 									data-hierarchy-filter-key="${hierarchy_name}"
 									data-hierarchy-filter-value="${bucket['key']}">
-								${bucket['key']} (${bucket['doc_count']})</span>
+								<i>(${bucket['doc_count']})</i></span>
 							</li>
 							<block tal:repeat="sub_key bucket" tal:omit-tag="">
 								<block tal:condition="python: sub_key != 'key' and sub_key != 'doc_count'  and sub_key != 'taxon' and isinstance(bucket[sub_key], dict)" tal:omit-tag="">
