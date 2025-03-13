@@ -7,14 +7,14 @@
 			data-hierarchy-filter-name="${hierarchyfilterdefs[hierarchy_name]['en']}"
 			data-hierarchy-filter-key="${hierarchy_name}"
 			data-hierarchy-filter-value="${bucket['key']}">
-		+ ${child_bucket['taxon']}</span>
+		+ </span>
 		<span 
 			class="hierarchy_entry clickable"
 			data-hierarchy-filter-id="filter_${hierarchy_name}_${child_bucket['key']}" 
 			data-hierarchy-filter-name="${hierarchyfilterdefs[hierarchy_name]['en']}"
 			data-hierarchy-filter-key="${hierarchy_name}"
 			data-hierarchy-filter-value="${child_bucket['key']}">
-		<i>(${child_bucket['doc_count']})</i></span>
+		${child_bucket['taxon']} (${child_bucket['doc_count']})</span>
 		<block tal:repeat="sub_key child_bucket" tal:omit-tag="">
 			<block tal:condition="python: sub_key != 'key' and sub_key != 'doc_count' and sub_key != 'taxon'" tal:omit-tag="">
 				<block tal:define="child_bucket child_bucket[sub_key]" tal:omit-tag="">

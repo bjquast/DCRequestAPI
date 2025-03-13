@@ -74,7 +74,7 @@ class HierarchyLists {
 			open_button.attr('data-hierarchy-filter-key', buckets['aggregation']);
 			open_button.attr('data-hierarchy-filter-value', buckets['buckets'][i][0]);
 			
-			let hierarchy_entry = $('<span class="hierarchy_entry clickable"><i>(' + buckets['buckets'][i][1] + ')</i><span>').appendTo(list_entry);
+			let hierarchy_entry = $('<span class="hierarchy_entry clickable">' + buckets['buckets'][i][0] + ' (' + buckets['buckets'][i][1] + ')<span>').appendTo(list_entry);
 			hierarchy_entry.attr('data-hierarchy-filter-id', 'filter_' + buckets['aggregation'] + '_' + buckets['buckets'][i][0]);
 			hierarchy_entry.attr('data-hierarchy-filter-key', buckets['aggregation']);
 			hierarchy_entry.attr('data-hierarchy-filter-value', buckets['buckets'][i][0]);
