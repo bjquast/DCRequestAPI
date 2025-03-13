@@ -126,7 +126,8 @@ class RequestParams():
 							self.search_params[param_name] = {}
 						if query[0] not in self.search_params[param_name]:
 							self.search_params[param_name][query[0]] = []
-						self.search_params[param_name][query[0]].append(query[1])
+						if query[1] not in self.search_params[param_name][query[0]]:
+							self.search_params[param_name][query[0]].append(query[1])
 					else:
 						self.search_params[param_name] = {}
 			else:

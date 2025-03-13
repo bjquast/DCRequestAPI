@@ -204,6 +204,14 @@ class FieldDefinitions():
 		return
 
 
+	def getHierarchyFilterNames(self):
+		hierarchy_filter_names = {}
+		for hierarchy_filter in self.hierarchy_query_fields:
+			if hierarchy_filter in self.fielddefinitions:
+				hierarchy_filter_names[hierarchy_filter] = self.fielddefinitions[hierarchy_filter]['names']
+		return hierarchy_filter_names
+
+
 	def setFields(self):
 		self.setFieldNames()
 		self.setBucketFields()

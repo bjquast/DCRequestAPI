@@ -20,7 +20,7 @@
 						<div tal:condition="python: filter_key in default_bucketfields or filter_key in hierarchy_filter_fields" data-filter-id="filter_${filter_key}_${filter_value}" class="filter_checkbox">
 							<input type="checkbox" form="search_form" checked="checked" value="${filter_key}:${filter_value}" name="term_filters" data-filter-id="filter_${filter_key}_${filter_value}">
 							<label tal:condition="python: filter_key in bucketdefs"><b>${bucketdefs[filter_key]['en']}:</b> ${filter_value}</label>
-							<label tal:condition="python: filter_key in hierarchyfilterdefs"><b>${hierarchyfilterdefs[filter_key]['en']}:</b> ${filter_value}</label>
+							<label tal:condition="python: filter_key in hierarchy_filter_names"><b>${hierarchy_filter_names[filter_key]['en']}:</b> ${filter_value}</label>
 						</div>
 					</block>
 				</block>
@@ -68,7 +68,9 @@
 			</div>
 		</div>
 		
-		<div metal:use-macro="load: DCRequestAPI:templates/hierarchy_filters_macro.pt"></div>
+		<div id="hierarchy_filters">
+			<block metal:use-macro="load: DCRequestAPI:templates/hierarchy_filters_macro.pt" tal:omit-tag=""></block>
+		</div>
 		
 	</fieldset>
 	

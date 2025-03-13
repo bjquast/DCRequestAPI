@@ -7,7 +7,7 @@ class IUPartsTable():
 	def __init__(self):
 		self.coldefs = {}
 		self.bucketdefs = {}
-		self.hierarchyfilterdefs = {}
+		self.hierarchy_filter_names = {}
 		self.default_sourcefields = []
 		self.selected_sourcefields = []
 		self.required_sourcefields = ['StableIdentifierURL', ]
@@ -25,16 +25,12 @@ class IUPartsTable():
 		self.stacked_query_fields = fielddefs.stacked_query_fields
 		self.hierarchy_query_fields = fielddefs.hierarchy_query_fields
 		
+		# these methods get the names, not the definitions, perhaps they should be reworked to resemble fielddefs.getHierarchyFilterNames()
 		self.readFieldDefinitions()
 		self.readBucketDefinitions()
-		self.readHierarchyFilterDefinitions()
-		#self.setSourceFields()
-
-
-	def readHierarchyFilterDefinitions(self):
-		for hierarchy_filter in self.hierarchy_query_fields:
-			if hierarchy_filter in self.fielddefinitions:
-				self.hierarchyfilterdefs[hierarchy_filter] = self.fielddefinitions[hierarchy_filter]['names']
+		
+		# get a dict with names for hierarchy fields 
+		self.hierarchy_filter_names = fielddefs.getHierarchyFilterNames()
 
 
 	def readBucketDefinitions(self):

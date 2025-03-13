@@ -10,6 +10,7 @@ class HierarchyLists {
 	add_collapsible_hierarchies_events() {
 		let self = this;
 		$('.hierarchy_selectors').each( function () {
+			//$(this).off();
 			$(this).on('toggle', function() {
 				if ($(this).attr('open') == 'open') {
 					$(this).children('input:checkbox').prop('checked', true);
@@ -42,11 +43,17 @@ class HierarchyLists {
 			});
 		});
 		
-		$('#term_filters_connector').off();
-		$('#term_filters_connector').change( function () {
-			$("#search_form").submit();
+		$('.hierarchy_open_button').each( function () {
+			$(this).off();
+			$(this).click( function() {
+				let hierarchy_filter_id = $(this).data('hierarchy-filter-id');
+				let hierarchy_filter_name = $(this).data('hierarchy-filter-name');
+				let hierarchy_filter_key = $(this).data('hierarchy-filter-key');
+				let hierarchy_filter_value = $(this).data('hierarchy-filter-value');
+				
+				//self.toggleHierarchyPart(hierarchy_filter_id, hierarchy_filter_name, hierarchy_filter_key, hierarchy_filter_value);
+			});
 		});
-		
 	}
 
 
@@ -57,38 +64,14 @@ class HierarchyLists {
 	}
 
 
-	createFilterList(hierarchy_list_id, buckets) {
+	createFilterList(data) {
 		let self = this;
-		
-		$('#' + hierarchy_list_id).append('<ul>');
-		let unordered_list = $('#' + hierarchy_list_id + ' ul');
-		unordered_list.addClass('ul-no-bullet');
-		
-		for (let i = 0; i < buckets['buckets'].length; i++) {
-			let list_entry = $('<li></li>');
-			unordered_list.append(list_entry);
-			
-			let open_button = $('<span class="hierarchy_open_button clickable"><span>').appendTo(list_entry);
-			open_button.html('+ ' + buckets['buckets'][i][0] + ' ');
-			open_button.attr('data-hierarchy-filter-id', 'filter_' + buckets['aggregation'] + '_' + buckets['buckets'][i][0]);
-			open_button.attr('data-hierarchy-filter-key', buckets['aggregation']);
-			open_button.attr('data-hierarchy-filter-value', buckets['buckets'][i][0]);
-			
-			let hierarchy_entry = $('<span class="hierarchy_entry clickable">' + buckets['buckets'][i][0] + ' (' + buckets['buckets'][i][1] + ')<span>').appendTo(list_entry);
-			hierarchy_entry.attr('data-hierarchy-filter-id', 'filter_' + buckets['aggregation'] + '_' + buckets['buckets'][i][0]);
-			hierarchy_entry.attr('data-hierarchy-filter-key', buckets['aggregation']);
-			hierarchy_entry.attr('data-hierarchy-filter-value', buckets['buckets'][i][0]);
-			if (buckets['aggregation_names']['en']) {
-				hierarchy_entry.attr('data-hierarchy-filter-name', buckets['aggregation_names']['en']);
-			}
-			else {
-				hierarchy_entry.attr('data-hierarchy-filter-name', buckets['aggregation']);
-			}
-		}
+		$('#hierarchy_filters').empty();
+		$('#hierarchy_filters').append(data);
 	}
 
 
-	updateHierarchyList(hierarchy_list_id, hierarchy_pathes) {
+	updateHierarchyList(hierarchy_list_id) {
 		let self = this;
 		
 		let buckets = [];
@@ -97,15 +80,18 @@ class HierarchyLists {
 		self.readSearchFormParameters();
 		
 		
+		// add a hierarchies parameter without path to open the hierarchy tree when no other path is available
 		self.form_data.append('hierarchies', hierarchy_filter_key + ':');
 		self.form_data.append('buckets_size', 1000);
 		
+		console.log(self.form_data);
+		
+		
 		$.ajax({
-			url: "./hierarchy_aggregation/" + hierarchy_filter_key,
+			url: "./hierarchies",
 			type: 'POST',
 			processData: false,
 			contentType: false,
-			dataType: 'json',
 			data: self.form_data
 		})
 		.fail(function (xhr, textStatus, errorThrown) {
@@ -113,11 +99,20 @@ class HierarchyLists {
 			console.log(error_response);
 		})
 		.done( function(data) {
-			buckets = data;
-			self.createFilterList(hierarchy_list_id, buckets);
-			//self.add_hierarchy_opener_event();
+			//console.log(data);
+			self.createFilterList(data);
+			self.add_collapsible_hierarchies_events();
 			self.add_hierarchy_filter_events();
 		});
 	}
-}
 
+	/*
+	toggleHierarchyPart(hierarchy_filter_id, hierarchy_filter_name, hierarchy_filter_key, hierarchy_filter_value) {
+		let self = this;
+		
+		let buckets = [];
+		self.readSearchFormParameters();
+		
+	}
+	*/
+}

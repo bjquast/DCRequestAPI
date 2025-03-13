@@ -198,6 +198,7 @@ class ES_Searcher():
 		self.client.indices.put_settings(index=self.index, body=body)
 
 
+	'''
 	def singleHierarchyAggregationSearch(self, hierarchy_name, hierarchy_pathes_dict = {}):
 		
 		self.setQuery()
@@ -210,18 +211,42 @@ class ES_Searcher():
 		source_fields = False
 		
 		response = self.client.search(index=self.index, query=self.query, source=source_fields, aggs=aggs, size = 0)
-		
+		pudb.set_trace()
 		buckets = []
 		if 'aggregations' in response:
 			self.raw_aggregations = response['aggregations']
 			buckets = self.getBucketListFromAggregation(self.raw_aggregations[hierarchy_name])
+		
+		return buckets
+	'''
+
+
+	def searchHierarchyAggregations(self, hierarchy_pathes_dict = None, source_fields = None):
+		if hierarchy_pathes_dict is None:
+			hierarchy_pathes_dict = {}
+		if source_fields is None:
+			source_fields = []
+		
+		self.setQuery()
+		buckets_query = HierarchyQueries(hierarchy_pathes_dict = hierarchy_pathes_dict, users_project_ids = self.users_project_ids, source_fields = source_fields) #, buckets_sort_alphanum = True)
+		aggs = buckets_query.getHierarchiesQuery()
+		
+		logger.debug(json.dumps(aggs))
+		logger.debug(json.dumps(self.query))
+		
+		source_fields = False
+		
+		response = self.client.search(index=self.index, query=self.query, source=source_fields, aggs=aggs, size = 0)
+		
+		self.raw_aggregations = response['aggregations']
+		aggregations = self.getParsedAggregations()
 		
 		'''
 		if 'aggregations' in response:
 			self.raw_aggregations = response['aggregations']
 			buckets = self.getBucketListFromCompositeAggregation(self.raw_aggregations[aggregation_name])
 		'''
-		return buckets
+		return aggregations
 
 
 	def singleAggregationSearch(self, aggregation_name, buckets_search_term = None, size = 5000, buckets_sort_alphanum = True, buckets_sort_dir = 'asc'):

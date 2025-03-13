@@ -10,11 +10,17 @@ from ElasticSearch.FieldDefinitions import FieldDefinitions
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 class HierarchyQueries():
-	def __init__(self, hierarchy_pathes_dict = {}, users_project_ids = [], source_fields = [], size = 1000):
+	def __init__(self, hierarchy_pathes_dict = {}, users_project_ids = None, source_fields = None, size = 1000):
 		self.hierarchy_pathes_dict = hierarchy_pathes_dict
+		
+		if users_project_ids is None:
+			users_project_ids = []
 		self.users_project_ids = users_project_ids
 		
+		if source_fields is None:
+			source_fields = []
 		self.source_fields = source_fields
+		
 		self.size = size
 		
 		fielddefs = FieldDefinitions()

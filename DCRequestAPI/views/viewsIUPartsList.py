@@ -179,7 +179,7 @@ class IUPartsListView():
 		
 		coldefs = iupartstable.coldefs
 		bucketdefs = iupartstable.bucketdefs
-		hierarchyfilterdefs = iupartstable.hierarchyfilterdefs
+		hierarchy_filter_names = iupartstable.hierarchy_filter_names
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids, restrict_to_users_projects = restrict_to_users_projects)
 		es_searcher.setSourceFields(selected_sourcefields)
@@ -208,7 +208,7 @@ class IUPartsListView():
 			'hierarchies_dict': hierarchies_dict,
 			'coldefs': coldefs,
 			'bucketdefs': bucketdefs,
-			'hierarchyfilterdefs': hierarchyfilterdefs,
+			'hierarchy_filter_names': hierarchy_filter_names,
 			'default_sourcefields': default_sourcefields,
 			'selected_sourcefields': selected_sourcefields, 
 			'default_bucketfields': default_bucketfields,
