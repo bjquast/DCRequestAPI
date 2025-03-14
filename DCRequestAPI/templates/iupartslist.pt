@@ -29,7 +29,7 @@
 </metal:js>
 
 <metal:js fill-slot="search_form">
-	<form id="search_form" action="${request.application_url}/list" method="GET" >
+	<form id="search_form" action="${request.application_url}/list" method="POST" >
 		<div metal:use-macro="load: DCRequestAPI:templates/stacked_queries_macro.pt"></div>
 	</form>
 	<div id="buckets-overlay-slot"></div>
