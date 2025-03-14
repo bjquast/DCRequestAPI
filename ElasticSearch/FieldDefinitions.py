@@ -56,10 +56,11 @@ class FieldDefinitions():
 		self.bucketfields = [
 			'DatabaseAccronym',
 			#'CollectionsTree.CollectionName',
-			#'CollectionName',
-			'CollectionsTree',
+			'CollectionName',
+			#'CollectionsTree',
 			'Projects.Project',
 			'LastIdentificationCache',
+			'MatchedTaxon',
 			'VernacularTerms',
 			'MatchedSynonyms.Synonym',
 			'MatchedTaxaTree',
@@ -94,10 +95,11 @@ class FieldDefinitions():
 		self.default_filter_sections = [
 			'DatabaseAccronym',
 			#'CollectionsTree.CollectionName',
-			#'CollectionName',
-			'CollectionsTree',
+			'CollectionName',
+			#'CollectionsTree',
 			'Projects.Project',
 			'LastIdentificationCache',
+			'MatchedTaxon',
 			'VernacularTerms',
 			'MatchedSynonyms.Synonym',
 			'MatchedTaxaTree',
@@ -270,7 +272,7 @@ class FieldDefinitions():
 			},
 			
 			'MatchedTaxon': {
-				'names': {'en': 'Taxon in GBIF'},
+				'names': {'en': 'Accepted Taxon'},
 				'buckets': {
 					'field_query': 'MatchedTaxon', 
 				},
@@ -294,7 +296,7 @@ class FieldDefinitions():
 			},
 			
 			'MatchedTaxaHierarchyString': {
-				'names': {'en': 'Taxonomy'},
+				'names': {'en': 'Taxonomic Tree'},
 				'buckets': {
 					'field_query': 'MatchedTaxaHierarchyString.facet'
 				}
@@ -433,7 +435,7 @@ class FieldDefinitions():
 			},
 			
 			'CollectionHierarchyString': {
-				'names': {'en': 'Collection(s)'},
+				'names': {'en': 'Collections (hierarchical)'},
 				'buckets': {
 					'field_query': 'CollectionHierarchyString.facet'
 				}
