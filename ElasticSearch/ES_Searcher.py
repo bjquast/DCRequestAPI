@@ -159,7 +159,14 @@ class ES_Searcher():
 			if 'term_filters_connector' in self.search_params:
 				connector = self.search_params['term_filters_connector']
 			
-			filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids, source_fields = self.bucket_fields, connector = connector).getTermFilterQueries(self.search_params['term_filters'])
+			# append source fields from term_filters not yet in self.bucket_fields
+			# this is due to the term_filters comming from hierarchy aggregations
+			hierarchy_bucket_fields = list(self.bucket_fields)
+			for key in self.search_params['term_filters']:
+				if key not in hierarchy_bucket_fields:
+					hierarchy_bucket_fields.append(key)
+			
+			filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids, source_fields = hierarchy_bucket_fields, connector = connector).getTermFilterQueries(self.search_params['term_filters'])
 			self.query['bool']["filter"].extend(filter_queries)
 		
 		#pudb.set_trace()
