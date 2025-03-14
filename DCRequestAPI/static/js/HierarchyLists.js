@@ -21,14 +21,21 @@ class HierarchyLists {
 						let hierarchy_filter_key = $('#' + hierarchy_list_id).attr('data-hierarchy-filter-key');
 						
 						self.readSearchFormParameters();
-						
-						
 						self.updateHierarchyList(hierarchy_filter_key, self.form_data);
 					}
 				}
 				else {
-					$(this).children('input:checkbox').prop('checked', false);
+					let hierarchy_list_id = $(this).prop('id');
+					hierarchy_list_id = hierarchy_list_id.replace(/\./g, '\\.');
+					let hierarchy_filter_key = $('#' + hierarchy_list_id).attr('data-hierarchy-filter-key');
+					
 					$(this).find('ul').remove();
+					
+					$('.open_hierarchy_selectors_input').each( function () {
+						if ($(this).val() == hierarchy_filter_key) {
+							$(this).prop('checked', false);
+						}
+					});
 				}
 			});
 		});
@@ -82,12 +89,16 @@ class HierarchyLists {
 		let buckets = [];
 		
 		// add a hierarchies parameter without path to open the hierarchy tree when no other path is available
-		self.form_data.append('hierarchies', hierarchy_filter_key + ':');
+		// self.form_data.append('hierarchies', hierarchy_filter_key + ':');
 		
+		let open_hierarchies = form_data.getAll('open_hierarchy_selectors');
+		
+		if (open_hierarchies.indexOf(hierarchy_filter_key) == -1) {
+			form_data.append('open_hierarchy_selectors', hierarchy_filter_key);
+		}
+		
+		form_data.delete('buckets_size');
 		form_data.append('buckets_size', 1000);
-		
-		//console.log(self.form_data);
-		
 		
 		$.ajax({
 			url: "./hierarchies",

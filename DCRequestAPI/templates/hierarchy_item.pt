@@ -8,8 +8,9 @@
 		data-hierarchy-filter-key="${hierarchy_name}"
 		data-hierarchy-filter-value="${child_bucket['key']}"
 		tal:attributes="data-is-parent 'is parent' if len(child_bucket['child_keys']) > 0 else 'is not parent'">
-	<span tal:condition="python: len(child_bucket['child_keys']) > 0">- </span>
-	<span tal:condition="python: len(child_bucket['child_keys']) <= 0">+ </span>
+		<span tal:condition="python: len(child_bucket['child_keys']) > 0"><img src="./static/buttons/close_hierarchy_item.png" class="list_icons"></span>
+		<span tal:condition="python: len(child_bucket['child_keys']) <= 0"><img src="./static/buttons/open_hierarchy_item.png" class="list_icons"></span>
+		${child_bucket['term']} 
 	</span>
 	<span 
 		class="hierarchy_entry clickable"
@@ -17,7 +18,9 @@
 		data-hierarchy-filter-name="${hierarchy_filter_names[hierarchy_name]['en']}"
 		data-hierarchy-filter-key="${hierarchy_name}"
 		data-hierarchy-filter-value="${child_bucket['key']}">
-	${child_bucket['term']} (${child_bucket['doc_count']})</span>
+		<img src="./static/buttons/term_filter.png" class="inline_icons">
+		(${child_bucket['doc_count']})
+	</span>
 	<ul tal:repeat="sub_key child_bucket['child_keys']" class="ul-no-bullet">
 		<block tal:define="child_bucket child_bucket[sub_key]" tal:omit-tag="">
 			<block metal:use-macro="load: DCRequestAPI:templates/hierarchy_item.pt" tal:omit-tag=""></block>

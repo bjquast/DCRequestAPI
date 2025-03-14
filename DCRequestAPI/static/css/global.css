@@ -195,3 +195,13 @@ span.input_delete_wrapper input {
 	box-sizing: border-box;
 }
 
+
+.list_icons {
+	height: 0.6em;
+	width: 0.6em;
+}
+
+.inline_icons {
+	height: 0.8em;
+	width: 0.8em;
+}

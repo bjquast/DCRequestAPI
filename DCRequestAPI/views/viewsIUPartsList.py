@@ -146,9 +146,9 @@ class IUPartsListView():
 		
 		hierarchy_pathes_dict = self.search_params['hierarchies']
 		
-		for hierarchy_field in self.search_params['hierarchies']:
-			if hierarchy_field not in open_hierarchy_selectors:
-				open_hierarchy_selectors.append(hierarchy_field)
+		#for hierarchy_field in self.search_params['hierarchies']:
+		#	if hierarchy_field not in open_hierarchy_selectors:
+		#		open_hierarchy_selectors.append(hierarchy_field)
 		
 		self.search_params['term_filters'] = self.reduce_hierarchical_term_filters(self.search_params['term_filters'], hierarchy_filter_fields)
 		

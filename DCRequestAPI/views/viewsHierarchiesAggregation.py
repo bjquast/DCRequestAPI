@@ -97,13 +97,12 @@ class HierarchiesView():
 
 	@view_config(route_name='hierarchies', accept='text/html', renderer="DCRequestAPI:templates/hierarchy_filters_macro.pt")
 	def viewHierarchiesHTML(self):
-		
 		hierarchy_pathes_dict = self.search_params['hierarchies']
 		
 		open_hierarchy_selectors = self.search_params['open_hierarchy_selectors']
-		for hierarchy_field in self.search_params['hierarchies']:
-			if hierarchy_field not in open_hierarchy_selectors:
-				open_hierarchy_selectors.append(hierarchy_field)
+		#for hierarchy_field in self.search_params['hierarchies']:
+		#	if hierarchy_field not in open_hierarchy_selectors:
+		#		open_hierarchy_selectors.append(hierarchy_field)
 		
 		for term_filter_field in self.search_params['term_filters']:
 			if term_filter_field in self.hierarchy_query_fields:
@@ -121,9 +120,9 @@ class HierarchiesView():
 		
 		hierarchies_dict = HierarchyAggregations(buckets).calcHierarchiesDict()
 		
-		for key in hierarchies_dict:
-			if key not in open_hierarchy_selectors:
-				open_hierarchy_selectors.append(key)
+		#for key in hierarchies_dict:
+		#	if key not in open_hierarchy_selectors:
+		#		open_hierarchy_selectors.append(key)
 		
 		response_dict = {
 			'hierarchy_pathes_dict': hierarchy_pathes_dict,

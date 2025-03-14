@@ -307,7 +307,6 @@ class ES_Searcher():
 		
 		aggs = None
 		if len(self.bucket_fields) > 0:
-			pudb.set_trace()
 			buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = self.bucket_fields)
 			aggs = buckets_query.getAggregationsQuery()
 		

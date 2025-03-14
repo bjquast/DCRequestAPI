@@ -1,29 +1,32 @@
 
 <div>
-	
-	<hr>
-	
 	<div id="hierarchy_filter_sections_header" class="flex-space-between">
 		<h4>Hierarchies</h4>
 	</div>
-	<div id="available_hierarchies">
+	<div class="hidden">
+		<block tal:repeat="hierarchy_selector hierarchy_filter_fields" tal:omit-tag="">
+			<input class="open_hierarchy_selectors_input" type="checkbox" name="open_hierarchy_selectors" form="search_form" value="${hierarchy_selector}" tal:attributes="checked 'checked' if hierarchy_selector in open_hierarchy_selectors else None">
+			<span>${hierarchy_selector}</span>
+		</block>
+	</div>
+	<div class="hidden">
 		<block tal:repeat="key hierarchy_pathes_dict" tal:omit-tag="">
 			<block tal:repeat="path hierarchy_pathes_dict[key]" tal:omit-tag="">
-				<input type="checkbox" name="hierarchies" form="search_form" class="hidden" value="${key}:${path}" tal:attributes="checked 'checked'">
+				<input class="hierachy_pathes_input" type="checkbox" name="hierarchies" form="search_form" value="${key}:${path}" tal:attributes="checked 'checked'">
+				<span>${path}</span>
 			</block>
 		</block>
-		<div tal:repeat="hierarchy_name hierarchy_filter_fields" class="hierarchy-filter-select-box">
-			<details id="hierarchy_list_${hierarchy_name}" class="hierarchy_selectors" data-hierarchy-filter-key="${hierarchy_name}" tal:attributes="open 'open' if hierarchy_name in open_hierarchy_selectors else None">
-				<summary class="clickable">${hierarchy_filter_names[hierarchy_name]['en']}</summary>
-				<ul tal:condition="python: hierarchy_name in hierarchies_dict and hierarchy_name in open_hierarchy_selectors" class="ul-no-bullet">
-					<block tal:repeat="sub_key hierarchies_dict[hierarchy_name]" tal:omit-tag="">
-						<block tal:define="child_bucket hierarchies_dict[hierarchy_name][sub_key]" tal:omit-tag="">
-							<block metal:use-macro="load: DCRequestAPI:templates/hierarchy_item.pt" tal:omit-tag=""></block>
-						</block>
-					</block>
-				</ul>
-			</details>
-		</div>
 	</div>
-	
+	<div tal:repeat="hierarchy_name hierarchy_filter_fields" class="hierarchy-filter-select-box">
+		<details id="hierarchy_list_${hierarchy_name}" class="hierarchy_selectors" data-hierarchy-filter-key="${hierarchy_name}" tal:attributes="open 'open' if hierarchy_name in open_hierarchy_selectors else None">
+			<summary class="clickable">${hierarchy_filter_names[hierarchy_name]['en']}</summary>
+			<ul tal:condition="python: hierarchy_name in hierarchies_dict and hierarchy_name in open_hierarchy_selectors" class="ul-no-bullet">
+				<block tal:repeat="sub_key hierarchies_dict[hierarchy_name]" tal:omit-tag="">
+					<block tal:define="child_bucket hierarchies_dict[hierarchy_name][sub_key]" tal:omit-tag="">
+						<block metal:use-macro="load: DCRequestAPI:templates/hierarchy_item.pt" tal:omit-tag=""></block>
+					</block>
+				</block>
+			</ul>
+		</details>
+	</div>
 </div>
