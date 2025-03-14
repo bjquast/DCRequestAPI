@@ -28,6 +28,7 @@ def main(global_config, **settings):
 	config.add_route('aggregation', '/aggregation')
 	#config.add_route('hierarchy_aggregation', '/hierarchy_aggregation/{hierarchy_name}')
 	config.add_route('hierarchies', '/hierarchies')
+	config.add_route('hierarchy_remove_path', '/hierarchy/remove_path/{hierarchy_name}')
 	config.add_route('aggs_suggestions', '/aggs_suggestions')
 	config.add_route('help', '/')
 	

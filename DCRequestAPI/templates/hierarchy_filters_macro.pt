@@ -9,8 +9,7 @@
 	<div id="available_hierarchies">
 		<block tal:repeat="key hierarchy_pathes_dict" tal:omit-tag="">
 			<block tal:repeat="path hierarchy_pathes_dict[key]" tal:omit-tag="">
-				<input type="checkbox" name="hierarchies" form="search_form" class="__hidden" value="${key}:${path}" tal:attributes="checked 'checked'">
-				${path}
+				<input type="checkbox" name="hierarchies" form="search_form" class="hidden" value="${key}:${path}" tal:attributes="checked 'checked'">
 			</block>
 		</block>
 		<div tal:repeat="hierarchy_name hierarchy_filter_fields" class="hierarchy-filter-select-box">

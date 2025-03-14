@@ -106,11 +106,14 @@ class HierarchiesView():
 				open_hierarchy_selectors.append(hierarchy_field)
 		
 		for term_filter_field in self.search_params['term_filters']:
-			if term_filter_field in self.hierarchy_query_fields and term_filter_field not in open_hierarchy_selectors:
-				open_hierarchy_selectors.append(term_filter_field)
+			if term_filter_field in self.hierarchy_query_fields:
+				if term_filter_field not in open_hierarchy_selectors:
+					open_hierarchy_selectors.append(term_filter_field)
 				if term_filter_field not in hierarchy_pathes_dict:
 					hierarchy_pathes_dict[term_filter_field] = []
-				hierarchy_pathes_dict[term_filter_field].extend(self.search_params['term_filters'][term_filter_field])
+				for path in self.search_params['term_filters'][term_filter_field]:
+					if path not in hierarchy_pathes_dict[term_filter_field]:
+						hierarchy_pathes_dict[term_filter_field].append(path)
 		
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
@@ -131,3 +134,59 @@ class HierarchiesView():
 		}
 		
 		return response_dict
+
+
+	@view_config(route_name='hierarchy_remove_path', accept='text/html', renderer="DCRequestAPI:templates/hierarchy_filters_macro.pt")
+	def viewRemovePathFromHierarchyHTML(self):
+		
+		hierarchy_name = self.request.matchdict['hierarchy_name']
+		
+		path_to_remove = self.search_params['path_to_remove']
+		hierarchy_pathes_dict = self.search_params['hierarchies']
+		
+		if hierarchy_name in hierarchy_pathes_dict:
+			new_pathes_list = []
+			for path in hierarchy_pathes_dict[hierarchy_name]:
+				if path.startswith(path_to_remove):
+					pass
+				else:
+					new_pathes_list.append(path)
+			hierarchy_pathes_dict[hierarchy_name] = new_pathes_list
+			
+		
+		open_hierarchy_selectors = self.search_params['open_hierarchy_selectors']
+		for hierarchy_field in self.search_params['hierarchies']:
+			if hierarchy_field not in open_hierarchy_selectors:
+				open_hierarchy_selectors.append(hierarchy_field)
+		
+		for term_filter_field in self.search_params['term_filters']:
+			if term_filter_field in self.hierarchy_query_fields:
+				if term_filter_field not in open_hierarchy_selectors:
+					open_hierarchy_selectors.append(term_filter_field)
+				if term_filter_field not in hierarchy_pathes_dict:
+					hierarchy_pathes_dict[term_filter_field] = []
+				for path in self.search_params['term_filters'][term_filter_field]:
+					if path not in hierarchy_pathes_dict[term_filter_field]:
+						hierarchy_pathes_dict[term_filter_field].append(path)
+		
+		
+		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
+		buckets = es_searcher.searchHierarchyAggregations(hierarchy_pathes_dict, source_fields = open_hierarchy_selectors)
+		
+		hierarchies_dict = HierarchyAggregations(buckets).calcHierarchiesDict()
+		
+		for key in hierarchies_dict:
+			if key not in open_hierarchy_selectors:
+				open_hierarchy_selectors.append(key)
+		
+		response_dict = {
+			'hierarchy_pathes_dict': hierarchy_pathes_dict,
+			'hierarchy_filter_fields': self.hierarchy_query_fields,
+			'hierarchies_dict': hierarchies_dict,
+			'open_hierarchy_selectors': open_hierarchy_selectors,
+			'hierarchy_filter_names': self.hierarchy_filter_names
+		}
+		
+		return response_dict
+
+

@@ -78,21 +78,25 @@ class HierarchyQueries():
 
 
 	def getPathRegexp(self, field):
+		
 		path_regex = ''
 		sub_pathes = []
 		
-		
 		for hierarchy_path in self.hierarchy_pathes_dict[field]:
-			sub_pathes.append('({0})?>?[^>]*'.format(hierarchy_path))
+			if len(hierarchy_path) > 0:
+				if hierarchy_path not in sub_pathes:
+					sub_pathes.append('({0})?'.format(hierarchy_path))
 			
 			path_elements = hierarchy_path.split('>')
 			
-			while len(path_elements) > 2:
+			while len(path_elements) > 1:
 				path_elements.pop()
-				sub_pathes.append('>'.join(path_elements))
+				sub_path = '({0})?'.format('>'.join(path_elements))
+				if len(sub_path) > 2:
+					if sub_path not in sub_pathes:
+						sub_pathes.append(sub_path)
 		
-		for hierarchy_path in sub_pathes:
-			path_regex += '({0})?'.format(hierarchy_path)
+		path_regex = ''.join(sub_pathes) + '>?[^>]*'
 		
 		return path_regex
 

@@ -35,20 +35,27 @@ class HierarchyAggregations():
 			if len(bucket['path_elements']) == 0:
 				del bucket['path_elements']
 				subdict[element] = bucket
-				subdict[element]['taxon'] = element
+				subdict[element]['term'] = element
+				subdict[element]['child_keys'] = []
 				return
 			else:
+				if bucket['path_elements'][0] not in subdict[element]['child_keys']:
+					subdict[element]['child_keys'].append(bucket['path_elements'][0])
 				self.addPathElements(subdict[element], bucket)
 		else:
 			if len(bucket['path_elements']) > 0:
+				if bucket['path_elements'][0] not in subdict[element]['child_keys']:
+					subdict[element]['child_keys'].append(bucket['path_elements'][0])
 				self.addPathElements(subdict[element], bucket)
+			'''
 			else:
-				# add key and doc_count whe not added before
+				# add key and doc_count when not added before
 				# because the bucket has not been on the end of the path_elements list before
 				subdict[element]['key'] = bucket['key']
 				subdict[element]['doc_count'] = bucket['doc_count']
-				subdict[element]['taxon'] = element
+				subdict[element]['term'] = element
 				return
+			'''
 		return
 
 

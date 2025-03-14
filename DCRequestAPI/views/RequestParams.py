@@ -94,7 +94,8 @@ class RequestParams():
 		exists_params = ['restrict_to_users_projects']
 		boolean_params = ['buckets_sort_alphanum']
 		simple_params = ['pagesize', 'page', 'sorting_col', 'sorting_dir', 'aggregation', 'tree', 'match_queries_connector', 
-							'term_filters_connector', 'buckets_search_term', 'overlay_remaining_all_select', 'buckets_sort_dir', 'buckets_size'
+							'term_filters_connector', 'buckets_search_term', 'overlay_remaining_all_select', 'buckets_sort_dir', 'buckets_size',
+							'path_to_remove'
 						]
 		complex_params = ['term_filters', 'hierarchies',]
 		
