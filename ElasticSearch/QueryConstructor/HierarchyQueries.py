@@ -82,9 +82,12 @@ class HierarchyQueries():
 		path_regex = ''
 		sub_pathes = []
 		
+		escape_pattern = re.compile(r'([\(\)\[\]])')
+		
 		for hierarchy_path in self.hierarchy_pathes_dict[field]:
 			if len(hierarchy_path) > 0:
 				if hierarchy_path not in sub_pathes:
+					hierarchy_path = escape_pattern.sub(r'\\\1', hierarchy_path)
 					sub_pathes.append('({0})?'.format(hierarchy_path))
 			
 			path_elements = hierarchy_path.split('>')
