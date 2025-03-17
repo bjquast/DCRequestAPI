@@ -1,14 +1,13 @@
 'use strict'
 
 const appliedfilters = new AppliedFiltersField();
+// load the overlay when the page is loading
+const loading_overlay = new LoadingOverlay();
 const filterlists = new FilterLists(appliedfilters);
-const hierarchylists = new HierarchyLists(appliedfilters);
+const hierarchylists = new HierarchyLists(appliedfilters, loading_overlay);
 const bucketsoverlay = new BucketsOverlay(appliedfilters);
 const aggs_suggestions = new AggsSuggestions(appliedfilters, "aggs_search_input", "aggs_search_suggestions_list");
 const stacked_search = new StackedSearch();
-// load the overlay when the page is loading
-const loading_overlay = new LoadingOverlay();
-
 
 $(document).ready( function() {
 	stacked_search.add_subsearch_events();

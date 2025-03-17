@@ -2,8 +2,9 @@
 
 class HierarchyLists {
 
-	constructor (applied_filters) {
+	constructor (applied_filters, loading_overlay) {
 		this.appliedfilters = appliedfilters;
+		this.loading_overlay = loading_overlay;
 	}
 
 
@@ -100,6 +101,8 @@ class HierarchyLists {
 		form_data.delete('buckets_size');
 		form_data.append('buckets_size', 1000);
 		
+		self.loading_overlay.add_loading_overlay();
+		
 		$.ajax({
 			url: "./hierarchies",
 			type: 'POST',
@@ -116,6 +119,9 @@ class HierarchyLists {
 			self.createFilterList(data);
 			self.add_collapsible_hierarchies_events();
 			self.add_hierarchy_filter_events();
+		})
+		.always( function() {
+			self.loading_overlay.remove_loading_overlay();
 		});
 	}
 
@@ -128,6 +134,8 @@ class HierarchyLists {
 		form_data.append('buckets_size', 1000);
 		
 		//console.log(self.form_data);
+		
+		self.loading_overlay.add_loading_overlay();
 		
 		$.ajax({
 			url: "./hierarchy/remove_path/" + hierarchy_filter_key,
@@ -145,6 +153,9 @@ class HierarchyLists {
 			self.createFilterList(data);
 			self.add_collapsible_hierarchies_events();
 			self.add_hierarchy_filter_events();
+		})
+		.always( function() {
+			self.loading_overlay.remove_loading_overlay();
 		});
 	}
 
