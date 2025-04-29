@@ -74,7 +74,7 @@ class AggsSuggestions {
 				self.current_search_term = self.search_term;
 				self.request_suggestions();
 			}
-			, 500);
+			, 200);
 		}
 		
 		if (self.search_term.length < self.min_length) {
@@ -85,8 +85,9 @@ class AggsSuggestions {
 				self.remove_progress_animation();
 				self.delete_suggestions_list();
 			}
-			, 500);
+			, 200);
 		}
+		self.add_suggestion_events();
 	}
 
 
