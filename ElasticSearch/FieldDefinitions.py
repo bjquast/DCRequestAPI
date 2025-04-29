@@ -206,6 +206,13 @@ class FieldDefinitions():
 		return
 
 
+	def setRangeFields(self):
+		self.range_fields = [
+			'SpecimenAdded',
+			'NumberOfUnits',
+		]
+
+
 	def getHierarchyFilterNames(self):
 		hierarchy_filter_names = {}
 		for hierarchy_filter in self.hierarchy_query_fields:
@@ -221,6 +228,7 @@ class FieldDefinitions():
 		self.setStackedQueryFields()
 		self.setHierarchyQueryFields()
 		self.setSuggestionFields()
+		self.setRangeFields()
 		
 		return
 

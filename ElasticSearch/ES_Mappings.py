@@ -348,7 +348,12 @@ MappingsDict['iuparts'] = {
 				'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
 			}
 		},
-		'NumberOfUnits': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+		# NumberOfUnits_Integer for statistics how many individuals are in there, not sure what happens if it is NULL
+		'NumberOfUnits': {'type': 'keyword', 'fields': {
+			'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256},
+			'integer': {'type': 'integer', 'ignore_malformed': True}
+			}
+		},
 		'NumberOfUnitsModifier': {'type': 'keyword'},
 		'UnitIdentifier': {'type': 'keyword'},
 		'UnitDescription': {'type': 'text'},
@@ -651,30 +656,3 @@ MappingsDict['iuparts'] = {
 	}
 }
 
-
-'''
-# better use the data in the iuparts index? otherwise 5m taxa have to be indexed where only about 100000 are used
-# and the index have to be synced whenever the iuparts index is updated
-MappingsDict['taxonomy'] = {
-	'propperties': {
-		'taxon_id': {'type': 'keyword'}, # is the same as _id in the index
-		'parent_taxon_id': {'type': 'keyword'}, # important for tree generation in ui: find all childs in a tree that have that parent
-		'Taxon': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
-		'TaxonAuthor': {'type': 'keyword'},
-		'TaxonRank': {'type': 'keyword'},
-		'TaxonURI': {'type': 'keyword'},
-		'TaxonURL': {'type': 'keyword'},
-		'ParentTaxa': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
-		'RankedParentTaxa': {
-			'type': 'nested',
-			'properties': {
-				'TaxonURI': {'type': 'keyword'},
-				'TaxonURL': {'type': 'keyword'},
-				'Taxon': {'type': 'keyword'},
-				'Rank': {'type': 'keyword'},
-				'TreeLevel': {'type': 'integer'}
-			}
-		}
-	}
-}
-'''

@@ -82,6 +82,16 @@ class QueryConstructor():
 		return case_insensitive
 
 
+	def getRangeType(self, query_def):
+		if "type" in query_def and query_def['type'] == 'date':
+			range_type = "date"
+		elif "type" in query_def and query_def['type'] == 'number':
+			range_type = "number"
+		else:
+			range_type = None
+		return range_type
+
+
 	def getStringQuerySearchField(self, key, query_def):
 		# set the default value
 		search_field = key

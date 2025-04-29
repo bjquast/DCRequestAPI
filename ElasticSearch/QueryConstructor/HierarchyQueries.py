@@ -67,7 +67,6 @@ class HierarchyQueries():
 		return
 
 
-
 	def setHierarchiesQuery(self):
 		self.hierarchies_query = {}
 		self.setSimpleHierarchiesQuery()
@@ -127,6 +126,8 @@ class HierarchyQueries():
 				path_regex = self.getPathRegexp(field)
 			else:
 				path_regex = '>?[^>]*'
+			
+			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.simple_restricted_fields[field]['withholdflags']]
 			
 			self.hierarchies_query[field] = {
 				"filter": {
@@ -188,6 +189,8 @@ class HierarchyQueries():
 				path_regex = self.getPathRegexp(field)
 			else:
 				path_regex = '>?[^>]*'
+			
+			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.nested_restricted_fields[field]['withholdflags']]
 			
 			self.hierarchies_query[field] = {
 				"nested": {
