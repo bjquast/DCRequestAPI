@@ -8,7 +8,6 @@ from dwb_authentication.mysql_connect import mysql_connect
 
 class SessionDBSetup():
 	def __init__(self):
-		pudb.set_trace()
 		self.con, self.cur = mysql_connect()
 		
 		self.delete_tables()

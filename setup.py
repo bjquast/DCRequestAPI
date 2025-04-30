@@ -9,7 +9,7 @@ else:
 
 requires = [
 	'configparser',
-	'elastic-transport==8.15.1'
+	'elastic-transport==8.15.1',
 	'elasticsearch==8.17.0',
 	'pyodbc',
 	'pymysql',
