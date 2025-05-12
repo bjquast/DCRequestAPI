@@ -514,6 +514,8 @@ MappingsDict['iuparts'] = {
 			}
 		},
 		
+		'NumberOfBarcodes': {'type': 'integer', 'null_value': 0},
+		
 		'Barcodes': {
 			'properties': {
 				# from IdentificationUnitAnalysis
@@ -561,6 +563,8 @@ MappingsDict['iuparts'] = {
 			}
 		},
 		
+		'NumberOfFOGS': {'type': 'integer', 'null_value': 0},
+		
 		'FOGS': {
 			'properties': {
 				# from IdentificationUnitAnalysis
@@ -601,6 +605,8 @@ MappingsDict['iuparts'] = {
 				}
 			}
 		},
+		
+		'NumberOfMAM_Measurements': {'type': 'integer', 'null_value': 0},
 		
 		'MAM_Measurements': {
 			'properties': {

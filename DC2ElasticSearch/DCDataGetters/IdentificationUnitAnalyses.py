@@ -402,6 +402,7 @@ class IdentificationUnitAnalyses():
 		for idshash in self.keys_dict:
 			if idshash not in self.iuanalyses_dict:
 				self.iuanalyses_dict[idshash] = {}
+				self.iuanalyses_dict[idshash]['NumberOf{0}'.format(self.fieldname)] = 0
 				self.iuanalyses_dict[idshash][self.fieldname] = []
 			
 			for analysis_pk in self.keys_dict[idshash]:
@@ -423,6 +424,8 @@ class IdentificationUnitAnalyses():
 					analysis['Methods'].append(method)
 				
 				self.iuanalyses_dict[idshash][self.fieldname].append(analysis)
+				
+				self.iuanalyses_dict[idshash]['NumberOf{0}'.format(self.fieldname)] += 1
 		
 		return
 
