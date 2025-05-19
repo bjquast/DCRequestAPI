@@ -15,6 +15,7 @@ class AggsSuggestions {
 		this.suggestion_ids = [];
 		this.timeout = null;
 		this.progress_animation = null;
+		this.request = null;
 		
 		this.current_search_term = '';
 	}
@@ -22,13 +23,11 @@ class AggsSuggestions {
 	request_suggestions() {
 		let self = this;
 		
-		$("#" + self.input_id).off();
-		
 		let form = document.getElementById("search_form");
 		let form_data = new FormData(form);
 		form_data.append('buckets_search_term', self.search_term);
 		
-		$.ajax({
+		self.request = $.ajax({
 			url: "./aggs_suggestions",
 			type: 'POST',
 			processData: false,
@@ -46,18 +45,16 @@ class AggsSuggestions {
 			
 			self.delete_suggestions_list();
 			self.fill_suggestions_list();
+			self.remove_progress_animation();
 		})
 		.always( function () {
-			self.remove_progress_animation();
+			self.request = null;
+			
 			// check if search_term has been changed during request
 			// if so send the next request with the new search term
-			
 			self.search_term = $("#" + self.input_id).val();
 			if (self.search_term != self.current_search_term) {
 				self.handle_input_change();
-			}
-			else {
-				self.add_suggestion_events();
 			}
 		})
 	}
@@ -72,22 +69,23 @@ class AggsSuggestions {
 			
 			self.timeout = setTimeout( function() {
 				self.current_search_term = self.search_term;
+				if (self.request != null) {
+					// abort the running request if there is one
+					self.request.abort()
+				}
 				self.request_suggestions();
 			}
-			, 200);
+			, 50);
 		}
 		
 		if (self.search_term.length < self.min_length) {
-			
-			//self.unblock_suggest_input();
 			clearTimeout(self.timeout);
 			self.timeout = setTimeout( function() {
 				self.remove_progress_animation();
 				self.delete_suggestions_list();
 			}
-			, 200);
+			, 50);
 		}
-		self.add_suggestion_events();
 	}
 
 
