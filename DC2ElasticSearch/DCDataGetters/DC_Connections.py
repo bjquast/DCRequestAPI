@@ -1,4 +1,5 @@
 import pudb
+import re
 
 from configparser import ConfigParser
 
@@ -34,6 +35,23 @@ class DC_Connections():
 				encrypt = self.config.get(section, 'encrypt', fallback = None)
 				project_section = self.config.get(section, 'project_db_connector', fallback = None)
 				
+				# fixed project ids and collection ids for which all specimen data should be withholded even for logged in users
+				withholded_projects = self.config.get(section, 'withhold_projects', fallback = None)
+				withholded_collections = self.config.get(section, 'withhold_collections', fallback = None)
+				
+				if withholded_projects is not None:
+					withholded_projects = re.split('[;,]', withholded_projects)
+					withholded_projects = [w.strip() for w in withholded_projects]
+				else:
+					withholded_projects = []
+				
+				if withholded_collections is not None:
+					withholded_collections = re.split('[;,]', withholded_collections)
+					withholded_collections = [w.strip() for w in withholded_collections]
+				else:
+					withholded_collections = []
+				
+				
 				if project_section is not None:
 					self.read_projects_connectionparams(project_section)
 				else:
@@ -48,7 +66,9 @@ class DC_Connections():
 					'database_name': database_name,
 					'accronym': accronym,
 					'database_id': database_id,
-					'projects_connectionstring': self.projects_connectionstring
+					'projects_connectionstring': self.projects_connectionstring,
+					'withholded_projects': withholded_projects,
+					'withholded_collections': withholded_collections
 				}
 				
 				self.databases.append(database_params)

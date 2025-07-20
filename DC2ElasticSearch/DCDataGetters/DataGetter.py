@@ -24,6 +24,9 @@ class DataGetter():
 		self.accronym = self.dc_params['accronym']
 		self.database_id = self.dc_params['database_id']
 		
+		self.withholded_projects = self.dc_params['withholded_projects']
+		self.withholded_collections = self.dc_params['withholded_collections']
+		
 		self.cur = self.dc_db.getCursor()
 		self.con = self.dc_db.getConnection()
 		
@@ -43,7 +46,7 @@ class DataGetter():
 		CREATE TABLE [#temp_cs_ids] (
 		[rownumber] INT IDENTITY PRIMARY KEY, -- set an IDENTITY column that can be used for paging,
 		[CollectionSpecimenID] INT,
-		INDEX [idx_CollectionSpecimenID] ([CollectionSpecimenID])
+		INDEX [idx_CollectionSpecimenID] UNIQUE ([CollectionSpecimenID])
 		)
 		;"""
 		self.cur.execute(query)
@@ -51,30 +54,56 @@ class DataGetter():
 		return
 
 
+	def set_project_collection_withhold_clause(self):
+		self.p_c_withhold_clause = ''
+		withhold_clauses = []
+		if len(self.withholded_projects) > 0:
+			withhold_clauses.append("cp.ProjectID NOT IN ({0})".format(', '.join([str(element) for element in self.withholded_projects])))
+		if len(self.withholded_collections) > 0:
+			withhold_clauses.append("c.CollectionID NOT IN ({0})".format(', '.join([str(element) for element in self.withholded_collections])))
+		if len(withhold_clauses) > 0:
+			self.p_c_withhold_clause = ('WHERE ({0})'.format(' AND '.join(withhold_clauses)))
+		return
+
+
 	def fill_cs_ids_temptable(self, last_updated = None):
 		if last_updated is not None:
+			self.set_project_collection_withhold_clause()
 			self.create_changed_cs_ids_temptable()
 			self.fill_changed_cs_ids_temptable()
 			self.set_max_page()
 		
 		else:
+			self.set_project_collection_withhold_clause()
 			query = """
 			INSERT INTO [#temp_cs_ids] ([CollectionSpecimenID])
-			SELECT 
+			SELECT DISTINCT
 			 -- TOP 100000
-			[CollectionSpecimenID]
-			FROM [CollectionSpecimen]
+			cs.[CollectionSpecimenID]
+			FROM [CollectionSpecimen] cs
+			 -- if there are any projects for which all data should be withholded even for signed in users (LEX Biobank Quarantine)
+			INNER JOIN 
+			(
+				SELECT cs.CollectionSpecimenID, 
+				COALESCE (csp.CollectionID, cs.CollectionID) AS CollectionID
+				FROM [CollectionSpecimen] cs
+				LEFT JOIN [CollectionSpecimenPart] csp ON cs.CollectionSpecimenID = csp.CollectionSpecimenID
+			) AS c
+			ON c.CollectionSpecimenID = cs.CollectionSpecimenID
+			 -- if there are any collections for which all data should be withholded even for signed in users (LEX Biobank Quarantine)
+			LEFT JOIN CollectionProject cp on cp.CollectionSpecimenID = cs.CollectionSpecimenID
+			{0}
 			 -- important: ORDER BY [CollectionSpecimenID] to have identical rownumbers for each instance of DataGetter
 			 -- when using them as multi threaded datagetters
-			ORDER BY [CollectionSpecimenID]
-			;"""
+			ORDER BY cs.[CollectionSpecimenID]
+			;""".format(self.p_c_withhold_clause)
 			
+			log_query.info(query)
 			self.cur.execute(query)
 			self.con.commit()
 			
 			self.set_max_page()
 			return
-
 
 
 	def create_changed_cs_ids_temptable(self):
@@ -114,12 +143,24 @@ class DataGetter():
 		# to fill_iupart_ids_temptable
 		query = """
 		INSERT INTO [#temp_cs_ids] ([CollectionSpecimenID])
-		SELECT DISTINCT [CollectionSpecimenID]
-		FROM #ChangedSpecimens
+		SELECT DISTINCT cs.[CollectionSpecimenID]
+		FROM [#ChangedSpecimens] cs
+		 -- if there are any projects for which all data should be withholded even for signed in users (LEX Biobank Quarantine)
+		INNER JOIN 
+		(
+			SELECT cs.CollectionSpecimenID, 
+			COALESCE (csp.CollectionID, cs.CollectionID) AS CollectionID
+			FROM [CollectionSpecimen] cs
+			LEFT JOIN [CollectionSpecimenPart] csp ON cs.CollectionSpecimenID = csp.CollectionSpecimenID
+		) AS c
+		ON c.CollectionSpecimenID = cs.CollectionSpecimenID
+		 -- if there are any collections for which all data should be withholded even for signed in users (LEX Biobank Quarantine)
+		LEFT JOIN CollectionProject cp on cp.CollectionSpecimenID = cs.CollectionSpecimenID
+		{0}
 		 -- important: ORDER BY [CollectionSpecimenID] to have identical rownumbers for each instance of DataGetter
 		 -- when using them as multi threaded datagetters
 		ORDER BY [CollectionSpecimenID]
-		;"""
+		;""".format(self.p_c_withhold_clause)
 		
 		log_query.debug(query)
 		self.cur.execute(query)
