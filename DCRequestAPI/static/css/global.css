@@ -23,27 +23,6 @@ a:visited {
 }
 
 
-
-#pageheader {
-	display: flex;
-	justify-content: space-between;
-	margin-bottom: 0.5em;
-	width: 95%;
-	border: none;
-}
-
-#navigation {
-	display: flex;
-	justify-content: right;
-}
-
-
-#navigation>div,
-#navigation>span {
-	margin-left: 1em;
-}
-
-
 label{
 	font-size: small;
 }
@@ -127,20 +106,12 @@ input{
 .ul-no-bullet {
 	list-style-type: none;
 	padding-left: 1em;
+	margin-top: 0.2em;
+	margin-bottom: 0.2em;
 }
 
 .clickable {
 	cursor: pointer;
-}
-
-
-#selectable_filters {
-	min-width: 20rem;
-	max-width: 25rem;
-}
-
-#results_iuparts {
-	height: 60vh;
 }
 
 .align-items-center {

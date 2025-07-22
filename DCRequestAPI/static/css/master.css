@@ -13,9 +13,9 @@ body {
 	margin: 1em;
 }
 
-@media (min-width: 30em) { 
+@media (min-width: 45em) { 
 	body {
-		grid-template-columns: 1fr minmax(30em, auto);
+		grid-template-columns: 1fr minmax(45em, auto);
 	}
 }
 
@@ -32,6 +32,41 @@ header, message_box, search_box, footer {
 	/*overflow-x: hidden;*/
 }
 
+
+/*the result window*/
+main {
+	height: 80vh;
+	overflow: scroll;
+}
+
+
+/*Left area for the filters*/
+
+#selectable_filters fieldset {
+	min-width: 20rem;
+	max-width: 25rem;
+	height: 78vh;
+	overflow-y: scroll;
+}
+
+#filter_selection_field {
+	max-height: 60vh;
+	overflow: scroll;
+}
+
+/*
+#available_filters {
+	max-height: 30vh;
+	overflow: scroll;
+}
+
+#available_hierarchy_filters {
+	max-height: 25vh;
+	overflow: scroll;
+}
+*/
+
+/*loading overlay*/
 #loading_overlay {
 	background: none repeat scroll 0 0;
 	height:100%;

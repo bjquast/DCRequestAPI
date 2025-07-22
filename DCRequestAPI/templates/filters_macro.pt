@@ -47,31 +47,32 @@
 			<h4>Filters</h4>
 			<div metal:use-macro="load: DCRequestAPI:templates/filter_selector_macro.pt"></div>
 		</div>
-		<div id="available_filters">
-			<div tal:repeat="aggs_name selected_filter_sections" class="filter-select-box">
-			<!--<div tal:repeat="aggs_name default_bucketfields" class="filter-select-box">-->
-				<details id="filter_list_${aggs_name}" class="filter_selectors" data-filter-key="${aggs_name}" tal:attributes="open 'open' if aggs_name in open_filter_selectors else None">
-					<!-- hidden checkbox to submit the state of the details box -->
-					<input type="checkbox" form="search_form" name="open_filter_selectors" class="hidden" value="${aggs_name}" tal:attributes="checked 'checked' if aggs_name in open_filter_selectors else None">
-					<summary class="clickable">${bucketdefs[aggs_name]['en']}</summary>
-					<ul tal:condition="python: aggs_name in aggregations and aggs_name in selected_bucketfields" class="ul-no-bullet">
-						<li tal:repeat="bucket aggregations[aggs_name]" class="bucket_entry clickable" 
-							data-filter-id="filter_${aggs_name}_${bucket['key']}" 
-							data-filter-name="${bucketdefs[aggs_name]['en']}"
-							data-filter-key="${aggs_name}"
-							data-filter-value="${bucket['key']}">
-							${bucket['key']} (${bucket['doc_count']})
-						</li>
-						<li><button id="more_button_${aggs_name}" class="more_filter_entries_button" data-filter-key="${aggs_name}">more options</button></li>
-					</ul>
-				</details>
+		<div id="filter_selection_field">
+			<div id="available_filters">
+				<div tal:repeat="aggs_name selected_filter_sections" class="filter-select-box">
+				<!--<div tal:repeat="aggs_name default_bucketfields" class="filter-select-box">-->
+					<details id="filter_list_${aggs_name}" class="filter_selectors" data-filter-key="${aggs_name}" tal:attributes="open 'open' if aggs_name in open_filter_selectors else None">
+						<!-- hidden checkbox to submit the state of the details box -->
+						<input type="checkbox" form="search_form" name="open_filter_selectors" class="hidden" value="${aggs_name}" tal:attributes="checked 'checked' if aggs_name in open_filter_selectors else None">
+						<summary class="clickable">${bucketdefs[aggs_name]['en']}</summary>
+						<ul tal:condition="python: aggs_name in aggregations and aggs_name in selected_bucketfields" class="ul-no-bullet">
+							<li tal:repeat="bucket aggregations[aggs_name]" class="bucket_entry clickable" 
+								data-filter-id="filter_${aggs_name}_${bucket['key']}" 
+								data-filter-name="${bucketdefs[aggs_name]['en']}"
+								data-filter-key="${aggs_name}"
+								data-filter-value="${bucket['key']}">
+								${bucket['key']} (${bucket['doc_count']})
+							</li>
+							<li><button id="more_button_${aggs_name}" class="more_filter_entries_button" data-filter-key="${aggs_name}">more options</button></li>
+						</ul>
+					</details>
+				</div>
+			</div>
+			
+			<div id="hierarchy_filters">
+				<block metal:use-macro="load: DCRequestAPI:templates/hierarchy_filters_macro.pt" tal:omit-tag=""></block>
 			</div>
 		</div>
-		
-		<div id="hierarchy_filters">
-			<block metal:use-macro="load: DCRequestAPI:templates/hierarchy_filters_macro.pt" tal:omit-tag=""></block>
-		</div>
-		
 	</fieldset>
 	
 	

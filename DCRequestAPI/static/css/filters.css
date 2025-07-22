@@ -11,7 +11,9 @@
 }
 
 #filter_sections_header h4,
-#filter_sections_header details {
-	margin-top: 1em;
-	margin-bottom: 1em;
+#filter_sections_header details,
+#hierarchy_filter_sections_header h4 {
+	margin-top: 0.5em;
+	margin-bottom: 0.2em;
 }
+
