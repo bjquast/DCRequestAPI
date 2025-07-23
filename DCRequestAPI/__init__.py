@@ -25,6 +25,7 @@ def main(global_config, **settings):
 	config.add_renderer('jsonp', JSONP(param_name='callback'))
 	
 	config.add_route('iupartslist', '/list')
+	config.add_route('export_csv', '/export/csv')
 	config.add_route('aggregation', '/aggregation')
 	#config.add_route('hierarchy_aggregation', '/hierarchy_aggregation/{hierarchy_name}')
 	config.add_route('hierarchies', '/hierarchies')

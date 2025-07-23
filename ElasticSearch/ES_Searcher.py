@@ -61,8 +61,12 @@ class ES_Searcher():
 		return
 
 
-	def setStartRow(self):
-		if 'page' in self.search_params:
+	def setStartRow(self, page = None):
+		if page is not None:
+			if int(page) < 1:
+				page = 1
+			self.start = self.pagesize * int(page)-1
+		elif 'page' in self.search_params:
 			if int(self.search_params['page']) < 1:
 				self.search_params['page'] = 1
 			self.start = self.pagesize * (int(self.search_params['page'])-1)
@@ -299,6 +303,51 @@ class ES_Searcher():
 		return buckets
 
 
+	def countResultDocsSearch(self):
+		self.updateMaxResultWindow(max_result_window=2000000)
+		self.readIndexMapping()
+		self.setQuery()
+		aggs = None
+		logger.debug(json.dumps(self.query))
+		
+		response = self.client.search(index=self.index, size=self.pagesize, query=self.query, from_=self.start, source=False, track_total_hits=True)
+		
+		resultnum = response['hits']['total']['value']
+		maxpage = self.getMaxPage(resultnum)
+		return maxpage, resultnum
+
+
+	def searchDocsByPage(self, page):
+		self.setPageSize()
+		self.setStartRow(page)
+		self.setSorting()
+		
+		self.setQuery()
+		
+		logger.debug(json.dumps(self.query))
+		
+		if len(self.source_fields) <= 0:
+			source_fields = True
+		else:
+			self.__setRequiredSourceFields()
+			source_fields = self.source_fields
+		
+		response = self.client.search(index=self.index, size=self.pagesize, sort=self.sort, query=self.query, from_=self.start, source=source_fields, track_total_hits=True)
+		
+		resultnum = response['hits']['total']['value']
+		maxpage = self.getMaxPage(resultnum)
+		
+		if self.start > resultnum:
+			self.search_params['page'] = maxpage
+			self.setStartRow()
+			response = self.client.search(index=self.index, size=self.pagesize, sort=self.sort, query=self.query, from_=self.start, source=source_fields, track_total_hits=True)
+		
+		docs = [doc for doc in response['hits']['hits']]
+		docs = self.withholdfilters.applyFiltersToSources(docs, self.users_project_ids)
+		
+		return docs, maxpage, resultnum
+
+
 
 	def paginatedSearch(self):
 		
@@ -332,17 +381,8 @@ class ES_Searcher():
 		if len(self.source_fields) <= 0:
 			source_fields = True
 		else:
-			# add the fields that are needed for filtering the results in WithholdFilters.applyFiltersToSources()
-			if 'Projects.DB_ProjectID' not in self.source_fields:
-				self.source_fields.append('Projects.DB_ProjectID')
-			self.source_fields.extend(self.withhold_fields)
+			self.__setRequiredSourceFields()
 			source_fields = self.source_fields
-			
-			# add the fields that are necessary for linking out from the retrieved data
-			if 'PartAccessionNumber' not in self.source_fields:
-				self.source_fields.append('PartAccessionNumber')
-			if 'StableIdentifierURL' not in self.source_fields:
-				self.source_fields.append('StableIdentifierURL')
 		
 		response = self.client.search(index=self.index, size=self.pagesize, sort=self.sort, query=self.query, from_=self.start, source=source_fields, track_total_hits=True, aggs=aggs)
 		
@@ -363,6 +403,21 @@ class ES_Searcher():
 		docs = self.withholdfilters.applyFiltersToSources(docs, self.users_project_ids)
 		
 		return docs, maxpage, resultnum
+
+
+	def __setRequiredSourceFields(self):
+		# add the fields that are needed for filtering the results in WithholdFilters.applyFiltersToSources()
+		if 'Projects.DB_ProjectID' not in self.source_fields:
+			self.source_fields.append('Projects.DB_ProjectID')
+		self.source_fields.extend(self.withhold_fields)
+		source_fields = self.source_fields
+		
+		# add the fields that are necessary for linking out from the retrieved data
+		if 'PartAccessionNumber' not in self.source_fields:
+			self.source_fields.append('PartAccessionNumber')
+		if 'StableIdentifierURL' not in self.source_fields:
+			self.source_fields.append('StableIdentifierURL')
+		return
 
 
 	def parseRawAggregations(self):

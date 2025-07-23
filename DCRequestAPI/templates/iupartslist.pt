@@ -56,6 +56,11 @@
 					<div metal:use-macro="load: DCRequestAPI:templates/paging_macro.pt"></div>
 				</div>
 				<div metal:use-macro="load: DCRequestAPI:templates/column_selector_macro.pt"></div>
+				<div>
+					<form id="export_csv_form" method="post" action="${request.application_url}/export/csv">
+						<input type="submit" form="export_csv_form" value="Export as CSV-File">
+					</form>
+				</div>
 			</div>
 			
 			<div class="flex-space-between">
