@@ -63,11 +63,7 @@ class IUPartsListView():
 		# makes no sense here
 		#if len(self.search_params['open_filter_selectors']) > 0:
 		#	iupartstable.setSelectedBucketFields(self.search_params['open_filter_selectors'])
-		
-		restrict_to_users_projects = False
-		if 'restrict_to_users_projects' in self.search_params and self.uid is not None:
-			restrict_to_users_projects = True
-		
+				
 		selected_sourcefields = iupartstable.selected_sourcefields
 		#default_sourcefields = iupartstable.default_sourcefields
 		selected_bucketfields = iupartstable.selected_bucketfields
@@ -76,7 +72,7 @@ class IUPartsListView():
 		coldefs = iupartstable.coldefs
 		bucketdefs = iupartstable.bucketdefs
 		
-		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids, restrict_to_users_projects = restrict_to_users_projects)
+		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
 		es_searcher.setSourceFields(selected_sourcefields)
 		es_searcher.setBucketFields(selected_bucketfields)
 		docs, maxpage, resultnum = es_searcher.paginatedSearch()
@@ -117,7 +113,6 @@ class IUPartsListView():
 
 	@view_config(route_name='iupartslist', accept='text/html', renderer="DCRequestAPI:templates/iupartslist.pt")
 	def IUPartsListHTML(self):
-		
 		iupartstable = IUPartsTable()
 		if len(self.search_params['result_table_columns']) > 0:
 			iupartstable.setSelectedSourceFields(self.search_params['result_table_columns'])
@@ -125,10 +120,6 @@ class IUPartsListView():
 		#if len(self.search_params['open_filter_selectors']) > 0:
 		iupartstable.setSelectedBucketFields(self.search_params['open_filter_selectors'])
 		iupartstable.setSelectedFilterSections(self.search_params['selected_filter_sections'])
-		
-		restrict_to_users_projects = False
-		if 'restrict_to_users_projects' in self.search_params and self.uid is not None:
-			restrict_to_users_projects = True
 		
 		selected_sourcefields = iupartstable.selected_sourcefields
 		default_sourcefields = iupartstable.default_sourcefields
@@ -181,7 +172,7 @@ class IUPartsListView():
 		bucketdefs = iupartstable.bucketdefs
 		hierarchy_filter_names = iupartstable.hierarchy_filter_names
 		
-		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids, restrict_to_users_projects = restrict_to_users_projects)
+		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
 		es_searcher.setSourceFields(selected_sourcefields)
 		es_searcher.setBucketFields(selected_bucketfields)
 		es_searcher.setHierarchyFields(open_hierarchy_selectors)

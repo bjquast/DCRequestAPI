@@ -57,9 +57,7 @@
 				</div>
 				<div metal:use-macro="load: DCRequestAPI:templates/column_selector_macro.pt"></div>
 				<div>
-					<form id="export_csv_form" method="post" action="${request.application_url}/export/csv">
-						<input type="submit" form="export_csv_form" value="Export as CSV-File">
-					</form>
+                    <input type="submit" form="search_form" formaction="${request.application_url}/export/csv" name="submit.export" value="export csv file">
 				</div>
 			</div>
 			

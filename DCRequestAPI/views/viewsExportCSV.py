@@ -6,7 +6,6 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPSeeOther
 from ElasticSearch.ES_Searcher import ES_Searcher
 
 from DCRequestAPI.lib.SearchResults.IUPartsTable import IUPartsTable
-from DCRequestAPI.lib.SearchResults.HierarchyAggregations import HierarchyAggregations
 from DCRequestAPI.lib.UserLogin.UserLogin import UserLogin
 
 from DCRequestAPI.views.RequestParams import RequestParams
@@ -53,13 +52,7 @@ class ExportCSVView():
 
 	@view_config(route_name='export_csv', accept='application/json')
 	def export_csv(self):
-		pudb.set_trace()
-		
-		restrict_to_users_projects = False
-		if 'restrict_to_users_projects' in self.search_params and self.uid is not None:
-			restrict_to_users_projects = True
-		
-		csv_generator = CSVGenerator(self.search_params, self.uid, self.users_project_ids, restrict_to_users_projects)
+		csv_generator = CSVGenerator(self.search_params, self.uid, self.users_project_ids)
 		csv_generator.set_es_searcher()
 		
 		now = datetime.now().strftime("%d.%m.%Y-%H:%M:%S")
@@ -73,16 +66,11 @@ class ExportCSVView():
 		
 		
 
-
-
-
-
 class CSVGenerator():
-	def __init__(self, search_params, uid, users_project_ids, restrict_to_users_projects):
+	def __init__(self, search_params, uid, users_project_ids):
 		self.search_params = search_params
 		self.uid = uid
 		self.users_project_ids = users_project_ids
-		self.restrict_to_users_projects = restrict_to_users_projects
 		
 		self.maxpage = 0
 		self.resultnum = 0
@@ -96,20 +84,34 @@ class CSVGenerator():
 		
 	
 	def set_es_searcher(self):
-		self.es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids, restrict_to_users_projects = self.restrict_to_users_projects)
+		self.es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
 		self.es_searcher.setSourceFields(self.selected_sourcefields)
 		self.maxpage, self.resultnum = self.es_searcher.countResultDocsSearch()
 		return
 	
+	def get_header_row(self):
+		coldefs = self.iupartstable.coldefs
+		headers = []
+		for source_field in self.selected_sourcefields:
+			if source_field in coldefs:
+				headers.append(coldefs[source_field]['en'])
+			else:
+				headers.append('')
+		header_row = ', '.join(["'" + head + "'" for head in headers])
+		return header_row
+	
 	def yield_CSV_pages(self):
 		self.page = 1
-		pudb.set_trace()
+		# pudb.set_trace()
+		header_row = self.get_header_row()
 		while self.page <= self.maxpage:
+			csv_page = ''
+			if header_row:
+				csv_page += header_row
+				header_row = None
+			
 			docs, maxpage, resultnum = self.es_searcher.searchDocsByPage(self.page)
 			iupartslist = self.iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs])
-			
-			self.page = self.page + 1
-			csv_page = ''
 			
 			for iupart in iupartslist:
 				csv_list = []
@@ -124,7 +126,9 @@ class CSVGenerator():
 					else:
 						csv_list.append('')
 				csv_page += '\n' + ', '.join(csv_list)
-			print (self.page, self.maxpage)
+			
+			self.page = self.page + 1
+			# print (self.page, self.maxpage)
 			yield bytes(csv_page, 'utf8')
 		
 		return 

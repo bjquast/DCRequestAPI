@@ -18,14 +18,16 @@ from ElasticSearch.QueryConstructor.HierarchyQueries import HierarchyQueries
 from ElasticSearch.QueryConstructor.StackedQueries import StackedInnerQuery, StackedOuterQuery
 
 class ES_Searcher():
-	def __init__(self, search_params = {}, user_id = None, users_project_ids = [], restrict_to_users_projects = False):
+	def __init__(self, search_params = {}, user_id = None, users_project_ids = []):
 		es_connector = ES_Connector()
 		self.client = es_connector.client
 		
 		self.search_params = search_params
 		self.user_id = user_id
 		self.users_project_ids = users_project_ids
-		self.restrict_to_users_projects = restrict_to_users_projects
+		self.restrict_to_users_projects = False
+		if 'restrict_to_users_projects' in self.search_params and self.search_params['restrict_to_users_projects'] and self.user_id:
+			self.restrict_to_users_projects = True
 		
 		self.index = 'iuparts'
 		self.source_fields = []

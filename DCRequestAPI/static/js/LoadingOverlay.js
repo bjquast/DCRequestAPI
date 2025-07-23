@@ -10,10 +10,9 @@ class LoadingOverlay {
 	
 	add_loading_overlay_event() {
 		let self = this;
-		
-		$("#search_form").submit(
-			function() {
-				self.add_loading_overlay();
+		$("#search_form").on ( 'submit',
+			function(e) {
+				//self.add_loading_overlay();
 			}
 		);
 	}
