@@ -10,11 +10,14 @@ class LoadingOverlay {
 	
 	add_loading_overlay_event() {
 		let self = this;
-		$("#search_form").on ( 'submit',
-			function(e) {
-				//self.add_loading_overlay();
+
+		// i haven't find a way to get the submitter when using a jquery submit event
+		document.addEventListener('submit',function(e){
+			let submitter_name = e.submitter['name'];
+			if (submitter_name != 'file download') {
+				self.add_loading_overlay();
 			}
-		);
+		});
 	}
 	
 	add_loading_overlay() {
