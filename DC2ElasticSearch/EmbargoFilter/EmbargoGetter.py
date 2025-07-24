@@ -49,9 +49,13 @@ class EmbargoGetter():
 		FROM cte_embargo ct
 		INNER JOIN ProjectSetting dps ON ct.ProjectID = dps.ProjectID
 		INNER JOIN Setting ds ON dps.SettingID = ds.SettingID
-		WHERE ds.DisplayText IN ('embargo_collector', 'anonymize_collector', 'anonymize_depositor',
-					'anonymize_determiner', 'embargo_event_but_country', 'embargo_coordinates',
-					'embargo_event_but_country_after_1992', 'embargo_coll_date')
+		WHERE ds.DisplayText IN ('embargo_collector',
+								'anonymize_collector', 'anonymize_collector_after_1950',
+								'anonymize_depositor', 'anonymize_depositor_after_1950',
+								'anonymize_determiner', 'anonymize_determiner_after_1950',
+								'embargo_event_but_country', 'embargo_coordinates',
+								'embargo_event_but_country_after_1992', 'embargo_coll_date',
+								'embargo_complete')
 		ORDER BY ct.ChildProjectID
 		;"""
 		log_query.debug(query)

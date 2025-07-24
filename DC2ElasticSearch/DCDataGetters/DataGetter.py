@@ -191,7 +191,7 @@ class DataGetter():
 		[SpecimenPartID] INT,
 		[SpecimenAccessionNumber] NVARCHAR(255),
 		[PartAccessionNumber] NVARCHAR(255),
-		 -- columns for Embargo settings comming from DiversityProjects, a LIB specific idea, may not implemented elsewhere
+		 -- columns for Embargo settings coming from DiversityProjects, a LIB specific idea, may not implemented elsewhere
 		[embargo_anonymize_depositor] BIT DEFAULT 0,
 		[embargo_collector] BIT DEFAULT 0,
 		[embargo_anonymize_collector] BIT DEFAULT 0,
@@ -200,6 +200,7 @@ class DataGetter():
 		[embargo_coordinates] BIT DEFAULT 0,
 		[embargo_event_but_country_after_1992] BIT DEFAULT 0,
 		[embargo_coll_date] BIT DEFAULT 0,
+		[embargo_complete] BIT DEFAULT 0,
 		INDEX [idx_idshash] UNIQUE ([idshash]),
 		INDEX [idx_DatabaseURI] ([DatabaseURI]),
 		INDEX [idx_CollectionSpecimenID] ([CollectionSpecimenID]),

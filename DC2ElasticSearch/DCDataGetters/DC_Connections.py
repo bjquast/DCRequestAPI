@@ -39,13 +39,13 @@ class DC_Connections():
 				withholded_projects = self.config.get(section, 'withhold_projects', fallback = None)
 				withholded_collections = self.config.get(section, 'withhold_collections', fallback = None)
 				
-				if withholded_projects is not None:
+				if withholded_projects is not None and withholded_projects != '':
 					withholded_projects = re.split('[;,]', withholded_projects)
 					withholded_projects = [w.strip() for w in withholded_projects]
 				else:
 					withholded_projects = []
 				
-				if withholded_collections is not None:
+				if withholded_collections is not None and withholded_collections != '':
 					withholded_collections = re.split('[;,]', withholded_collections)
 					withholded_collections = [w.strip() for w in withholded_collections]
 				else:

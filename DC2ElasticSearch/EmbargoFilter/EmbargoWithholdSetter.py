@@ -22,14 +22,37 @@ class EmbargoWithholdSetter():
 		self.con = self.dc_db.getConnection()
 		self.cur = self.dc_db.getCursor()
 		
-		self.anonymize_depositor()
 		self.embargo_collector()
+		self.anonymize_depositor()
+		self.anonymize_depositor_after_1950()
 		self.anonymize_collector()
+		self.anonymize_collector_after_1950()
 		self.anonymize_determiner()
+		self.anonymize_determiner_after_1950()
 		self.embargo_event_but_country()
 		self.embargo_coordinates()
 		self.embargo_event_but_country_after_1992()
 		self.embargo_coll_date()
+		self.embargo_specimen()
+
+
+	def embargo_collector(self):
+		query = """
+		UPDATE [#temp_iu_part_ids]
+		SET [embargo_collector] = 1
+		FROM [#temp_iu_part_ids] gt
+		INNER JOIN IdentificationUnit iu ON
+		iu.CollectionSpecimenID = gt.CollectionSpecimenID AND iu.IdentificationUnitID = gt.IdentificationUnitID
+		INNER JOIN CollectionProject cp ON
+		cp.CollectionSpecimenID = iu.CollectionSpecimenID
+		INNER JOIN [{0}] et
+		ON et.ProjectID = cp.ProjectID
+		WHERE et.DisplayText IN ('embargo_collector')
+		;""".format(self.embargo_temptable)
+		log_query.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		return
 
 
 	def anonymize_depositor(self):
@@ -51,18 +74,22 @@ class EmbargoWithholdSetter():
 		return
 
 
-	def embargo_collector(self):
+	def anonymize_depositor_after_1950(self):
 		query = """
 		UPDATE [#temp_iu_part_ids]
-		SET [embargo_collector] = 1
+		SET [embargo_anonymize_depositor] = 1
 		FROM [#temp_iu_part_ids] gt
-		INNER JOIN IdentificationUnit iu ON
-		iu.CollectionSpecimenID = gt.CollectionSpecimenID AND iu.IdentificationUnitID = gt.IdentificationUnitID
-		INNER JOIN CollectionProject cp ON 
-		cp.CollectionSpecimenID = iu.CollectionSpecimenID
+		INNER JOIN IdentificationUnit iu
+		ON iu.CollectionSpecimenID = gt.CollectionSpecimenID AND iu.IdentificationUnitID = gt.IdentificationUnitID
+		INNER JOIN CollectionSpecimen cs
+		ON iu.CollectionSpecimenID = cs.CollectionSpecimenID
+		INNER JOIN CollectionEvent ce
+		ON ce.CollectionEventID = cs.CollectionEventID AND ce.CollectionYear > 1949
+		INNER JOIN CollectionProject cp
+		ON cp.CollectionSpecimenID = iu.CollectionSpecimenID
 		INNER JOIN [{0}] et
 		ON et.ProjectID = cp.ProjectID
-		WHERE et.DisplayText IN ('embargo_collector')
+		WHERE et.DisplayText IN ('anonymize_depositor_after_1950')
 		;""".format(self.embargo_temptable)
 		log_query.debug(query)
 		self.cur.execute(query)
@@ -75,13 +102,36 @@ class EmbargoWithholdSetter():
 		UPDATE [#temp_iu_part_ids]
 		SET [embargo_anonymize_collector] = 1
 		FROM [#temp_iu_part_ids] gt
-		INNER JOIN IdentificationUnit iu ON
-		iu.CollectionSpecimenID = gt.CollectionSpecimenID AND iu.IdentificationUnitID = gt.IdentificationUnitID
-		INNER JOIN CollectionProject cp ON 
-		cp.CollectionSpecimenID = iu.CollectionSpecimenID
+		INNER JOIN IdentificationUnit iu
+		ON iu.CollectionSpecimenID = gt.CollectionSpecimenID AND iu.IdentificationUnitID = gt.IdentificationUnitID
+		INNER JOIN CollectionProject cp
+		ON cp.CollectionSpecimenID = iu.CollectionSpecimenID
 		INNER JOIN [{0}] et
 		ON et.ProjectID = cp.ProjectID
 		WHERE et.DisplayText IN ('anonymize_collector')
+		;""".format(self.embargo_temptable)
+		log_query.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		return
+
+
+	def anonymize_collector_after_1950(self):
+		query = """
+		UPDATE [#temp_iu_part_ids]
+		SET [embargo_anonymize_collector] = 1
+		FROM [#temp_iu_part_ids] gt
+		INNER JOIN IdentificationUnit iu
+		ON iu.CollectionSpecimenID = gt.CollectionSpecimenID AND iu.IdentificationUnitID = gt.IdentificationUnitID
+		INNER JOIN CollectionSpecimen cs
+		ON iu.CollectionSpecimenID = cs.CollectionSpecimenID
+		INNER JOIN CollectionEvent ce
+		ON ce.CollectionEventID = cs.CollectionEventID AND ce.CollectionYear > 1949
+		INNER JOIN CollectionProject cp
+		ON cp.CollectionSpecimenID = iu.CollectionSpecimenID
+		INNER JOIN [{0}] et
+		ON et.ProjectID = cp.ProjectID
+		WHERE et.DisplayText IN ('anonymize_collector_after_1950')
 		;""".format(self.embargo_temptable)
 		log_query.debug(query)
 		self.cur.execute(query)
@@ -94,13 +144,36 @@ class EmbargoWithholdSetter():
 		UPDATE [#temp_iu_part_ids]
 		SET [embargo_anonymize_determiner] = 1
 		FROM [#temp_iu_part_ids] gt
-		INNER JOIN IdentificationUnit iu ON
-		iu.CollectionSpecimenID = gt.CollectionSpecimenID AND iu.IdentificationUnitID = gt.IdentificationUnitID
-		INNER JOIN CollectionProject cp ON 
-		cp.CollectionSpecimenID = iu.CollectionSpecimenID
+		INNER JOIN IdentificationUnit iu
+		ON iu.CollectionSpecimenID = gt.CollectionSpecimenID AND iu.IdentificationUnitID = gt.IdentificationUnitID
+		INNER JOIN CollectionProject cp
+		ON cp.CollectionSpecimenID = iu.CollectionSpecimenID
 		INNER JOIN [{0}] et
 		ON et.ProjectID = cp.ProjectID
 		WHERE et.DisplayText IN ('anonymize_determiner')
+		;""".format(self.embargo_temptable)
+		log_query.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		return
+
+
+	def anonymize_determiner_after_1950(self):
+		query = """
+		UPDATE [#temp_iu_part_ids]
+		SET [embargo_anonymize_determiner] = 1
+		FROM [#temp_iu_part_ids] gt
+		INNER JOIN IdentificationUnit iu
+		ON iu.CollectionSpecimenID = gt.CollectionSpecimenID AND iu.IdentificationUnitID = gt.IdentificationUnitID
+		INNER JOIN CollectionSpecimen cs
+		ON iu.CollectionSpecimenID = cs.CollectionSpecimenID
+		INNER JOIN CollectionEvent ce
+		ON ce.CollectionEventID = cs.CollectionEventID AND ce.CollectionYear > 1949
+		INNER JOIN CollectionProject cp
+		ON cp.CollectionSpecimenID = iu.CollectionSpecimenID
+		INNER JOIN [{0}] et
+		ON et.ProjectID = cp.ProjectID
+		WHERE et.DisplayText IN ('anonymize_determiner_after_1950')
 		;""".format(self.embargo_temptable)
 		log_query.debug(query)
 		self.cur.execute(query)
@@ -113,10 +186,10 @@ class EmbargoWithholdSetter():
 		UPDATE [#temp_iu_part_ids]
 		SET [embargo_event_but_country] = 1
 		FROM [#temp_iu_part_ids] gt
-		INNER JOIN IdentificationUnit iu ON
-		iu.CollectionSpecimenID = gt.CollectionSpecimenID AND iu.IdentificationUnitID = gt.IdentificationUnitID
-		INNER JOIN CollectionProject cp ON 
-		cp.CollectionSpecimenID = iu.CollectionSpecimenID
+		INNER JOIN IdentificationUnit iu
+		ON iu.CollectionSpecimenID = gt.CollectionSpecimenID AND iu.IdentificationUnitID = gt.IdentificationUnitID
+		INNER JOIN CollectionProject cp
+		ON cp.CollectionSpecimenID = iu.CollectionSpecimenID
 		INNER JOIN [{0}] et
 		ON et.ProjectID = cp.ProjectID
 		WHERE et.DisplayText IN ('embargo_event_but_country')
@@ -132,10 +205,10 @@ class EmbargoWithholdSetter():
 		UPDATE [#temp_iu_part_ids]
 		SET [embargo_coordinates] = 1
 		FROM [#temp_iu_part_ids] gt
-		INNER JOIN IdentificationUnit iu ON
-		iu.CollectionSpecimenID = gt.CollectionSpecimenID AND iu.IdentificationUnitID = gt.IdentificationUnitID
-		INNER JOIN CollectionProject cp ON 
-		cp.CollectionSpecimenID = iu.CollectionSpecimenID
+		INNER JOIN IdentificationUnit iu
+		ON iu.CollectionSpecimenID = gt.CollectionSpecimenID AND iu.IdentificationUnitID = gt.IdentificationUnitID
+		INNER JOIN CollectionProject cp
+		ON cp.CollectionSpecimenID = iu.CollectionSpecimenID
 		INNER JOIN [{0}] et
 		ON et.ProjectID = cp.ProjectID
 		WHERE et.DisplayText IN ('embargo_coordinates')
@@ -174,10 +247,10 @@ class EmbargoWithholdSetter():
 		UPDATE [#temp_iu_part_ids]
 		SET [embargo_coll_date] = 1
 		FROM [#temp_iu_part_ids] gt
-		INNER JOIN IdentificationUnit iu ON
-		iu.CollectionSpecimenID = gt.CollectionSpecimenID AND iu.IdentificationUnitID = gt.IdentificationUnitID
-		INNER JOIN CollectionProject cp ON 
-		cp.CollectionSpecimenID = iu.CollectionSpecimenID
+		INNER JOIN IdentificationUnit iu
+		ON iu.CollectionSpecimenID = gt.CollectionSpecimenID AND iu.IdentificationUnitID = gt.IdentificationUnitID
+		INNER JOIN CollectionProject cp
+		ON cp.CollectionSpecimenID = iu.CollectionSpecimenID
 		INNER JOIN [{0}] et
 		ON et.ProjectID = cp.ProjectID
 		WHERE et.DisplayText IN ('embargo_coll_date')
@@ -188,7 +261,23 @@ class EmbargoWithholdSetter():
 		return
 
 
-
+	def embargo_specimen(self):
+		query = """
+		UPDATE [#temp_iu_part_ids]
+		SET [embargo_complete] = 1
+		FROM [#temp_iu_part_ids] gt
+		INNER JOIN IdentificationUnit iu
+		ON iu.CollectionSpecimenID = gt.CollectionSpecimenID AND iu.IdentificationUnitID = gt.IdentificationUnitID
+		INNER JOIN CollectionProject cp
+		ON cp.CollectionSpecimenID = iu.CollectionSpecimenID
+		INNER JOIN [{0}] et
+		ON et.ProjectID = cp.ProjectID
+		WHERE et.DisplayText IN ('embargo_complete')
+		;""".format(self.embargo_temptable)
+		log_query.debug(query)
+		self.cur.execute(query)
+		self.con.commit()
+		return
 
 
 

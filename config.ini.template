@@ -19,7 +19,7 @@ trusted_connection = @@DS1_TRUSTED_CONNECTION@@
 encrypt = @@DS1_ENCRYPT@@
 # project_db_connector references an existing section with SQL SERVER connection parameters
 project_db_connector = @@DS1_PROJECT_DB_CONNECTOR@@
-# projects or collections where the data should be withholded even for signed in users
+# collections where the data should be withholded even for signed in users
 withhold_projects = @@DS1_WITHHOLD_PROJECTS@@
 withhold_collections = @@DS1_WITHHOLD_COLLECTIONS@@
 

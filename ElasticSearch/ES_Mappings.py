@@ -137,6 +137,7 @@ MappingsDict['iuparts'] = {
 		'embargo_coordinates': {'type': 'boolean'},
 		'embargo_event_but_country_after_1992': {'type': 'boolean'},
 		'embargo_coll_date': {'type': 'boolean'},
+		'embargo_complete': {'type': 'boolean'},
 		
 		# Storage
 		'PreparationMethod': {'type': 'text', 'fields': {

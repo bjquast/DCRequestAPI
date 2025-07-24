@@ -29,18 +29,22 @@ class IdentificationUnitParts():
 		idstemp.[SpecimenAccessionNumber], 
 		idstemp.[PartAccessionNumber],
 		CONCAT_WS('/', REPLACE(dbo.StableIdentifierBase(), 'http:', 'https:'), idstemp.[CollectionSpecimenID], idstemp.[IdentificationUnitID], idstemp.[SpecimenPartID]) AS [StableIdentifierURL],
-		 -- columns for Embargo settings comming from DiversityProjects, a LIB specific idea, may not implemented elsewhere
+		 -- columns for Embargo settings coming from DiversityProjects, a LIB specific idea, may not implemented elsewhere
 		CASE WHEN idstemp.[embargo_anonymize_depositor] = 1 THEN 'true' ELSE 'false' END AS [embargo_anonymize_depositor],
 		CASE WHEN idstemp.[embargo_event_but_country] = 1 THEN 'true' ELSE 'false' END AS [embargo_event_but_country],
 		CASE WHEN idstemp.[embargo_coordinates] = 1 THEN 'true' ELSE 'false' END AS [embargo_coordinates],
 		CASE WHEN idstemp.[embargo_event_but_country_after_1992] = 1 THEN 'true' ELSE 'false' END AS [embargo_event_but_country_after_1992],
 		CASE WHEN idstemp.[embargo_coll_date] = 1 THEN 'true' ELSE 'false' END AS [embargo_coll_date],
-		 -- end embargo columns
+		 -- end embargo columns, embargo_complete is used to set SpecimenWithhold
 		CONVERT (NVARCHAR, cs.[LogUpdatedWhen], 121) AS [LastUpdated],
 		CONVERT(NVARCHAR, cs.[AccessionDate], 120) AS [AccessionDate], 
 		cs.[DepositorsName], 
 		cs.[DataWithholdingReason] AS SpecimenWithholdingReason, 
-		CASE 
+		CASE
+			 -- apply the complete embargo here, because it can not be applied in withhold filters
+			 -- because the result number in search requests will not match if it is applied there afterwards
+			 -- CASE returns the THEN value of the first WHEN clause that matches
+			WHEN idstemp.[embargo_complete] = 1 THEN 'true'
 			WHEN cs.[DataWithholdingReason] = '' THEN 'false'
 			WHEN cs.[DataWithholdingReason] IS NULL THEN 'false'
 			ELSE 'true'
