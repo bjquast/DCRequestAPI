@@ -74,8 +74,9 @@ class CSVGenerator():
 		
 		self.maxpage = 0
 		self.resultnum = 0
-		self.pagesize = 1000
-		self.page = 1
+		
+		# set pagesize to 10000 because large pagesizes are faster than small pagesizes
+		search_params['pagesize'] = 10000
 		
 		self.iupartstable = IUPartsTable()
 		if len(self.search_params['result_table_columns']) > 0:
@@ -101,16 +102,15 @@ class CSVGenerator():
 		return header_row
 	
 	def yield_CSV_pages(self):
-		self.page = 1
-		# pudb.set_trace()
+		page = 1
 		header_row = self.get_header_row()
-		while self.page <= self.maxpage:
+		while page <= self.maxpage:
 			csv_page = ''
 			if header_row:
 				csv_page += header_row
 				header_row = None
 			
-			docs, maxpage, resultnum = self.es_searcher.searchDocsByPage(self.page)
+			docs, maxpage, resultnum = self.es_searcher.searchDocsByPage(page)
 			iupartslist = self.iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs])
 			
 			for iupart in iupartslist:
@@ -127,8 +127,8 @@ class CSVGenerator():
 						csv_list.append('')
 				csv_page += '\n' + ', '.join(csv_list)
 			
-			self.page = self.page + 1
-			# print (self.page, self.maxpage)
+			page = page + 1
+			# print (page, self.maxpage)
 			yield bytes(csv_page, 'utf8')
 		
 		return 

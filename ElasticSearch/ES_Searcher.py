@@ -79,6 +79,7 @@ class ES_Searcher():
 
 	def setSorting(self):
 		#pudb.set_trace()
+		self.readIndexMapping()
 		self.sort = [{"PartAccessionNumber.keyword_lc":{"order":"asc"}}]
 		
 		if 'sorting_col' in self.search_params and 'sorting_dir' not in self.search_params:
@@ -307,7 +308,7 @@ class ES_Searcher():
 
 	def countResultDocsSearch(self):
 		self.updateMaxResultWindow(max_result_window=2000000)
-		self.readIndexMapping()
+		self.setPageSize()
 		self.setQuery()
 		aggs = None
 		logger.debug(json.dumps(self.query))
@@ -354,8 +355,6 @@ class ES_Searcher():
 	def paginatedSearch(self):
 		
 		self.updateMaxResultWindow(max_result_window=2000000)
-		self.readIndexMapping()
-		
 		self.setPageSize()
 		self.setStartRow()
 		self.setSorting()
