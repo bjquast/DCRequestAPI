@@ -100,7 +100,6 @@ class IUPartsTable():
 
 
 	def getComplexElements(self, doc_element, keys_list, valuelist = []):
-		#pudb.set_trace()
 		for key in keys_list:
 			if key in doc_element:
 				doc_element = doc_element[key]
@@ -119,15 +118,11 @@ class IUPartsTable():
 
 
 	def setRowContent(self, doc_sources = []):
-		
 		self.rows = []
-		
-		#pudb.set_trace()
 		colkeys = list(self.selected_sourcefields)
 		for key in self.required_sourcefields:
 			if key not in colkeys:
 				colkeys.append(key)
-		
 		
 		for doc_source in doc_sources:
 			source_dict = {}
@@ -141,10 +136,12 @@ class IUPartsTable():
 					doc_element = doc_source[colkey]
 					if isinstance(doc_element, list) or isinstance(doc_element, tuple):
 						source_dict[colkey] = doc_element
+					elif doc_element is None:
+						source_dict[colkey] = []
 					else:
 						source_dict[colkey] = [doc_element]
 				else:
-					source_dict[colkey] = [None]
+					source_dict[colkey] = []
 			self.rows.append(source_dict)
 		return
 
@@ -155,9 +152,10 @@ class IUPartsTable():
 			source_dict['StableIdentifierURL'] = ['<a href="{0}">{0}</a>'.format(source_dict['StableIdentifierURL'][0])]
 
 
-	def getRowContent(self, doc_sources = []):
+	def getRowContent(self, doc_sources = [], setStableIDURL = True):
 		self.setRowContent(doc_sources = doc_sources)
-		self.setStableIdentifierURL()
+		if setStableIDURL is True:
+			self.setStableIdentifierURL()
 		return self.rows
 
 

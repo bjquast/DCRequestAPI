@@ -111,7 +111,7 @@ class CSVGenerator():
 				header_row = None
 			
 			docs, maxpage, resultnum = self.es_searcher.searchDocsByPage(page)
-			iupartslist = self.iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs])
+			iupartslist = self.iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs], setStableIDURL=False)
 			
 			for iupart in iupartslist:
 				csv_list = []
