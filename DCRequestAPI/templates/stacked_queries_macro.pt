@@ -24,7 +24,7 @@
 											<input form="search_form" type="text" class="width-8em with_clearbutton" value="${search_term}" name="stack_query_terms_${i}_${j}" data-stack-query="${search_term}" />
 											<select form="search_form" name="stack_query_fields_${i}_${j}" class="width-8em">
 												<option tal:attributes="selected 'selected' if search_params['stack_queries'][i]['fields'][j] == 'all fields' else None" value="all fields">all fields</option>
-												<block tal:repeat="source_field default_sourcefields" tal:omit-tag="">
+												<block tal:repeat="source_field stacked_query_fields" tal:omit-tag="">
 													<option value="${source_field}" tal:attributes="selected 'selected' if search_params['stack_queries'][i]['fields'][j] == source_field else None">
 														${coldefs[source_field]['en']}
 													</option>
@@ -46,7 +46,7 @@
 											<block tal:define="j len(search_params['stack_queries'][i]['terms'])" tal:omit-tag="">
 												<select form="search_form" name="stack_query_fields_${i}_${j}" class="width-8em">
 													<option value="all fields">all fields</option>
-													<option tal:repeat="source_field default_sourcefields" value="${source_field}">
+													<option tal:repeat="source_field stacked_query_fields" value="${source_field}">
 														${coldefs[source_field]['en']}
 													</option>
 												</select>
