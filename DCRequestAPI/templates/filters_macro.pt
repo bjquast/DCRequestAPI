@@ -17,7 +17,7 @@
 			<block tal:condition="python: 'term_filters' in search_params">
 				<block tal:repeat="filter_key search_params['term_filters']">
 					<block tal:repeat="filter_value search_params['term_filters'][filter_key]">
-						<div tal:condition="python: filter_key in default_bucketfields or filter_key in hierarchy_filter_fields" data-filter-id="filter_${filter_key}_${filter_value}" class="filter_checkbox">
+						<div tal:condition="python: filter_key in all_bucketfields or filter_key in hierarchy_filter_fields" data-filter-id="filter_${filter_key}_${filter_value}" class="filter_checkbox">
 							<input type="checkbox" form="search_form" checked="checked" value="${filter_key}:${filter_value}" name="term_filters" data-filter-id="filter_${filter_key}_${filter_value}">
 							<label tal:condition="python: filter_key in bucketdefs"><b>${bucketdefs[filter_key]['en']}:</b> ${filter_value}</label>
 							<label tal:condition="python: filter_key in hierarchy_filter_names"><b>${hierarchy_filter_names[filter_key]['en']}:</b> ${filter_value}</label>
@@ -50,7 +50,6 @@
 		<div id="filter_selection_field">
 			<div id="available_filters">
 				<div tal:repeat="aggs_name selected_filter_sections" class="filter-select-box">
-				<!--<div tal:repeat="aggs_name default_bucketfields" class="filter-select-box">-->
 					<details id="filter_list_${aggs_name}" class="filter_selectors" data-filter-key="${aggs_name}" tal:attributes="open 'open' if aggs_name in open_filter_selectors else None">
 						<!-- hidden checkbox to submit the state of the details box -->
 						<input type="checkbox" form="search_form" name="open_filter_selectors" class="hidden" value="${aggs_name}" tal:attributes="checked 'checked' if aggs_name in open_filter_selectors else None">

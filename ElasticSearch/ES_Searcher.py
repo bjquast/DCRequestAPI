@@ -13,9 +13,12 @@ from ElasticSearch.ES_Mappings import MappingsDict
 
 from ElasticSearch.WithholdFilters import WithholdFilters
 from ElasticSearch.QueryConstructor.BucketAggregations import BucketAggregations
+from ElasticSearch.QueryConstructor.DateAggregations import DateAggregations
 from ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
 from ElasticSearch.QueryConstructor.HierarchyQueries import HierarchyQueries
 from ElasticSearch.QueryConstructor.StackedQueries import StackedInnerQuery, StackedOuterQuery
+#from ElasticSearch.QueryConstructor.RangeQueries import RangeQueries
+
 
 class ES_Searcher():
 	def __init__(self, search_params = {}, user_id = None, users_project_ids = []):
@@ -32,6 +35,7 @@ class ES_Searcher():
 		self.index = 'iuparts'
 		self.source_fields = []
 		self.bucket_fields = []
+		self.date_fields = []
 		self.hierarchy_fields = []
 		self.hierarchy_pathes_dict = {}
 		
@@ -129,6 +133,11 @@ class ES_Searcher():
 		return
 
 
+	def setDateFields(self, date_fields = []):
+		self.date_fields = list(date_fields)
+		return
+
+
 	def addUserLimitation(self):
 		# prepare the query as a subquery to the must-queries, so that it is guarantied that it is AND connected. 
 		# this is in contrast to should filters where the addition of other should filters might disable the AND connection
@@ -177,6 +186,17 @@ class ES_Searcher():
 			self.query['bool']["filter"].extend(filter_queries)
 		
 		#pudb.set_trace()
+		if 'range_queries' in self.search_params:
+			connector = 'AND'
+			if 'term_filters_connector' in self.search_params:
+				connector = self.search_params['term_filters_connector']
+			
+			range_queries = RangeQueries(users_project_ids = self.users_project_ids, source_fields = source_fields, connector = connector).setRangeQueries(self.search_params['range_queries'])
+			self.query['bool']["filter"].extend(filter_queries)
+			
+			
+			pass
+		
 		outer_query = StackedOuterQuery()
 		
 		if 'stack_queries' in self.search_params:
@@ -321,6 +341,12 @@ class ES_Searcher():
 
 
 	def searchDocsByPage(self, page):
+		"""
+		Search method for csv export
+		no aggregations requested
+		return docs for the specified result page
+		csv export code iterates over the existing pages
+		"""
 		self.setPageSize()
 		self.setStartRow(page)
 		self.setSorting()
@@ -353,7 +379,7 @@ class ES_Searcher():
 
 
 	def paginatedSearch(self):
-		
+		pudb.set_trace()
 		self.updateMaxResultWindow(max_result_window=2000000)
 		self.setPageSize()
 		self.setStartRow()
@@ -366,6 +392,13 @@ class ES_Searcher():
 		if len(self.bucket_fields) > 0:
 			buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = self.bucket_fields)
 			aggs = buckets_query.getAggregationsQuery()
+		
+		if len(self.date_fields) > 0:
+			date_aggregator = DateAggregations(users_project_ids = self.users_project_ids, source_fields = self.date_fields)
+			if aggs is not None:
+				aggs.update(date_aggregator.getAggregationsQuery())
+			else:
+				aggs = date_aggregator.getAggregationsQuery()
 		
 		if len(self.hierarchy_fields) > 0:
 			hierarchies_query = HierarchyQueries(hierarchy_pathes_dict = self.hierarchy_pathes_dict, users_project_ids = self.users_project_ids, source_fields = self.hierarchy_fields)

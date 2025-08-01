@@ -35,6 +35,7 @@ class FieldDefinitions():
 			'CollectingMethod',
 			'CountryCache',
 			'WGS84_Coordinate',
+			'CollectionDate',
 			'CollectionAgents.CollectorsName',
 			'LifeStage',
 			'Gender',
@@ -76,6 +77,7 @@ class FieldDefinitions():
 			#'MatchedTaxaTree.Subgenus',
 			'TypeStatus',
 			'CountryCache',
+			'CollectionDate',
 			'CollectingMethod',
 			'CollectionAgents.CollectorsName',
 			'LocalityVerbatim',
@@ -115,6 +117,7 @@ class FieldDefinitions():
 			#'MatchedTaxaTree.Subgenus',
 			#'TypeStatus',
 			'CountryCache',
+			'CollectionDate',
 			#'CollectingMethod',
 			#'CollectionAgents.CollectorsName',
 			'LocalityVerbatim',
@@ -206,10 +209,11 @@ class FieldDefinitions():
 		return
 
 
-	def setRangeFields(self):
-		self.range_fields = [
-			'SpecimenAdded',
-			'NumberOfUnits',
+	def setDateFields(self):
+		self.date_fields = [
+			#'SpecimenCreatedWhen',
+			'CollectionDate',
+			'AccessionDate'
 		]
 
 
@@ -228,7 +232,7 @@ class FieldDefinitions():
 		self.setStackedQueryFields()
 		self.setHierarchyQueryFields()
 		self.setSuggestionFields()
-		self.setRangeFields()
+		self.setDateFields()
 		
 		return
 
@@ -332,6 +336,22 @@ class FieldDefinitions():
 				},
 			},
 			
+			'AccessionDate': {
+				'names': {'en': 'Date of accession'},
+				'buckets': {
+					'field_query': 'AccessionDate',
+					'type': 'date'
+				}
+			},
+			
+			'SpecimenCreatedWhen': {
+				'names': {'en': 'Date of database submission'},
+				'buckets': {
+					'field_query': 'SpecimenCreatedWhen',
+					'type': 'date'
+				}
+			},
+			
 			'LocalityVerbatim': {
 				'names': {'en': 'Sampling locality'},
 				'buckets': {
@@ -370,6 +390,14 @@ class FieldDefinitions():
 					'field_query': 'CountryCache.keyword',
 					'withholdflags': ['EventWithhold'],
 				},
+			},
+			
+			'CollectionDate': {
+				'names': {'en': 'Collection date'},
+				'buckets': {
+					'field_query': 'CollectionDate',
+					'type': 'date'
+				}
 			},
 			
 			'WGS84_Coordinate': {

@@ -12,8 +12,8 @@ class IUPartsTable():
 		self.selected_sourcefields = []
 		self.required_sourcefields = ['StableIdentifierURL', ]
 		
-		self.default_bucketfields = []
 		self.selected_bucketfields = []
+		self.selected_datefields = []
 		
 		self.non_text_fields = []
 		
@@ -24,6 +24,7 @@ class IUPartsTable():
 		self.default_filter_sections = fielddefs.default_filter_sections
 		self.stacked_query_fields = fielddefs.stacked_query_fields
 		self.hierarchy_query_fields = fielddefs.hierarchy_query_fields
+		self.date_fields = fielddefs.date_fields
 		
 		# these methods get the names, not the definitions, perhaps they should be reworked to resemble fielddefs.getHierarchyFilterNames()
 		self.readFieldDefinitions()
@@ -37,17 +38,11 @@ class IUPartsTable():
 		for bucketfield in self.bucketfields:
 			if bucketfield in self.fielddefinitions:
 				self.bucketdefs[bucketfield] = self.fielddefinitions[bucketfield]['names']
-				self.default_bucketfields.append(bucketfield)
 				self.selected_bucketfields.append(bucketfield)
 
 
 	def setSelectedBucketFields(self, bucketfields = []):
 		self.selected_bucketfields = []
-		#if len(bucketfields) <= 0:
-		#	for bucketfield in self.bucketfields:
-		#		self.selected_bucketfields.append(bucketfield)
-		
-		#else:
 		for bucketfield in bucketfields:
 			if bucketfield in self.bucketfields:
 				self.selected_bucketfields.append(bucketfield)
@@ -99,15 +94,15 @@ class IUPartsTable():
 		return self.default_sourcefields
 
 
-	def getComplexElements(self, doc_element, keys_list, valuelist = []):
+	def __getComplexElements(self, doc_element, keys_list, valuelist = []):
 		for key in keys_list:
 			if key in doc_element:
 				doc_element = doc_element[key]
 				if isinstance (doc_element, list) or isinstance (doc_element, tuple):
 					for element in doc_element:
-						valuelist = self.getComplexElements(element, keys_list[1:], valuelist)
+						valuelist = self.__getComplexElements(element, keys_list[1:], valuelist)
 				elif len(keys_list) > 1:
-					valuelist = self.getComplexElements(doc_element, keys_list[1:], valuelist)
+					valuelist = self.__getComplexElements(doc_element, keys_list[1:], valuelist)
 				elif doc_element is None:
 					pass
 				else:
@@ -129,7 +124,7 @@ class IUPartsTable():
 			for colkey in colkeys:
 				colkey_parts = colkey.split('.')
 				if len(colkey_parts) > 1:
-					valuelist = self.getComplexElements(doc_source, colkey_parts, valuelist = [])
+					valuelist = self.__getComplexElements(doc_source, colkey_parts, valuelist = [])
 					source_dict[colkey] = [val for val in valuelist]
 				
 				elif colkey in doc_source:

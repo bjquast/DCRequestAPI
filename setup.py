@@ -22,7 +22,8 @@ requires = [
 	'requests',
 	'cryptography',
 	'bcrypt',
-	'redis'
+	'redis',
+	'python-dateutil'
 ]
 
 setup(name='DCRequestAPI',

@@ -9,7 +9,7 @@ import re
 from ElasticSearch.FieldDefinitions import FieldDefinitions
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
-class HierarchyQueries():
+class HierarchyQueries(QueryConstructor):
 	def __init__(self, hierarchy_pathes_dict = {}, users_project_ids = None, source_fields = None, size = 1000):
 		self.hierarchy_pathes_dict = hierarchy_pathes_dict
 		
@@ -35,36 +35,6 @@ class HierarchyQueries():
 		
 		self.sort_queries_by_definitions()
 		self.setHierarchiesQuery()
-		
-
-
-	def sort_queries_by_definitions(self):
-		# reset the fields, needed when sort_queries_by_definitions is used more than once as with StackedInnerQuery
-		self.nested_restricted_fields = {}
-		self.nested_fields = {}
-		self.simple_restricted_fields = {}
-		self.simple_fields = {}
-		
-		
-		for fieldname in self.source_fields:
-			if fieldname in self.fielddefinitions:
-				if 'buckets' in self.fielddefinitions[fieldname] \
-					and 'path' in self.fielddefinitions[fieldname]['buckets'] \
-					and 'field_query' in self.fielddefinitions[fieldname]['buckets'] \
-					and 'withholdflags' in self.fielddefinitions[fieldname]['buckets']:
-					self.nested_restricted_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
-				elif 'buckets' in self.fielddefinitions[fieldname] \
-					and 'path' in self.fielddefinitions[fieldname]['buckets'] \
-					and 'field_query' in self.fielddefinitions[fieldname]['buckets'] \
-					and 'withholdflags' not in self.fielddefinitions[fieldname]['buckets']:
-					self.nested_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
-				elif 'buckets' in self.fielddefinitions[fieldname] \
-					and 'field_query' in self.fielddefinitions[fieldname]['buckets'] \
-					and 'withholdflags' in self.fielddefinitions[fieldname]['buckets']:
-					self.simple_restricted_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
-				elif 'buckets' in self.fielddefinitions[fieldname]:
-					self.simple_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
-		return
 
 
 	def setHierarchiesQuery(self):

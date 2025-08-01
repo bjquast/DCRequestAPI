@@ -65,9 +65,7 @@ class IUPartsListView():
 		#	iupartstable.setSelectedBucketFields(self.search_params['open_filter_selectors'])
 				
 		selected_sourcefields = iupartstable.selected_sourcefields
-		#default_sourcefields = iupartstable.default_sourcefields
 		selected_bucketfields = iupartstable.selected_bucketfields
-		#default_bucketfields = iupartstable.default_bucketfields
 		
 		coldefs = iupartstable.coldefs
 		bucketdefs = iupartstable.bucketdefs
@@ -124,11 +122,12 @@ class IUPartsListView():
 		selected_sourcefields = iupartstable.selected_sourcefields
 		default_sourcefields = iupartstable.default_sourcefields
 		selected_bucketfields = iupartstable.selected_bucketfields
-		default_bucketfields = iupartstable.default_bucketfields
+		all_bucketfields = iupartstable.bucketfields
 		selected_filter_sections = iupartstable.selected_filter_sections
-		default_filter_sections = iupartstable.default_filter_sections
 		stacked_query_fields = iupartstable.stacked_query_fields
 		hierarchy_filter_fields = iupartstable.hierarchy_query_fields
+		datefields = iupartstable.date_fields
+		selected_datefields = []
 		
 		open_filter_selectors = self.search_params['open_filter_selectors']
 		open_hierarchy_selectors = self.search_params['open_hierarchy_selectors']
@@ -145,8 +144,10 @@ class IUPartsListView():
 		# the fields from self.search_params['term_filters'] must be added, otherwise their results are not mentioned when their filter selector is not opened
 		
 		for term_filter_field in self.search_params['term_filters']:
-			if term_filter_field in selected_bucketfields and term_filter_field not in selected_bucketfields:
+			if term_filter_field in all_bucketfields and term_filter_field not in datefields and term_filter_field not in selected_bucketfields:
 				selected_bucketfields.append(term_filter_field)
+			if term_filter_field in all_bucketfields and term_filter_field in datefields and term_filter_field not in selected_datefields:
+				selected_datefields.append(term_filter_field)
 			if term_filter_field in hierarchy_filter_fields:
 				if term_filter_field not in open_hierarchy_selectors:
 					open_hierarchy_selectors.append(term_filter_field)
@@ -159,12 +160,13 @@ class IUPartsListView():
 		# add the opened_filter_selectors to the selected filtersections
 		# which here also includes the fields from the applied filters in self.search_params['term_filters']
 		# because they are in selected_bucketfields
-		# order the fields by default_bucketfields
+		# order the fields by all_bucketfields
 		sorted_filter_sections = []
-		for bucketfield in default_bucketfields:
-			if bucketfield in selected_bucketfields or bucketfield in selected_filter_sections:
+		pudb.set_trace()
+		for bucketfield in all_bucketfields:
+			if bucketfield in selected_bucketfields or bucketfield in selected_datefields or bucketfield in selected_filter_sections:
 				sorted_filter_sections.append(bucketfield)
-			if bucketfield in selected_bucketfields and bucketfield not in open_filter_selectors:
+			if (bucketfield in selected_bucketfields or bucketfield in selected_datefields) and bucketfield not in open_filter_selectors:
 				open_filter_selectors.append(bucketfield)
 		selected_filter_sections = sorted_filter_sections
 		
@@ -175,6 +177,7 @@ class IUPartsListView():
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
 		es_searcher.setSourceFields(selected_sourcefields)
 		es_searcher.setBucketFields(selected_bucketfields)
+		es_searcher.setDateFields(selected_datefields)
 		es_searcher.setHierarchyFields(open_hierarchy_selectors)
 		
 		es_searcher.setHierarchyPathesDict(hierarchy_pathes_dict)
@@ -202,8 +205,8 @@ class IUPartsListView():
 			'bucketdefs': bucketdefs,
 			'hierarchy_filter_names': hierarchy_filter_names,
 			'default_sourcefields': default_sourcefields,
-			'selected_sourcefields': selected_sourcefields, 
-			'default_bucketfields': default_bucketfields,
+			'selected_sourcefields': selected_sourcefields,
+			'all_bucketfields': all_bucketfields,
 			'selected_bucketfields': selected_bucketfields,
 			'open_filter_selectors': open_filter_selectors,
 			'selected_filter_sections': selected_filter_sections,

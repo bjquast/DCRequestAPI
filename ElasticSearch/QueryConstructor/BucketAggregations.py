@@ -11,7 +11,6 @@ from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 class BucketAggregations(QueryConstructor):
 	def __init__(self, users_project_ids = [], source_fields = [], size = 10, buckets_search_term = None, buckets_sort_alphanum = False, buckets_sort_dir = None, prefix_or_match = 'prefix', add_include_filter = False):
-		#pudb.set_trace()
 		
 		self.users_project_ids = users_project_ids
 		self.source_fields = source_fields
@@ -22,12 +21,8 @@ class BucketAggregations(QueryConstructor):
 			self.buckets_search_term = None
 		
 		self.buckets_sort_alphanum = buckets_sort_alphanum
-		
-		# keep buckets_sort_dir None if it is not set 
-		# so that the default directions asc and desc can be used for _key and _count, respectively
 		self.buckets_sort_dir = buckets_sort_dir
-		if self.buckets_sort_dir is not None:
-			self.buckets_sort_dir = self.buckets_sort_dir.lower()
+		self.setBucketsSorting()
 		
 		self.prefix_or_match = prefix_or_match
 		
@@ -78,19 +73,6 @@ class BucketAggregations(QueryConstructor):
 		return self.aggs_query
 
 
-	def getSorting(self):
-		sorting = {}
-		if self.buckets_sort_alphanum is True:
-			if self.buckets_sort_dir not in ['asc', 'desc']:
-				self.buckets_sort_dir = 'asc'
-			sorting = {"_key": self.buckets_sort_dir}
-		else:
-			if self.buckets_sort_dir not in ['asc', 'desc']:
-				self.buckets_sort_dir = 'desc'
-			sorting = {"_count": self.buckets_sort_dir}
-		return sorting
-
-
 	def setAggregationsQuery(self):
 		
 		for field in self.simple_fields:
@@ -108,7 +90,8 @@ class BucketAggregations(QueryConstructor):
 					"buckets": {
 						"terms": {
 							"field": self.simple_fields[field]['field_query'],
-							'size': self.size
+							"size": self.size,
+							"order": self.sorting
 						}
 					}
 				}
@@ -119,10 +102,6 @@ class BucketAggregations(QueryConstructor):
 			
 			if self.include_filter_term is not None:
 				self.aggs_query[field]['aggs']["buckets"]['terms']['include'] = self.include_filter_term
-			
-			sorting_dict = self.getSorting()
-			if len(sorting_dict) > 0:
-				self.aggs_query[field]['aggs']['buckets']['terms']['order'] = sorting_dict
 		
 		return
 
@@ -149,7 +128,8 @@ class BucketAggregations(QueryConstructor):
 							"buckets": {
 								"terms": {
 									"field": self.nested_fields[field]['field_query'],
-									'size': self.size
+									"size": self.size,
+									"order": self.sorting
 								}
 							}
 						}
@@ -168,10 +148,6 @@ class BucketAggregations(QueryConstructor):
 			
 			if self.include_filter_term is not None:
 				self.aggs_query[field]['aggs']["buckets"]['aggs']["buckets"]['terms']['include'] = self.include_filter_term
-			
-			sorting_dict = self.getSorting()
-			if len(sorting_dict) > 0:
-				self.aggs_query[field]['aggs']["buckets"]['aggs']['buckets']['terms']['order'] = sorting_dict
 			
 		return
 
@@ -210,7 +186,8 @@ class BucketAggregations(QueryConstructor):
 							"buckets": {
 								"terms": {
 									"field": self.nested_restricted_fields[field]['field_query'],
-									'size': self.size
+									"size": self.size,
+									"order": self.sorting
 								}
 							}
 						}
@@ -230,9 +207,6 @@ class BucketAggregations(QueryConstructor):
 			if self.include_filter_term is not None:
 				self.aggs_query[field]['aggs']["buckets"]['aggs']["buckets"]['terms']['include'] = self.include_filter_term
 			
-			sorting_dict = self.getSorting()
-			if len(sorting_dict) > 0:
-				self.aggs_query[field]['aggs']['buckets']['aggs']['buckets']['terms']['order'] = sorting_dict
 		return
 
 
@@ -263,7 +237,8 @@ class BucketAggregations(QueryConstructor):
 					"buckets": {
 						"terms": {
 							"field": self.simple_restricted_fields[field]['field_query'],
-							'size': self.size
+							"size": self.size,
+							"order": self.sorting
 						}
 					}
 				}
@@ -275,9 +250,6 @@ class BucketAggregations(QueryConstructor):
 			if self.include_filter_term is not None:
 				self.aggs_query[field]['aggs']["buckets"]['terms']['include'] = self.include_filter_term
 			
-			sorting_dict = self.getSorting()
-			if len(sorting_dict) > 0:
-				self.aggs_query[field]['aggs']['buckets']['terms']['order'] = sorting_dict
 		return
 
 

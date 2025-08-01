@@ -57,8 +57,7 @@ class TermFilterQueries(QueryConstructor):
 			for filter_key in self.term_queries:
 				should_query['bool']['should'].extend(self.term_queries[filter_key])
 			filter_queries.append(should_query)
-			
-			
+		
 		return filter_queries
 
 

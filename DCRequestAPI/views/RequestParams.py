@@ -99,6 +99,8 @@ class RequestParams():
 						]
 		complex_params = ['term_filters', 'hierarchies',]
 		
+		range_params = ['date']
+		
 		list_params = ['open_filter_selectors', 'result_table_columns', 'selected_filter_sections', 'open_hierarchy_selectors']
 		
 		for param_name in boolean_params:
@@ -130,7 +132,7 @@ class RequestParams():
 						if query[1] not in self.search_params[param_name][query[0]]:
 							self.search_params[param_name][query[0]].append(query[1])
 					else:
-						self.search_params[param_name] = {}
+						pass
 			else:
 				self.search_params[param_name] = {}
 		
@@ -139,6 +141,26 @@ class RequestParams():
 				self.search_params[param_name] = self.params_dict[param_name]
 			else:
 				self.search_params[param_name] = []
+		
+		for param_name in range_params:
+			if param_name in self.params_dict and len(self.params_dict[param_name]) > 0:
+				for searchquery in self.params_dict[param_name]:
+					query = searchquery.split(':', 2)
+					if len(query) == 3 and (len(query[1]) > 0 or len(query[2]) > 0):
+						if param_name not in self.search_params:
+							self.search_params[param_name] = {}
+						if query[0] not in self.search_params[param_name]:
+							self.search_params[param_name][query[0]] = []
+						range_dict = {}
+						if len(query[1]) > 0:
+							range_dict['gte'] = query[1]
+						if len(query[2]) > 0:
+							range_dict['gte'] = query[2]
+						self.search_params[param_name][query[0]].append(range_dict)
+					else:
+						pass
+			else:
+				self.search_params[param_name] = {}
 		
 		return
 
