@@ -104,8 +104,8 @@ class QueryConstructor():
 		set sorting params sorting for the aggregations
 		sorting for search queries is set in ES_Searcher
 		"""
-		pudb.set_trace()
-		self.sorting = {}
+		
+		self.bucket_sorting = {}
 		try:
 			self.buckets_sort_alphanum
 			self.buckets_sort_dir
@@ -113,14 +113,14 @@ class QueryConstructor():
 			if self.buckets_sort_alphanum is True:
 				if self.buckets_sort_dir is None or self.buckets_sort_dir.lower() not in ['asc', 'desc']:
 					self.buckets_sort_dir = 'asc'
-				self.sorting = {"_key": self.buckets_sort_dir.lower()}
+				self.bucket_sorting = {"_key": self.buckets_sort_dir.lower()}
 			else:
 				if self.buckets_sort_dir is None or self.buckets_sort_dir.lower() not in ['asc', 'desc']:
 					self.buckets_sort_dir = 'desc'
-				self.sorting = {"_count": self.buckets_sort_dir.lower()}
+				self.bucket_sorting = {"_count": self.buckets_sort_dir.lower()}
 		
 		except AttributeError:
-			self.sorting = {"_count": 'desc'}
+			self.bucket_sorting = {"_count": 'desc'}
 		return
 
 

@@ -97,9 +97,9 @@ class RequestParams():
 							'term_filters_connector', 'buckets_search_term', 'overlay_remaining_all_select', 'buckets_sort_dir', 'buckets_size',
 							'path_to_remove'
 						]
-		complex_params = ['term_filters', 'hierarchies',]
+		complex_params = ['term_filters', 'hierarchies', 'date']
 		
-		range_params = ['date']
+		#range_params = ['date']
 		
 		list_params = ['open_filter_selectors', 'result_table_columns', 'selected_filter_sections', 'open_hierarchy_selectors']
 		
@@ -142,6 +142,7 @@ class RequestParams():
 			else:
 				self.search_params[param_name] = []
 		
+		'''
 		for param_name in range_params:
 			if param_name in self.params_dict and len(self.params_dict[param_name]) > 0:
 				for searchquery in self.params_dict[param_name]:
@@ -161,6 +162,7 @@ class RequestParams():
 						pass
 			else:
 				self.search_params[param_name] = {}
+		'''
 		
 		return
 

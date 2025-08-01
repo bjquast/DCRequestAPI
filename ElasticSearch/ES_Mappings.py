@@ -98,7 +98,7 @@ MappingsDict['iuparts'] = {
 			},
 		'AccessionDate':
 			{"type": "date",
-			"format": "yyyy-MM-dd HH:mm:ss",
+			"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
 			'ignore_malformed': True},
 		'DepositorsName': {
 			'type': 'text', 'fields': {
@@ -147,7 +147,7 @@ MappingsDict['iuparts'] = {
 			},
 		'PreparationDate': {
 			"type": "date",
-			"format": "yyyy-MM-dd HH:mm:ss",
+			"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
 			'ignore_malformed': True
 		},
 		'MaterialCategory': {'type': 'text', 'fields': {
@@ -217,7 +217,7 @@ MappingsDict['iuparts'] = {
 			},
 		'CollectionDate': {
 			"type": "date",
-			"format": "yyyy-MM-dd HH:mm:ss",
+			"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
 			'ignore_malformed': True
 		},
 		'WGS84_Coordinate':
@@ -299,7 +299,7 @@ MappingsDict['iuparts'] = {
 				'IdentificationSequenceID': {'type': 'short'},
 				'IdentificationDate': {
 					"type": "date",
-					"format": "yyyy-MM-dd HH:mm:ss",
+					"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
 					'ignore_malformed': True
 				},
 				'TaxonomicName': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},

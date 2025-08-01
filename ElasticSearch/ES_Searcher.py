@@ -18,6 +18,7 @@ from ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
 from ElasticSearch.QueryConstructor.HierarchyQueries import HierarchyQueries
 from ElasticSearch.QueryConstructor.StackedQueries import StackedInnerQuery, StackedOuterQuery
 #from ElasticSearch.QueryConstructor.RangeQueries import RangeQueries
+from ElasticSearch.FieldDefinitions import FieldDefinitions
 
 
 class ES_Searcher():
@@ -45,6 +46,7 @@ class ES_Searcher():
 		self.withholdfilters = WithholdFilters()
 		self.withhold_fields = self.withholdfilters.getWithholdFields()
 		
+		self.fielddefs = FieldDefinitions()
 
 
 	def getMaxPage(self, hits):
@@ -285,8 +287,14 @@ class ES_Searcher():
 
 	def singleAggregationSearch(self, aggregation_name, buckets_search_term = None, size = 5000, buckets_sort_alphanum = True, buckets_sort_dir = 'asc'):
 		self.setQuery()
-		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size, 
-			buckets_search_term = buckets_search_term, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
+		pudb.set_trace()
+		if aggregation_name in self.fielddefs.date_fields:
+			buckets_query = DateAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size, 
+				buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
+		
+		else:
+			buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size, 
+				buckets_search_term = buckets_search_term, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
 		aggs = buckets_query.getAggregationsQuery()
 		
 		logger.debug(json.dumps(aggs))
@@ -474,7 +482,7 @@ class ES_Searcher():
 
 
 	def getBucketListFromAggregation(self, raw_aggregation):
-		#pudb.set_trace()
+		pudb.set_trace()
 		buckets = []
 		if 'buckets' in raw_aggregation:
 			if isinstance(raw_aggregation['buckets'], list) or isinstance(raw_aggregation['buckets'], tuple):

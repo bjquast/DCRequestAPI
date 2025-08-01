@@ -91,7 +91,7 @@ class BucketAggregations(QueryConstructor):
 						"terms": {
 							"field": self.simple_fields[field]['field_query'],
 							"size": self.size,
-							"order": self.sorting
+							"order": self.bucket_sorting
 						}
 					}
 				}
@@ -129,7 +129,7 @@ class BucketAggregations(QueryConstructor):
 								"terms": {
 									"field": self.nested_fields[field]['field_query'],
 									"size": self.size,
-									"order": self.sorting
+									"order": self.bucket_sorting
 								}
 							}
 						}
@@ -187,7 +187,7 @@ class BucketAggregations(QueryConstructor):
 								"terms": {
 									"field": self.nested_restricted_fields[field]['field_query'],
 									"size": self.size,
-									"order": self.sorting
+									"order": self.bucket_sorting
 								}
 							}
 						}
@@ -238,7 +238,7 @@ class BucketAggregations(QueryConstructor):
 						"terms": {
 							"field": self.simple_restricted_fields[field]['field_query'],
 							"size": self.size,
-							"order": self.sorting
+							"order": self.bucket_sorting
 						}
 					}
 				}

@@ -28,8 +28,6 @@ class DateAggregations(QueryConstructor):
 		
 		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.source_fields)
 		
-		self.es_date_format = 'yyyy-MM-dd'
-		
 		self.date_ranges = DateRangesGenerator(startdate = startdate, enddate = enddate, interval = interval, interval_multiplicator = interval_multiplicator).generate_ranges()
 		
 		self.sort_queries_by_definitions()
@@ -56,18 +54,17 @@ class DateAggregations(QueryConstructor):
 					}
 				},
 				"aggs": {
-					"buckets": {
+					"range": {
 						"date_range": {
 							"field": field,
-							"format": self.es_date_format,
+							#"min_doc_count": 1,
+							#"order": self.bucket_sorting,
 							"ranges": self.date_ranges
 						},
 						"aggs": {
 							"limit": {
 								"bucket_sort": {
-									"sort": [
-										self.bucket_sorting
-									],
+									"sort": [],
 									"size": self.size
 								}
 							}
@@ -94,20 +91,19 @@ class DateAggregations(QueryConstructor):
 							}
 						},
 						"aggs": {
-							"buckets": {
+							"range": {
 								"date_range": {
 									"field": field,
-									"format": self.es_date_format,
+									#"min_doc_count": 1,
+									#"order": self.bucket_sorting,
 									"ranges": self.date_ranges
-								},
-								"aggs": {
-									"limit": {
-										"bucket_sort": {
-											"sort": [
-												self.bucket_sorting
-											],
-											"size": self.size
-										}
+								}
+							},
+							"aggs": {
+								"limit": {
+									"bucket_sort": {
+										"sort": [],
+										"size": self.size
 									}
 								}
 							}
@@ -146,20 +142,19 @@ class DateAggregations(QueryConstructor):
 							}
 						},
 						"aggs": {
-							"buckets": {
+							"range": {
 								"date_range": {
 									"field": field,
-									"format": self.es_date_format,
+									#"min_doc_count": 1,
+									#"order": self.bucket_sorting,
 									"ranges": self.date_ranges
-								},
-								"aggs": {
-									"limit": {
-										"bucket_sort": {
-											"sort": [
-												self.bucket_sorting
-											],
-											"size": self.size
-										}
+								}
+							},
+							"aggs": {
+								"limit": {
+									"bucket_sort": {
+										"sort": [],
+										"size": self.size
 									}
 								}
 							}
@@ -194,18 +189,17 @@ class DateAggregations(QueryConstructor):
 					}
 				},
 				"aggs": {
-					"buckets": {
+					"range": {
 						"date_range": {
 							"field": field,
-							"format": self.es_date_format,
+							#"min_doc_count": 1,
+							#"order": self.bucket_sorting,
 							"ranges": self.date_ranges
 						},
 						"aggs": {
 							"limit": {
 								"bucket_sort": {
-									"sort": [
-										self.bucket_sorting
-									],
+									"sort": [],
 									"size": self.size
 								}
 							}
