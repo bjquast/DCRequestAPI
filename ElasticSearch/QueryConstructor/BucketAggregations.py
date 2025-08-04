@@ -5,15 +5,19 @@ logger = logging.getLogger('elastic_queries')
 
 import pudb
 
-from ElasticSearch.FieldDefinitions import FieldDefinitions
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
 class BucketAggregations(QueryConstructor):
 	def __init__(self, users_project_ids = [], source_fields = [], size = 10, buckets_search_term = None, buckets_sort_alphanum = False, buckets_sort_dir = None, prefix_or_match = 'prefix', add_include_filter = False):
+		QueryConstructor.__init__(self)
 		
 		self.users_project_ids = users_project_ids
+		
 		self.source_fields = source_fields
+		if len(self.source_fields) <= 0:
+			self.source_fields = self.fieldconf.bucketfields
+		
 		self.size = size
 		
 		self.buckets_search_term = buckets_search_term
@@ -29,13 +33,9 @@ class BucketAggregations(QueryConstructor):
 		self.add_include_filter = add_include_filter
 		self.setIncludeFilter()
 		
-		fielddefs = FieldDefinitions()
-		if len(self.source_fields) <= 0:
-			self.source_fields = fielddefs.bucketfields
-		
-		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.source_fields)
 		if self.buckets_search_term is not None:
 			self.removeNonTextFromSourceList()
+		
 		self.sort_queries_by_definitions()
 		self.setSubFilters()
 

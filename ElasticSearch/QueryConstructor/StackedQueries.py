@@ -5,22 +5,22 @@ logger = logging.getLogger('elastic_queries')
 
 import pudb
 
-from ElasticSearch.FieldDefinitions import FieldDefinitions
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
 class StackedInnerQuery(QueryConstructor):
 	def __init__(self, query_dict, users_project_ids = []):
+		QueryConstructor.__init__(self)
+		
 		self.query_dict = query_dict
 		self.users_project_ids = users_project_ids
 		
-		fielddefs = FieldDefinitions()
-		self.source_fields = fielddefs.stacked_query_fields
+		self.source_fields = self.query_dict['fields']
 		
 		self.readQueryDict()
-		self.query_type = 'simple_query_string'
 		
-		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.query_dict['fields'])
+		self.query_type = 'simple_query_string'
+
 
 
 	def readQueryDict(self):
@@ -34,7 +34,7 @@ class StackedInnerQuery(QueryConstructor):
 					
 					query_dict = {
 						'term': self.query_dict['terms'][i],
-						'fields': self.source_fields
+						'fields': self.fieldconf.stacked_query_fields
 					}
 					self.single_query_dicts.append(query_dict)
 			

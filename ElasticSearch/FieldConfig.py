@@ -1,12 +1,31 @@
 import pudb
 
+import threading
 from ElasticSearch.ES_Mappings import MappingsDict
 
 
 # TODO: read the fields that must be withholded from withholdfilters and add the according fields for withholdflags
 # for each item in self.fielddefinitions 
 
-class FieldDefinitions():
+# make it a singleton?!
+
+
+class FieldConfig:
+	_instance = None
+	_lock = threading.Lock()
+
+	def __new__(cls, *args, **kwargs):
+		pudb.set_trace()
+		if cls._instance is None: 
+			with cls._lock:
+				# Another thread could have created the instance
+				# before we acquired the lock. So check that the
+				# instance is still nonexistent.
+				if not cls._instance:
+					cls._instance = super().__new__(cls)
+		return cls._instance
+
+
 	def __init__(self):
 		self.setFields()
 		self.setFieldDefinitions()
@@ -16,8 +35,11 @@ class FieldDefinitions():
 		self.setFieldTypes()
 
 
-	def setFieldNames(self):
-		self.fieldnames = [
+	def setResultFields(self):
+		"""
+		all fields that should be shown in the result table
+		"""
+		self.result_fields = [
 			'PartAccessionNumber',
 			#'StableIdentifierURL',
 			'LastIdentificationCache',
@@ -40,8 +62,6 @@ class FieldDefinitions():
 			'LifeStage',
 			'Gender',
 			'NumberOfUnits',
-			# NumberOfSpecimenImages does not work. because it is a numeric type it can not be set to case_insensitiv in TermFilterQuery. Think about RangeQuery implementation 
-			# 'NumberOfSpecimenImages',
 			'CollectionName',
 			'Projects.Project',
 			'CollectionSpecimenID',
@@ -53,7 +73,7 @@ class FieldDefinitions():
 		return
 
 
-	def setAllFilterFields(self):
+	def setFilterDefs(self):
 		"""
 		all filters that may occur in filters,
 		this list exists to give the order of the filters
@@ -61,84 +81,81 @@ class FieldDefinitions():
 		provide the filters ordered by data type, default_filter_sections
 		sets the list of filters when no filters are selected
 		"""
-		self.filterfields = [
-			'DatabaseAccronym',
-			'CollectionsTree.CollectionName',
-			'CollectionName',
-			'CollectionsTree',
-			'Projects.Project',
-			'LastIdentificationCache',
-			'MatchedTaxon',
-			'VernacularTerms',
-			'MatchedSynonyms.Synonym',
-			'MatchedTaxaTree',
-			'MatchedTaxaTree.Phylum',
-			'MatchedTaxaTree.Subphylum',
-			'MatchedTaxaTree.Class',
-			'MatchedTaxaTree.Subclass',
-			'MatchedTaxaTree.Order',
-			'MatchedTaxaTree.Suborder',
-			'MatchedTaxaTree.Family',
-			'MatchedTaxaTree.Subfamily',
-			'MatchedTaxaTree.Genus',
-			'MatchedTaxaTree.Subgenus',
-			'TypeStatus',
-			'CountryCache',
-			'CollectionDate',
-			'CollectingMethod',
-			'CollectionAgents.CollectorsName',
-			'LocalityVerbatim',
-			'LocalityDescription',
-			'HabitatDescription',
-			'MaterialCategory',
-			'LifeStage',
-			'Gender',
-			'NumberOfUnits',
-			'Barcodes.Methods.region',
-			'ImagesAvailable' # not working with prefix query
+		
+		# each entry has a list with values for: [available, is shown by default in filters, type of filter]
+		
+		self.filter_defs = [
+			{'DatabaseAccronym': [True, True, 'term']},
+			{'AccessionDate': [True, False, 'date']},
+			#{'CollectionsTree.CollectionName': [False, False, 'term']},
+			{'CollectionName': [True, True, 'term']},
+			#{'CollectionsTree': [False, False, 'term']},
+			{'CollectionHierarchyString': [True, False, 'hierarchy']},
+			{'Projects.Project': [True, True, 'term']},
+			{'LastIdentificationCache': [True, True, 'term']},
+			{'MatchedTaxon': [True, True, 'term']},
+			{'VernacularTerms': [True, True, 'term']},
+			{'MatchedSynonyms.Synonym': [True, True, 'term']},
+			{'MatchedTaxaTree': [True, True, 'term']},
+			{'MatchedTaxaTree.Phylum': [True, False, 'term']},
+			{'MatchedTaxaTree.Subphylum': [True, False, 'term']},
+			{'MatchedTaxaTree.Class': [True, False, 'term']},
+			{'MatchedTaxaTree.Subclass': [True, False, 'term']},
+			{'MatchedTaxaTree.Order': [True, False, 'term']},
+			{'MatchedTaxaTree.Suborder': [True, False, 'term']},
+			{'MatchedTaxaTree.Family': [True, False, 'term']},
+			{'MatchedTaxaTree.Subfamily': [True, False, 'term']},
+			{'MatchedTaxaTree.Genus': [True, False, 'term']},
+			#{'MatchedTaxaTree.Subgenus': [False, False, 'term']},
+			{'MatchedTaxaHierarchyString': [True, False, 'hierarchy']},
+			{'TypeStatus': [True, True, 'term']},
+			{'CountryCache': [True, True, 'term']},
+			{'CollectionDate': [True, True, 'date']},
+			{'CollectingMethod': [True, False, 'term']},
+			{'CollectionAgents.CollectorsName': [True, False, 'term']},
+			{'LocalityVerbatim': [True, False, 'term']},
+			{'LocalityDescription': [True, False, 'term']},
+			{'HabitatDescription': [True, False, 'term']},
+			{'MaterialCategory': [True, False, 'term']},
+			{'LifeStage': [True, False, 'term']},
+			{'Gender': [True, False, 'term']},
+			{'NumberOfUnits': [True, False, 'term']},
+			{'Barcodes.Methods.region': [True, False, 'term']},
+			{'ImagesAvailable': [True, True, 'term']}
+			
 		]
 		return
 
 
+	def setAllFilterFields(self):
+		self.filter_fields = []
+		for field in self.filter_defs:
+			for key in field:
+				if field[key][0] is True and field[key][2] == 'term':
+					self.filter_fields.append(key)
+		return
+
+
 	def setBucketFields(self):
+		self.bucketfields = []
+		
+		for field in self.filter_defs:
+			for key in field:
+				if field[key][0] is True and field[key][2] == 'term':
+					self.bucketfields.append(key)
+		return
+
+
+	def setDateFields(self):
 		"""
-		all fields that are used as term filters
+		all fields with type date that should be used in web interface
 		"""
-		self.bucketfields = [
-			'DatabaseAccronym',
-			#'CollectionsTree.CollectionName',
-			'CollectionName',
-			#'CollectionsTree',
-			'Projects.Project',
-			'LastIdentificationCache',
-			'MatchedTaxon',
-			'VernacularTerms',
-			'MatchedSynonyms.Synonym',
-			'MatchedTaxaTree',
-			'MatchedTaxaTree.Phylum',
-			'MatchedTaxaTree.Subphylum',
-			'MatchedTaxaTree.Class',
-			'MatchedTaxaTree.Subclass',
-			'MatchedTaxaTree.Order',
-			'MatchedTaxaTree.Suborder',
-			'MatchedTaxaTree.Family',
-			'MatchedTaxaTree.Subfamily',
-			'MatchedTaxaTree.Genus',
-			#'MatchedTaxaTree.Subgenus',
-			'TypeStatus',
-			'CountryCache',
-			'CollectingMethod',
-			'CollectionAgents.CollectorsName',
-			'LocalityVerbatim',
-			'LocalityDescription',
-			'HabitatDescription',
-			'MaterialCategory',
-			'LifeStage',
-			'Gender',
-			'NumberOfUnits',
-			'Barcodes.Methods.region',
-			'ImagesAvailable' # not working with prefix query
-		]
+		self.date_fields = []
+		
+		for field in self.filter_defs:
+			for key in field:
+				if field[key][0] is True and field[key][2] == 'date':
+					self.date_fields.append(key)
 		return
 
 
@@ -146,43 +163,14 @@ class FieldDefinitions():
 		"""
 		all fields that are in the filter section when no filters are selected
 		"""
-		self.default_filter_sections = [
-			'DatabaseAccronym',
-			#'CollectionsTree.CollectionName',
-			'CollectionName',
-			#'CollectionsTree',
-			'Projects.Project',
-			'LastIdentificationCache',
-			'MatchedTaxon',
-			'VernacularTerms',
-			'MatchedSynonyms.Synonym',
-			'MatchedTaxaTree',
-			#'MatchedTaxaTree.Phylum',
-			#'MatchedTaxaTree.Subphylum',
-			#'MatchedTaxaTree.Class',
-			#'MatchedTaxaTree.Subclass',
-			#'MatchedTaxaTree.Order',
-			#'MatchedTaxaTree.Suborder',
-			#'MatchedTaxaTree.Family',
-			#'MatchedTaxaTree.Subfamily',
-			#'MatchedTaxaTree.Genus',
-			#'MatchedTaxaTree.Subgenus',
-			#'TypeStatus',
-			'CountryCache',
-			'CollectionDate',
-			#'CollectingMethod',
-			#'CollectionAgents.CollectorsName',
-			'LocalityVerbatim',
-			'LocalityDescription',
-			#'HabitatDescription',
-			#'MaterialCategory',
-			#'LifeStage',
-			#'Gender',
-			#'NumberOfUnits',
-			#'Barcodes.Methods.region',
-			'ImagesAvailable'
-		]
+		self.default_filter_sections = []
+		
+		for field in self.filter_defs:
+			for key in field:
+				if field[key][0] is True and field[key][1] is True:
+					self.default_filter_sections.append(key)
 		return
+
 
 
 	def setStackedQueryFields(self):
@@ -270,17 +258,6 @@ class FieldDefinitions():
 		return
 
 
-	def setDateFields(self):
-		"""
-		all fields with type date that should be used in web interface
-		"""
-		self.date_fields = [
-			#'SpecimenCreatedWhen',
-			'CollectionDate',
-			'AccessionDate'
-		]
-
-
 	def getHierarchyFilterNames(self):
 		hierarchy_filter_names = {}
 		for hierarchy_filter in self.hierarchy_query_fields:
@@ -293,7 +270,11 @@ class FieldDefinitions():
 		"""
 		selt the lists of names for the different parts of the web interface
 		"""
-		self.setFieldNames()
+		
+		self.setResultFields()
+		
+		self.setFilterDefs()
+		self.setAllFilterFields()
 		self.setBucketFields()
 		self.setDefaultFilterSections()
 		self.setStackedQueryFields()
@@ -631,14 +612,6 @@ class FieldDefinitions():
 	def setFieldTypes(self):
 		for field in self.fielddefinitions:
 			
-			# a field not defined in mapping, generated automatically
-			#if field == 'Barcodes.Methods.region':
-			#	pudb.set_trace()
-			
-			# set a defauld value
-			if 'buckets' in self.fielddefinitions[field]:
-				self.fielddefinitions[field]['buckets']['query_string_field'] = field
-			
 			field_keys = field.split('.')
 			
 			sub_dict = dict(self.es_mappings)
@@ -652,18 +625,6 @@ class FieldDefinitions():
 							if 'fields' in sub_dict:
 								for typename in sub_dict['fields']:
 									self.fielddefinitions[field]['buckets']['types'].append(typename)
-							
-							'''
-							if 'types' in self.fielddefinitions[field]['buckets']:
-								if 'text' in self.fielddefinitions[field]['buckets']['types']:
-									self.fielddefinitions[field]['buckets']['query_string_field'] = '{0}.{1}'.format(field, 'text')
-								elif 'keyword_lc' in self.fielddefinitions[field]['buckets']['types']:
-									self.fielddefinitions[field]['buckets']['query_string_field'] = '{0}.{1}'.format(field, 'keyword_lc')
-								elif 'keyword' in self.fielddefinitions[field]['buckets']['types']:
-									self.fielddefinitions[field]['buckets']['query_string_field'] = '{0}.{1}'.format(field, 'keyword')
-								else:
-									self.fielddefinitions[field]['buckets']['query_string_field'] = field
-							'''
 		
 		return
 

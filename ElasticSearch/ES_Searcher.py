@@ -18,7 +18,7 @@ from ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
 from ElasticSearch.QueryConstructor.HierarchyQueries import HierarchyQueries
 from ElasticSearch.QueryConstructor.StackedQueries import StackedInnerQuery, StackedOuterQuery
 #from ElasticSearch.QueryConstructor.RangeQueries import RangeQueries
-from ElasticSearch.FieldDefinitions import FieldDefinitions
+from ElasticSearch.FieldConfig import FieldConfig
 
 
 class ES_Searcher():
@@ -46,7 +46,7 @@ class ES_Searcher():
 		self.withholdfilters = WithholdFilters()
 		self.withhold_fields = self.withholdfilters.getWithholdFields()
 		
-		self.fielddefs = FieldDefinitions()
+		self.fielddefs = FieldConfig()
 
 
 	def getMaxPage(self, hits):

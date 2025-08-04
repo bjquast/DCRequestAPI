@@ -5,22 +5,21 @@ logger = logging.getLogger('elastic_queries')
 
 import pudb
 
-from ElasticSearch.FieldDefinitions import FieldDefinitions
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
 class TermFilterQueries(QueryConstructor):
 	def __init__(self, users_project_ids = [], source_fields = [], connector = 'AND'):
+		QueryConstructor.__init__(self)
+		
 		self.users_project_ids = users_project_ids
 		self.source_fields = source_fields
+		if len(self.source_fields) <= 0:
+			self.source_fields = self.fieldconf.bucketfields
+			self.source_fields.extend(self.fieldconf.hierarchy_query_fields)
+		
 		self.connector = connector
 		
-		fielddefs = FieldDefinitions()
-		if len(self.source_fields) <= 0:
-			self.source_fields = fielddefs.bucketfields
-			self.source_fields.extend(fielddefs.hierarchy_query_fields)
-		
-		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.source_fields)
 		self.sort_queries_by_definitions()
 		self.setSubFilters()
 

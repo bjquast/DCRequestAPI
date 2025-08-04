@@ -1,6 +1,6 @@
 import pudb
 
-from ElasticSearch.FieldDefinitions import FieldDefinitions
+from ElasticSearch.FieldConfig import FieldConfig
 
 
 class IUPartsTable():
@@ -17,21 +17,21 @@ class IUPartsTable():
 		
 		self.non_text_fields = []
 		
-		fielddefs = FieldDefinitions()
-		self.fieldnames = fielddefs.fieldnames
-		self.bucketfields = fielddefs.bucketfields
-		self.fielddefinitions = fielddefs.fielddefinitions
-		self.default_filter_sections = fielddefs.default_filter_sections
-		self.stacked_query_fields = fielddefs.stacked_query_fields
-		self.hierarchy_query_fields = fielddefs.hierarchy_query_fields
-		self.date_fields = fielddefs.date_fields
+		fieldconf = FieldConfig()
+		self.result_fields = fieldconf.result_fields
+		self.bucketfields = fieldconf.bucketfields
+		self.fielddefinitions = fieldconf.fielddefinitions
+		self.default_filter_sections = fieldconf.default_filter_sections
+		self.stacked_query_fields = fieldconf.stacked_query_fields
+		self.hierarchy_query_fields = fieldconf.hierarchy_query_fields
+		self.date_fields = fieldconf.date_fields
 		
-		# these methods get the names, not the definitions, perhaps they should be reworked to resemble fielddefs.getHierarchyFilterNames()
-		self.readFieldDefinitions()
+		# these methods get the names, not the definitions, perhaps they should be reworked to resemble fieldconf.getHierarchyFilterNames()
+		self.readFieldConfig()
 		self.readBucketDefinitions()
 		
 		# get a dict with names for hierarchy fields 
-		self.hierarchy_filter_names = fielddefs.getHierarchyFilterNames()
+		self.hierarchy_filter_names = fieldconf.getHierarchyFilterNames()
 
 
 	def readBucketDefinitions(self):
@@ -57,14 +57,14 @@ class IUPartsTable():
 				self.selected_filter_sections.append(filter_section)
 		else:
 			for filter_section in filter_sections:
-				# check that filter_section is available in FieldDefinitions().bucketfields
+				# check that filter_section is available in FieldConfig().bucketfields
 				if filter_section in self.bucketfields:
 					self.selected_filter_sections.append(filter_section)
 		return
 
 
-	def readFieldDefinitions(self):
-		for fieldname in self.fieldnames:
+	def readFieldConfig(self):
+		for fieldname in self.result_fields:
 			if fieldname in self.fielddefinitions:
 				self.coldefs[fieldname] = self.fielddefinitions[fieldname]['names']
 				self.default_sourcefields.append(fieldname)
@@ -74,12 +74,12 @@ class IUPartsTable():
 	def setSelectedSourceFields(self, sourcefields = []):
 		self.selected_sourcefields = []
 		if len(sourcefields) <= 0:
-			for fieldname in self.fieldnames:
+			for fieldname in self.result_fields:
 				self.selected_sourcefields.append(fieldname)
 		
 		else:
 			for sourcefield in sourcefields:
-				if sourcefield in self.fieldnames:
+				if sourcefield in self.result_fields:
 					self.selected_sourcefields.append(sourcefield)
 			if 'PartAccessionNumber' not in self.selected_sourcefields:
 				self.selected_sourcefields.insert(0, 'PartAccessionNumber')

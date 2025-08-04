@@ -5,7 +5,6 @@ logger = logging.getLogger('elastic_queries')
 
 import pudb
 
-from ElasticSearch.FieldDefinitions import FieldDefinitions
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 from ElasticSearch.QueryConstructor.DateRangesGenerator import DateRangesGenerator
 
@@ -13,6 +12,11 @@ from ElasticSearch.QueryConstructor.DateRangesGenerator import DateRangesGenerat
 class DateAggregations(QueryConstructor):
 	def __init__(self, users_project_ids = [], source_fields = [], size = 10, startdate = '1800-01-01', enddate = None, interval = 'year', interval_multiplicator = 1, buckets_sort_alphanum = False, buckets_sort_dir = None):
 		pudb.set_trace()
+		QueryConstructor.__init__(self)
+		
+		self.source_fields = source_fields
+		if len(self.source_fields) <= 0:
+			self.source_fields = self.fieldconf.date_fields
 		
 		self.users_project_ids = users_project_ids
 		self.source_fields = source_fields
@@ -21,12 +25,6 @@ class DateAggregations(QueryConstructor):
 		self.buckets_sort_alphanum = buckets_sort_alphanum
 		self.buckets_sort_dir = buckets_sort_dir
 		self.setBucketsSorting()
-		
-		fielddefs = FieldDefinitions()
-		if len(self.source_fields) <= 0:
-			self.source_fields = fielddefs.date_fields
-		
-		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.source_fields)
 		
 		self.es_date_format = 'yyyy-MM-dd'
 		

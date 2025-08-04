@@ -10,7 +10,7 @@ from ElasticSearch.ES_Searcher import ES_Searcher
 
 from DCRequestAPI.views.RequestParams import RequestParams
 from DCRequestAPI.lib.SearchResults.HierarchyAggregations import HierarchyAggregations
-from ElasticSearch.FieldDefinitions import FieldDefinitions
+from ElasticSearch.FieldConfig import FieldConfig
 
 
 import pudb
@@ -51,7 +51,7 @@ class HierarchiesView():
 		
 		self.messages.extend(self.userlogin.get_messages())
 		
-		fielddefs = FieldDefinitions()
+		fielddefs = FieldConfig()
 		self.fielddefinitions = fielddefs.fielddefinitions
 		self.hierarchy_query_fields = fielddefs.hierarchy_query_fields
 		self.hierarchy_filter_names = fielddefs.getHierarchyFilterNames()

@@ -5,19 +5,19 @@ logger = logging.getLogger('elastic_queries')
 
 import pudb
 
-from ElasticSearch.FieldDefinitions import FieldDefinitions
+from ElasticSearch.FieldConfig import FieldConfig
 
 
 class QueryConstructor():
-	def __init__(self, fielddefinitions, source_fields):
-		self.source_fields = source_fields
-		
+	def __init__(self):
+		self.source_fields = []
 		self.nested_fields = {}
 		self.nested_restricted_fields = {}
 		self.simple_fields = {}
 		self.simple_restricted_fields = {}
 		
-		self.fielddefinitions = fielddefinitions
+		self.fieldconf = FieldConfig()
+		self.fielddefinitions = self.fieldconf.fielddefinitions
 
 
 	def set_source_fields(self, source_fields = []):

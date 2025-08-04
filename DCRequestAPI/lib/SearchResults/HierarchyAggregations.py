@@ -1,13 +1,13 @@
 import pudb
 
-from ElasticSearch.FieldDefinitions import FieldDefinitions
+from ElasticSearch.FieldConfig import FieldConfig
 
 
 class HierarchyAggregations():
 	def __init__(self, aggregations = {}):
 		self.aggregations = aggregations
 		
-		fielddefs = FieldDefinitions()
+		fielddefs = FieldConfig()
 		self.hierarchy_fields = fielddefs.hierarchy_query_fields
 		
 		self.hierarchies_dict = {}

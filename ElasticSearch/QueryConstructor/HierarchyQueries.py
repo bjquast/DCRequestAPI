@@ -6,11 +6,12 @@ logger = logging.getLogger('elastic_queries')
 import pudb
 import re
 
-from ElasticSearch.FieldDefinitions import FieldDefinitions
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 class HierarchyQueries(QueryConstructor):
 	def __init__(self, hierarchy_pathes_dict = {}, users_project_ids = None, source_fields = None, size = 1000):
+		QueryConstructor.__init__(self)
+		
 		self.hierarchy_pathes_dict = hierarchy_pathes_dict
 		
 		if users_project_ids is None:
@@ -20,16 +21,10 @@ class HierarchyQueries(QueryConstructor):
 		if source_fields is None:
 			source_fields = []
 		self.source_fields = source_fields
+		if len(self.source_fields) <= 0:
+			self.source_fields = self.fieldconf.hierarchy_query_fields
 		
 		self.size = size
-		
-		fielddefs = FieldDefinitions()
-		self.fielddefinitions = fielddefs.fielddefinitions
-		
-		if len(self.source_fields) <= 0:
-			self.source_fields = fielddefs.hierarchy_query_fields
-		
-		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.source_fields)
 		
 		self.hierarchies_query = {}
 		
