@@ -53,7 +53,57 @@ class FieldDefinitions():
 		return
 
 
+	def setAllFilterFields(self):
+		"""
+		all filters that may occur in filters,
+		this list exists to give the order of the filters
+		the lists bucketfields, self.hierarchy_query_fields, date_fields
+		provide the filters ordered by data type, default_filter_sections
+		sets the list of filters when no filters are selected
+		"""
+		self.filterfields = [
+			'DatabaseAccronym',
+			'CollectionsTree.CollectionName',
+			'CollectionName',
+			'CollectionsTree',
+			'Projects.Project',
+			'LastIdentificationCache',
+			'MatchedTaxon',
+			'VernacularTerms',
+			'MatchedSynonyms.Synonym',
+			'MatchedTaxaTree',
+			'MatchedTaxaTree.Phylum',
+			'MatchedTaxaTree.Subphylum',
+			'MatchedTaxaTree.Class',
+			'MatchedTaxaTree.Subclass',
+			'MatchedTaxaTree.Order',
+			'MatchedTaxaTree.Suborder',
+			'MatchedTaxaTree.Family',
+			'MatchedTaxaTree.Subfamily',
+			'MatchedTaxaTree.Genus',
+			'MatchedTaxaTree.Subgenus',
+			'TypeStatus',
+			'CountryCache',
+			'CollectionDate',
+			'CollectingMethod',
+			'CollectionAgents.CollectorsName',
+			'LocalityVerbatim',
+			'LocalityDescription',
+			'HabitatDescription',
+			'MaterialCategory',
+			'LifeStage',
+			'Gender',
+			'NumberOfUnits',
+			'Barcodes.Methods.region',
+			'ImagesAvailable' # not working with prefix query
+		]
+		return
+
+
 	def setBucketFields(self):
+		"""
+		all fields that are used as term filters
+		"""
 		self.bucketfields = [
 			'DatabaseAccronym',
 			#'CollectionsTree.CollectionName',
@@ -77,7 +127,6 @@ class FieldDefinitions():
 			#'MatchedTaxaTree.Subgenus',
 			'TypeStatus',
 			'CountryCache',
-			'CollectionDate',
 			'CollectingMethod',
 			'CollectionAgents.CollectorsName',
 			'LocalityVerbatim',
@@ -94,6 +143,9 @@ class FieldDefinitions():
 
 
 	def setDefaultFilterSections(self):
+		"""
+		all fields that are in the filter section when no filters are selected
+		"""
 		self.default_filter_sections = [
 			'DatabaseAccronym',
 			#'CollectionsTree.CollectionName',
@@ -134,6 +186,9 @@ class FieldDefinitions():
 
 
 	def setStackedQueryFields(self):
+		"""
+		all fields that can be used in stacked queries
+		"""
 		self.stacked_query_fields = [
 			'PartAccessionNumber',
 			'LastIdentificationCache',
@@ -166,6 +221,9 @@ class FieldDefinitions():
 
 
 	def setHierarchyQueryFields(self):
+		"""
+		all fields used in hierarchy based filters
+		"""
 		self.hierarchy_query_fields = [
 			'MatchedTaxaHierarchyString',
 			'CollectionHierarchyString'
@@ -174,6 +232,9 @@ class FieldDefinitions():
 
 
 	def setSuggestionFields(self):
+		"""
+		all fields used for suggestions for filters
+		"""
 		self.suggestion_fields = [
 			#'CollectionsTree.CollectionName',
 			'CollectionName',
@@ -210,6 +271,9 @@ class FieldDefinitions():
 
 
 	def setDateFields(self):
+		"""
+		all fields with type date that should be used in web interface
+		"""
 		self.date_fields = [
 			#'SpecimenCreatedWhen',
 			'CollectionDate',
@@ -226,6 +290,9 @@ class FieldDefinitions():
 
 
 	def setFields(self):
+		"""
+		selt the lists of names for the different parts of the web interface
+		"""
 		self.setFieldNames()
 		self.setBucketFields()
 		self.setDefaultFilterSections()
@@ -238,6 +305,10 @@ class FieldDefinitions():
 
 
 	def setFieldDefinitions(self):
+		"""
+		definitions of the fields for elastic search requests 
+		and labels in web interface
+		"""
 		self.fielddefinitions = {
 			'PartAccessionNumber': {
 				'names': {'en': 'Accessionnumber', },

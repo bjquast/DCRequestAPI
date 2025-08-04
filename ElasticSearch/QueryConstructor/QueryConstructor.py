@@ -21,7 +21,8 @@ class QueryConstructor():
 
 
 	def set_source_fields(self, source_fields = []):
-		# allow to set the source fields later for queries with different source fields as in StackedInnerQuery
+		# allow to set the source fields later for queries with different source fields
+		# this is currently used in StackedInnerQuery to set a single source field when a stacked query searches for a defined field only
 		if len(source_fields) > 0:
 			self.source_fields = source_fields
 		return

@@ -15,7 +15,7 @@ class StackedInnerQuery(QueryConstructor):
 		self.users_project_ids = users_project_ids
 		
 		fielddefs = FieldDefinitions()
-		self.source_fields = fielddefs.fieldnames
+		self.source_fields = fielddefs.stacked_query_fields
 		
 		self.readQueryDict()
 		self.query_type = 'simple_query_string'

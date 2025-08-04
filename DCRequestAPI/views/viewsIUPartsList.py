@@ -162,7 +162,7 @@ class IUPartsListView():
 		# because they are in selected_bucketfields
 		# order the fields by all_bucketfields
 		sorted_filter_sections = []
-		pudb.set_trace()
+		
 		for bucketfield in all_bucketfields:
 			if bucketfield in selected_bucketfields or bucketfield in selected_datefields or bucketfield in selected_filter_sections:
 				sorted_filter_sections.append(bucketfield)
