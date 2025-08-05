@@ -3,6 +3,8 @@ from pyramid.renderers import render_to_response
 from pyramid.view import (view_config, view_defaults)
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPSeeOther
 
+
+from ElasticSearch.FieldConfig import FieldConfig
 from ElasticSearch.ES_Searcher import ES_Searcher
 
 from DCRequestAPI.lib.SearchResults.IUPartsTable import IUPartsTable
@@ -10,6 +12,7 @@ from DCRequestAPI.lib.SearchResults.HierarchyAggregations import HierarchyAggreg
 from DCRequestAPI.lib.UserLogin.UserLogin import UserLogin
 
 from DCRequestAPI.views.RequestParams import RequestParams
+from DCRequestAPI.lib.SearchResults.FieldParameterSetter import FieldParameterSetter
 
 
 import pudb
@@ -19,6 +22,7 @@ import json
 
 class IUPartsListView():
 	def __init__(self, request):
+		pudb.set_trace()
 		self.request = request
 		self.uid = self.request.authenticated_userid
 		
@@ -33,6 +37,8 @@ class IUPartsListView():
 		self.search_params = request_params.search_params
 		self.requeststring = request_params.requeststring
 		self.credentials = request_params.credentials
+		
+		self.fieldconfig = FieldConfig()
 		
 		# check if there are any authentication data given in request
 		# and if so: authenticate the user
@@ -57,8 +63,7 @@ class IUPartsListView():
 		#pudb.set_trace()
 		
 		iupartstable = IUPartsTable()
-		if len(self.search_params['result_table_columns']) > 0:
-			iupartstable.setSelectedSourceFields(self.search_params['result_table_columns'])
+		iupartstable.setSelectedSourceFields(self.search_params['result_table_columns'])
 		
 		# makes no sense here
 		#if len(self.search_params['open_filter_selectors']) > 0:
@@ -113,73 +118,40 @@ class IUPartsListView():
 	def IUPartsListHTML(self):
 		pudb.set_trace()
 		
-		iupartstable = IUPartsTable()
-		if len(self.search_params['result_table_columns']) > 0:
-			iupartstable.setSelectedSourceFields(self.search_params['result_table_columns'])
+		field_lists = FieldParameterSetter()
 		
-		#if len(self.search_params['open_filter_selectors']) > 0:
-		iupartstable.setSelectedBucketFields(self.search_params['open_filter_selectors'])
-		iupartstable.setSelectedFilterSections(self.search_params['selected_filter_sections'])
+		# -> columns in table = field_lists.selected_sourcefields, field_lists.fallback result_fields
+		field_lists.setSelectedSourceFields(self.search_params['result_table_columns'])
+		# -> filters opened in filter box
+		field_lists.setSelectedFilterFields(self.search_params['open_filter_selectors'])
+		# -> add all fields from self.search_params['open_filter_selectors']
+		field_lists.appendSelectedFilterFields(self.search_params['term_filters'])
+		# -> filters shown in filter box, can be selected by user, fallback default_filter_sections, must be extended by selected_filter_fields
+		field_lists.setSelectedFilterSections(self.search_params['selected_filter_sections'])
 		
-		selected_sourcefields = iupartstable.selected_sourcefields
-		default_sourcefields = iupartstable.default_sourcefields
-		selected_bucketfields = iupartstable.selected_bucketfields
-		all_bucketfields = iupartstable.bucketfields
-		selected_filter_sections = iupartstable.selected_filter_sections
-		stacked_query_fields = iupartstable.stacked_query_fields
-		hierarchy_filter_fields = iupartstable.hierarchy_query_fields
-		datefields = iupartstable.date_fields
-		selected_datefields = []
 		
-		open_filter_selectors = self.search_params['open_filter_selectors']
+		# -> fields for the hierarchy filter
+		hierarchy_filter_fields = field_lists.hierarchy_filter_fields
+		
+		column_names = self.fieldconfig.getColNames()
+		term_filter_names = self.fieldconfig.getTermFilterNames()
+		hierarchy_filter_names = self.fieldconfig.getHierarchyFilterNames()
+		
+		
+		########################
+		
 		open_hierarchy_selectors = self.search_params['open_hierarchy_selectors']
-		
 		hierarchy_pathes_dict = self.search_params['hierarchies']
 		
-		#for hierarchy_field in self.search_params['hierarchies']:
-		#	if hierarchy_field not in open_hierarchy_selectors:
-		#		open_hierarchy_selectors.append(hierarchy_field)
 		
-		self.search_params['term_filters'] = self.reduce_hierarchical_term_filters(self.search_params['term_filters'], hierarchy_filter_fields)
+		#bucketdefs = iupartstable.bucketdefs
+		#hierarchy_filter_names = iupartstable.hierarchy_filter_names
 		
-		# the selected_bucketfields contain only the fields found in self.search_params['open_filter_selectors']
-		# the fields from self.search_params['term_filters'] must be added, otherwise their results are not mentioned when their filter selector is not opened
-		
-		for term_filter_field in self.search_params['term_filters']:
-			if term_filter_field in all_bucketfields and term_filter_field not in datefields and term_filter_field not in selected_bucketfields:
-				selected_bucketfields.append(term_filter_field)
-			if term_filter_field in all_bucketfields and term_filter_field in datefields and term_filter_field not in selected_datefields:
-				selected_datefields.append(term_filter_field)
-			if term_filter_field in hierarchy_filter_fields:
-				if term_filter_field not in open_hierarchy_selectors:
-					open_hierarchy_selectors.append(term_filter_field)
-				if term_filter_field not in hierarchy_pathes_dict:
-					hierarchy_pathes_dict[term_filter_field] = []
-				for path in self.search_params['term_filters'][term_filter_field]:
-					if path not in hierarchy_pathes_dict[term_filter_field]:
-						hierarchy_pathes_dict[term_filter_field].append(path)
-		
-		# add the opened_filter_selectors to the selected filtersections
-		# which here also includes the fields from the applied filters in self.search_params['term_filters']
-		# because they are in selected_bucketfields
-		# order the fields by all_bucketfields
-		sorted_filter_sections = []
-		
-		for bucketfield in all_bucketfields:
-			if bucketfield in selected_bucketfields or bucketfield in selected_datefields or bucketfield in selected_filter_sections:
-				sorted_filter_sections.append(bucketfield)
-			if (bucketfield in selected_bucketfields or bucketfield in selected_datefields) and bucketfield not in open_filter_selectors:
-				open_filter_selectors.append(bucketfield)
-		selected_filter_sections = sorted_filter_sections
-		
-		coldefs = iupartstable.coldefs
-		bucketdefs = iupartstable.bucketdefs
-		hierarchy_filter_names = iupartstable.hierarchy_filter_names
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
-		es_searcher.setSourceFields(selected_sourcefields)
-		es_searcher.setBucketFields(selected_bucketfields)
-		es_searcher.setDateFields(selected_datefields)
+		es_searcher.setSourceFields(field_lists.selected_sourcefields)
+		es_searcher.setBucketFields(field_lists.selected_term_fields)
+		es_searcher.setDateFields(field_lists.selected_date_fields)
 		es_searcher.setHierarchyFields(open_hierarchy_selectors)
 		
 		es_searcher.setHierarchyPathesDict(hierarchy_pathes_dict)
@@ -188,42 +160,52 @@ class IUPartsListView():
 		aggregations = es_searcher.getParsedAggregations()
 		
 		hierarchies_dict = HierarchyAggregations(aggregations).calcHierarchiesDict()
+		pudb.set_trace()
+		doc_sources = [doc['_source'] for doc in docs]
 		
-		iupartslist = iupartstable.getRowContent(doc_sources = [doc['_source'] for doc in docs])
+		iupartstable = IUPartsTable(field_lists.selected_sourcefields)
+		iupartslist = iupartstable.getRowContent(doc_sources = doc_sources)
 		
 		pagecontent = {
+			'pagetitle': 'LIB collections cataloque',
+			# parameters from the request
 			'request': self.request,
-			'pagetitle': 'API for requests on DiversityCollection database',
 			'maxpage': maxpage,
 			'resultnum': resultnum,
 			'page': int(self.search_params.get('page', 1)),
 			'pagesize': int(self.search_params.get('pagesize', 1000)),
 			'requestparamsstring': self.requeststring,
 			'search_params': self.search_params,
+			# the ES request ressults
 			'iupartslist': iupartslist,
 			'aggregations': aggregations,
 			'hierarchies_dict': hierarchies_dict,
-			'coldefs': coldefs,
-			'bucketdefs': bucketdefs,
+			# dicts for the names of the fields shown in interface
+			'coldefs': column_names,
+			'bucketdefs': term_filter_names,
 			'hierarchy_filter_names': hierarchy_filter_names,
-			'default_sourcefields': default_sourcefields,
-			'selected_sourcefields': selected_sourcefields,
-			'all_bucketfields': all_bucketfields,
-			'selected_bucketfields': selected_bucketfields,
-			'open_filter_selectors': open_filter_selectors,
-			'selected_filter_sections': selected_filter_sections,
-			'stacked_query_fields': stacked_query_fields,
+			# the fields for the user interface
+			'default_sourcefields': field_lists.result_fields,
+			'selected_sourcefields': field_lists.selected_sourcefields,
+			'available_filter_fields': field_lists.available_filter_fields,
+			'selected_filter_fields': field_lists.selected_filter_fields,
+			'open_filter_selectors': field_lists.selected_filter_fields,
+			'selected_filter_sections': field_lists.selected_filter_sections,
+			'stacked_query_fields': field_lists.stacked_query_fields,
 			'hierarchy_filter_fields': hierarchy_filter_fields,
 			'open_hierarchy_selectors': open_hierarchy_selectors,
 			'hierarchy_pathes_dict': hierarchy_pathes_dict,
+			# authentication
 			'authenticated_user': self.uid,
 			'messages': self.messages
 		}
+		pudb.set_trace()
 		return pagecontent
 
 
 	def reduce_hierarchical_term_filters(self, term_filters, hierarchy_filter_fields):
-		# when term_filters that are used with hierarchies filter out the term_filters that are parents of other term_filters
+		# when term_filters are used with hierarchies
+		# filter out the term_filters that are parents of other term_filters
 		# to have a specific search
 		new_term_filters = {}
 		for key in term_filters:

@@ -4,94 +4,25 @@ from ElasticSearch.FieldConfig import FieldConfig
 
 
 class IUPartsTable():
-	def __init__(self):
-		self.coldefs = {}
-		self.bucketdefs = {}
-		self.hierarchy_filter_names = {}
-		self.default_sourcefields = []
-		self.selected_sourcefields = []
+	def __init__(self, selected_sourcefields):
+		self.fieldconf = FieldConfig()
 		self.required_sourcefields = ['StableIdentifierURL', ]
+		self.__setSelectedSourceFields(selected_sourcefields)
 		
-		self.selected_bucketfields = []
-		self.selected_datefields = []
-		
-		self.non_text_fields = []
-		
-		fieldconf = FieldConfig()
-		self.result_fields = fieldconf.result_fields
-		self.bucketfields = fieldconf.bucketfields
-		self.fielddefinitions = fieldconf.fielddefinitions
-		self.default_filter_sections = fieldconf.default_filter_sections
-		self.stacked_query_fields = fieldconf.stacked_query_fields
-		self.hierarchy_query_fields = fieldconf.hierarchy_query_fields
-		self.date_fields = fieldconf.date_fields
-		
-		# these methods get the names, not the definitions, perhaps they should be reworked to resemble fieldconf.getHierarchyFilterNames()
-		self.readFieldConfig()
-		self.readBucketDefinitions()
-		
-		# get a dict with names for hierarchy fields 
-		self.hierarchy_filter_names = fieldconf.getHierarchyFilterNames()
 
-
-	def readBucketDefinitions(self):
-		for bucketfield in self.bucketfields:
-			if bucketfield in self.fielddefinitions:
-				self.bucketdefs[bucketfield] = self.fielddefinitions[bucketfield]['names']
-				self.selected_bucketfields.append(bucketfield)
-
-
-	def setSelectedBucketFields(self, bucketfields = []):
-		self.selected_bucketfields = []
-		for bucketfield in bucketfields:
-			if bucketfield in self.bucketfields:
-				self.selected_bucketfields.append(bucketfield)
-		return
-
-
-	def setSelectedFilterSections(self, filter_sections = []):
-		self.selected_filter_sections = []
-		
-		if len(filter_sections) <= 0:
-			for filter_section in self.default_filter_sections:
-				self.selected_filter_sections.append(filter_section)
-		else:
-			for filter_section in filter_sections:
-				# check that filter_section is available in FieldConfig().bucketfields
-				if filter_section in self.bucketfields:
-					self.selected_filter_sections.append(filter_section)
-		return
-
-
-	def readFieldConfig(self):
-		for fieldname in self.result_fields:
-			if fieldname in self.fielddefinitions:
-				self.coldefs[fieldname] = self.fielddefinitions[fieldname]['names']
-				self.default_sourcefields.append(fieldname)
-				self.selected_sourcefields.append(fieldname)
-
-
-	def setSelectedSourceFields(self, sourcefields = []):
+	def __setSelectedSourceFields(self, sourcefields = []):
 		self.selected_sourcefields = []
 		if len(sourcefields) <= 0:
-			for fieldname in self.result_fields:
+			for fieldname in self.fieldconf.result_fields:
 				self.selected_sourcefields.append(fieldname)
 		
 		else:
 			for sourcefield in sourcefields:
-				if sourcefield in self.result_fields:
+				if sourcefield in self.fieldconf.result_fields:
 					self.selected_sourcefields.append(sourcefield)
 			if 'PartAccessionNumber' not in self.selected_sourcefields:
 				self.selected_sourcefields.insert(0, 'PartAccessionNumber')
 		return
-
-
-	def getSelectedSourceFields(self):
-		return self.selected_sourcefields
-
-
-	def getDefaultSourceFields(self):
-		return self.default_sourcefields
 
 
 	def __getComplexElements(self, doc_element, keys_list, valuelist = []):

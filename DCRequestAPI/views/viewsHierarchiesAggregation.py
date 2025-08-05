@@ -53,7 +53,7 @@ class HierarchiesView():
 		
 		fielddefs = FieldConfig()
 		self.fielddefinitions = fielddefs.fielddefinitions
-		self.hierarchy_query_fields = fielddefs.hierarchy_query_fields
+		self.hierarchy_filter_fields = fielddefs.hierarchy_filter_fields
 		self.hierarchy_filter_names = fielddefs.getHierarchyFilterNames()
 		
 
@@ -105,7 +105,7 @@ class HierarchiesView():
 		#		open_hierarchy_selectors.append(hierarchy_field)
 		
 		for term_filter_field in self.search_params['term_filters']:
-			if term_filter_field in self.hierarchy_query_fields:
+			if term_filter_field in self.hierarchy_filter_fields:
 				if term_filter_field not in open_hierarchy_selectors:
 					open_hierarchy_selectors.append(term_filter_field)
 				if term_filter_field not in hierarchy_pathes_dict:
@@ -126,7 +126,7 @@ class HierarchiesView():
 		
 		response_dict = {
 			'hierarchy_pathes_dict': hierarchy_pathes_dict,
-			'hierarchy_filter_fields': self.hierarchy_query_fields,
+			'hierarchy_filter_fields': self.hierarchy_filter_fields,
 			'hierarchies_dict': hierarchies_dict,
 			'open_hierarchy_selectors': open_hierarchy_selectors,
 			'hierarchy_filter_names': self.hierarchy_filter_names
@@ -159,7 +159,7 @@ class HierarchiesView():
 				open_hierarchy_selectors.append(hierarchy_field)
 		
 		for term_filter_field in self.search_params['term_filters']:
-			if term_filter_field in self.hierarchy_query_fields:
+			if term_filter_field in self.hierarchy_filter_fields:
 				if term_filter_field not in open_hierarchy_selectors:
 					open_hierarchy_selectors.append(term_filter_field)
 				if term_filter_field not in hierarchy_pathes_dict:
@@ -180,7 +180,7 @@ class HierarchiesView():
 		
 		response_dict = {
 			'hierarchy_pathes_dict': hierarchy_pathes_dict,
-			'hierarchy_filter_fields': self.hierarchy_query_fields,
+			'hierarchy_filter_fields': self.hierarchy_filter_fields,
 			'hierarchies_dict': hierarchies_dict,
 			'open_hierarchy_selectors': open_hierarchy_selectors,
 			'hierarchy_filter_names': self.hierarchy_filter_names

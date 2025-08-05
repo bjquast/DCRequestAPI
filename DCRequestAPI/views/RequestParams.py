@@ -2,6 +2,8 @@ import pudb
 import json
 import re
 
+from ElasticSearch.FieldConfig import FieldConfig
+
 
 class RequestParams():
 	def __init__(self, request):
@@ -12,6 +14,8 @@ class RequestParams():
 		self.read_credentials()
 		self.set_requeststring()
 		
+		default_params_setter = DefaultParamsSetter(self.search_params)
+		self.search_params = default_params_setter.search_params
 		pass
 
 
@@ -187,3 +191,160 @@ class RequestParams():
 		
 		self.requeststring = '&'.join(paramslist)
 		return
+
+
+
+
+
+
+class DefaultParamsSetter():
+	"""
+	set default values for missing search_params, concatenate parent parameters and fix some params
+	"""
+	def __init__(self, search_params):
+		self.fieldconf = FieldConfig()
+		
+		self.search_params = search_params
+		self.set_default_params()
+		
+		self.reduce_hierarchical_term_filters()
+
+
+	def set_default_params(self):
+		self.set_term_filters()
+		self.set_date_filters()
+		self.set_hierarchy_filters()
+		
+		self.set_selected_filter_sections()
+		self.set_open_filter_selectors()
+		self.set_result_table_columns()
+
+
+	def set_term_filters(self):
+		term_filters = {}
+		for key in self.search_params['term_filters']:
+			if key in self.fieldconf.term_fields:
+				term_filters[key] = self.search_params['term_filters'][key]
+		self.search_params['term_filters'] = term_filters
+
+
+	def set_date_filters(self):
+		date_filters = {}
+		for key in self.search_params['date']:
+			if key in self.fieldconf.date_fields:
+				date_filters[key] = self.search_params['date'][key]
+		self.search_params['date'] = date_filters
+
+
+	def set_hierarchy_filters(self):
+		hierarchy_filters = {}
+		for key in self.search_params['hierarchies']:
+			if key in self.fieldconf.hierarchy_fields:
+				hierarchy_filters[key] = self.search_params['hierarchies'][key]
+		self.search_params['hierarchies'] = hierarchy_filters
+
+
+	def set_open_filter_selectors(self):
+		open_filters = []
+		for field in self.fieldconf.available_filter_fields:
+			if field in self.search_params['open_filter_selectors']:
+				open_filters.append(field)
+			if field in self.search_params['term_filters']:
+				open_filters.append(field)
+			if field in self.search_params['date']:
+				open_filters.append(field)
+			if field in self.search_params['hierarchies']:
+				open_filters.append(field)
+		self.search_params['open_filter_selectors'] = open_filters
+		return
+
+
+	def set_selected_filter_sections(self):
+		selected_filters = []
+		for field in self.fieldconf.available_filter_fields:
+			if field in self.search_params['selected_filter_sections']:
+				selected_filters.append(field)
+			if field in self.search_params['term_filters']:
+				selected_filters.append(field)
+			if field in self.search_params['date']:
+				selected_filters.append(field)
+			if field in self.search_params['hierarchies']:
+				selected_filters.append(field)
+		if len(selected_filters) <= 0:
+			selected_filters = self.fieldconf.default_filter_sections
+		self.search_params['selected_filter_sections'] = selected_filters
+		return
+
+
+	def set_result_table_columns(self):
+		table_cols = []
+		for field in self.search_params['result_table_columns']:
+			if field in self.fieldconf.result_fields:
+				table_cols.append(field)
+		if len(table_cols) <= 0:
+			table_cols = self.fieldconf.result_fields
+		if 'PartAccessionNumber' not in table_cols:
+			table_cols.insert(0, 'PartAccessionNumber')
+		
+		self.search_params['result_table_columns'] = table_cols
+		return
+
+
+	# for hierarchy filters all term_filters must be removed that are a parent of any other term filter in the hierarchy
+	def reduce_hierarchical_term_filters(self):
+		# when term_filters are used with hierarchies
+		# filter out the term_filters that are parents of other term_filters
+		
+		hierarchy_filter_fields = self.fieldconf.hierarchy_filter_fields
+		term_filters = self.search_params['term_filters']
+		
+		new_term_filters = {}
+		for key in term_filters:
+			if key in hierarchy_filter_fields:
+				
+				filter_dict = {}
+				
+				for filter_entry in term_filters[key]:
+					element_list = [element.strip() for element in filter_entry.split('>')]
+					self.set_reduced_hierarchy_dict(filter_dict, element_list)
+				
+				self.reduced_hierarchy_pathes = []
+				self.set_reduced_hierarchy_pathes(filter_dict)
+				
+				if len(self.reduced_hierarchy_pathes) > 0:
+					new_term_filters[key] = []
+					for hierarchy_path in self.reduced_hierarchy_pathes:
+						new_term_filters[key].append('>'.join(hierarchy_path))
+				
+			else:
+				new_term_filters[key] = term_filters[key]
+		
+		self.search_params['term_filters'] = new_term_filters
+		return
+
+
+	def set_reduced_hierarchy_dict(self, subdict, element_list):
+		if len(element_list) <= 0:
+			return
+		element = element_list.pop(0)
+		if element in subdict.keys():
+			self.set_reduced_hierarchy_dict(subdict[element], element_list)
+		else:
+			subdict[element] = {}
+			self.set_reduced_hierarchy_dict(subdict[element], element_list)
+		return
+
+
+	def set_reduced_hierarchy_pathes(self, sub_dict, path = None):
+		if path is None:
+			path = []
+		for key in sub_dict:
+			if isinstance(sub_dict[key], dict) and len(sub_dict[key]) > 0:
+				path.append(key)
+				self.set_reduced_hierarchy_pathes(sub_dict[key], path)
+			elif isinstance(sub_dict[key], dict) and len(sub_dict[key]) <= 0:
+				path.append(key)
+				self.reduced_hierarchy_pathes.append(path)
+				return
+		return
+	

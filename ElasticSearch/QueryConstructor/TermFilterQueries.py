@@ -16,7 +16,7 @@ class TermFilterQueries(QueryConstructor):
 		self.source_fields = source_fields
 		if len(self.source_fields) <= 0:
 			self.source_fields = self.fieldconf.bucketfields
-			self.source_fields.extend(self.fieldconf.hierarchy_query_fields)
+			self.source_fields.extend(self.fieldconf.hierarchy_filter_fields)
 		
 		self.connector = connector
 		

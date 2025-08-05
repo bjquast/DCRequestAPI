@@ -11,11 +11,14 @@ from ElasticSearch.ES_Mappings import MappingsDict
 
 
 class FieldConfig:
+	"""
+	Class that sets the fields for the different ElasticSearch query and aggregation types and for the web interface
+	"""
+	# code to make it a singleton
 	_instance = None
 	_lock = threading.Lock()
 
 	def __new__(cls, *args, **kwargs):
-		pudb.set_trace()
 		if cls._instance is None: 
 			with cls._lock:
 				# Another thread could have created the instance
@@ -24,6 +27,7 @@ class FieldConfig:
 				if not cls._instance:
 					cls._instance = super().__new__(cls)
 		return cls._instance
+	# end singleton code
 
 
 	def __init__(self):
@@ -77,7 +81,7 @@ class FieldConfig:
 		"""
 		all filters that may occur in filters,
 		this list exists to give the order of the filters
-		the lists bucketfields, self.hierarchy_query_fields, date_fields
+		the lists term_fields, self.hierarchy_filter_fields, date_fields
 		provide the filters ordered by data type, default_filter_sections
 		sets the list of filters when no filters are selected
 		"""
@@ -127,22 +131,26 @@ class FieldConfig:
 		return
 
 
-	def setAllFilterFields(self):
-		self.filter_fields = []
+	def setFilterFields(self):
+		"""
+		set all filter fields that are available
+		containing term filters, date filters hierarchy filters ...
+		"""
+		self.available_filter_fields = []
 		for field in self.filter_defs:
 			for key in field:
-				if field[key][0] is True and field[key][2] == 'term':
-					self.filter_fields.append(key)
+				if field[key][0] is True:
+					self.available_filter_fields.append(key)
 		return
 
 
-	def setBucketFields(self):
-		self.bucketfields = []
+	def setTermFields(self):
+		self.term_fields = []
 		
 		for field in self.filter_defs:
 			for key in field:
 				if field[key][0] is True and field[key][2] == 'term':
-					self.bucketfields.append(key)
+					self.term_fields.append(key)
 		return
 
 
@@ -208,11 +216,11 @@ class FieldConfig:
 		return
 
 
-	def setHierarchyQueryFields(self):
+	def setHierarchyFilterFields(self):
 		"""
 		all fields used in hierarchy based filters
 		"""
-		self.hierarchy_query_fields = [
+		self.hierarchy_filter_fields = [
 			'MatchedTaxaHierarchyString',
 			'CollectionHierarchyString'
 		]
@@ -258,14 +266,6 @@ class FieldConfig:
 		return
 
 
-	def getHierarchyFilterNames(self):
-		hierarchy_filter_names = {}
-		for hierarchy_filter in self.hierarchy_query_fields:
-			if hierarchy_filter in self.fielddefinitions:
-				hierarchy_filter_names[hierarchy_filter] = self.fielddefinitions[hierarchy_filter]['names']
-		return hierarchy_filter_names
-
-
 	def setFields(self):
 		"""
 		selt the lists of names for the different parts of the web interface
@@ -274,16 +274,40 @@ class FieldConfig:
 		self.setResultFields()
 		
 		self.setFilterDefs()
-		self.setAllFilterFields()
-		self.setBucketFields()
+		self.setFilterFields()
+		self.setTermFields()
 		self.setDefaultFilterSections()
 		self.setStackedQueryFields()
-		self.setHierarchyQueryFields()
+		self.setHierarchyFilterFields()
 		self.setSuggestionFields()
 		self.setDateFields()
 		
 		return
 
+
+	# read the definitions for specific fields
+	def getTermFilterNames(self):
+		term_filter_defs = {}
+		for term_field in self.term_fields:
+			if term_field in self.fielddefinitions:
+				term_filter_defs[term_field] = self.fielddefinitions[term_field]['names']
+		return term_filter_defs
+
+
+	def getColNames(self):
+		colnames = {}
+		for fieldname in self.result_fields:
+			if fieldname in self.fielddefinitions:
+				colnames[fieldname] = self.fielddefinitions[fieldname]['names']
+		return colnames
+
+
+	def getHierarchyFilterNames(self):
+		hierarchy_filter_names = {}
+		for hierarchy_filter in self.hierarchy_filter_fields:
+			if hierarchy_filter in self.fielddefinitions:
+				hierarchy_filter_names[hierarchy_filter] = self.fielddefinitions[hierarchy_filter]['names']
+		return hierarchy_filter_names
 
 	def setFieldDefinitions(self):
 		"""

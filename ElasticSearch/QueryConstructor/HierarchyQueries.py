@@ -22,7 +22,7 @@ class HierarchyQueries(QueryConstructor):
 			source_fields = []
 		self.source_fields = source_fields
 		if len(self.source_fields) <= 0:
-			self.source_fields = self.fieldconf.hierarchy_query_fields
+			self.source_fields = self.fieldconf.hierarchy_filter_fields
 		
 		self.size = size
 		
