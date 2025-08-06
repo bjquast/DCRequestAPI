@@ -217,6 +217,7 @@ class DefaultParamsSetter():
 		
 		self.set_selected_filter_sections()
 		self.set_open_filter_selectors()
+		#self.set_open_hierarchy_selectors()
 		self.set_result_table_columns()
 
 
@@ -244,36 +245,48 @@ class DefaultParamsSetter():
 		self.search_params['hierarchies'] = hierarchy_filters
 
 
-	def set_open_filter_selectors(self):
-		open_filters = []
-		for field in self.fieldconf.available_filter_fields:
-			if field in self.search_params['open_filter_selectors']:
-				open_filters.append(field)
-			if field in self.search_params['term_filters']:
-				open_filters.append(field)
-			if field in self.search_params['date']:
-				open_filters.append(field)
-			if field in self.search_params['hierarchies']:
-				open_filters.append(field)
-		self.search_params['open_filter_selectors'] = open_filters
-		return
-
-
 	def set_selected_filter_sections(self):
+		# these are the filters shown as available filters
 		selected_filters = []
 		for field in self.fieldconf.available_filter_fields:
 			if field in self.search_params['selected_filter_sections']:
 				selected_filters.append(field)
-			if field in self.search_params['term_filters']:
+			elif field in self.search_params['term_filters']:
 				selected_filters.append(field)
-			if field in self.search_params['date']:
+			elif field in self.search_params['date']:
 				selected_filters.append(field)
-			if field in self.search_params['hierarchies']:
+			elif field in self.search_params['hierarchies']:
 				selected_filters.append(field)
 		if len(selected_filters) <= 0:
 			selected_filters = self.fieldconf.default_filter_sections
 		self.search_params['selected_filter_sections'] = selected_filters
 		return
+
+
+	def set_open_filter_selectors(self):
+		# these are the filters that are opend and show a list of buckets
+		open_filters = []
+		for field in self.fieldconf.available_filter_fields:
+			if field in self.search_params['open_filter_selectors']:
+				open_filters.append(field)
+			elif field in self.search_params['term_filters']:
+				open_filters.append(field)
+			elif field in self.search_params['date']:
+				open_filters.append(field)
+			elif field in self.search_params['hierarchies']:
+				open_filters.append(field)
+		self.search_params['open_filter_selectors'] = open_filters
+		return
+
+
+	'''
+	def set_open_hierarchy_selectors(self):
+		open_hierarchy_selectors = []
+		for field in self.search_params['open_hierarchy_selectors']:
+			if field in self.fieldconf.hierarchy_fields:
+				open_hierarchy_selectors.append(field)
+		self.search_params['open_hierarchy_selectors'] = open_hierarchy_selectors
+	'''
 
 
 	def set_result_table_columns(self):

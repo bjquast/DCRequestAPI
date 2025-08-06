@@ -294,6 +294,14 @@ class FieldConfig:
 		return term_filter_defs
 
 
+	def getFilterNames(self):
+		filter_defs = {}
+		for field in self.available_filter_fields:
+			if field in self.fielddefinitions:
+				filter_defs[field] = self.fielddefinitions[field]['names']
+		return filter_defs
+
+
 	def getColNames(self):
 		colnames = {}
 		for fieldname in self.result_fields:

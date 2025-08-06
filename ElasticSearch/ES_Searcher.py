@@ -35,9 +35,9 @@ class ES_Searcher():
 		
 		self.index = 'iuparts'
 		self.source_fields = []
-		self.bucket_fields = []
-		self.date_fields = []
-		self.hierarchy_fields = []
+		self.term_filters = []
+		self.date_filters = []
+		self.hierarchy_filters = []
 		self.hierarchy_pathes_dict = {}
 		
 		self.pagesize = 1000
@@ -46,22 +46,22 @@ class ES_Searcher():
 		self.withholdfilters = WithholdFilters()
 		self.withhold_fields = self.withholdfilters.getWithholdFields()
 		
-		self.fielddefs = FieldConfig()
+		self.fieldconfig = FieldConfig()
 
 
-	def getMaxPage(self, hits):
+	def __getMaxPage(self, hits):
 		maxpage = math.ceil(hits/self.pagesize)
 		return maxpage
 
 
-	def readIndexMapping(self):
+	def __readIndexMapping(self):
 		try:
 			self.mapping = MappingsDict[self.index]['properties']
 		except:
 			self.mapping = {}
 
 
-	def setPageSize(self):
+	def __setPageSize(self):
 		if 'pagesize' in self.search_params:
 			self.pagesize = int(self.search_params['pagesize'])
 		else:
@@ -69,7 +69,7 @@ class ES_Searcher():
 		return
 
 
-	def setStartRow(self, page = None):
+	def __setStartRow(self, page = None):
 		if page is not None:
 			if int(page) < 1:
 				page = 1
@@ -83,9 +83,9 @@ class ES_Searcher():
 		return
 
 
-	def setSorting(self):
+	def __setSorting(self):
 		#pudb.set_trace()
-		self.readIndexMapping()
+		self.__readIndexMapping()
 		self.sort = [{"PartAccessionNumber.keyword_lc":{"order":"asc"}}]
 		
 		if 'sorting_col' in self.search_params and 'sorting_dir' not in self.search_params:
@@ -107,6 +107,20 @@ class ES_Searcher():
 		return
 
 
+	def __addUserLimitation(self):
+		# prepare the query as a subquery to the must-queries, so that it is guarantied that it is AND connected. 
+		# this is in contrast to should filters where the addition of other should filters might disable the AND connection
+		if self.restrict_to_users_projects is False:
+			# when open data without withhold should be shown
+			self.user_limitation = {"bool": {"should": [{"terms": {"Projects.DB_ProjectID": self.users_project_ids}}, {"bool": {"must": [{"term": {"IUWithhold": "false"}}, {"term": {"SpecimenWithhold": "false"}}]}}], "minimum_should_match": 1}}
+		else:
+			# when only the data from the users projects should be shown
+			self.user_limitation = {"terms": {"Projects.DB_ProjectID": self.users_project_ids}}
+		
+		self.query["bool"]["must"].append(self.user_limitation)
+		return
+
+
 	def setSourceFields(self, source_fields = []):
 		# copy the source_fields, otherwise the change here changes the source_fields variable in the caller 
 		self.source_fields = list(source_fields)
@@ -120,37 +134,25 @@ class ES_Searcher():
 		'''
 
 
-	def setBucketFields(self, bucket_fields = []):
-		self.bucket_fields = list(bucket_fields)
-		return
 
-
-	def setHierarchyFields(self, hierarchy_fields = []):
-		self.hierarchy_fields = list(hierarchy_fields)
+	def setFilterFields(self, filter_fields = []):
+		# set the specific fields for aggs from terms, date, hierarchy fields 
+		
+		self.filter_fields = list(filter_fields)
+		self.term_filters = []
+		self.date_filters = []
+		for field in self.filter_fields:
+			if field in self.fieldconfig.term_fields:
+				self.term_filters.append(field)
+			elif field in self.fieldconfig.date_fields:
+				self.date_filters.append(field)
+			elif field in self.fieldconfig.hierarchy_fields:
+				self.hierarchy_filters.append(field)
 		return
 
 
 	def setHierarchyPathesDict(self, hierarchy_pathes_dict = {}):
 		self.hierarchy_pathes_dict = hierarchy_pathes_dict
-		return
-
-
-	def setDateFields(self, date_fields = []):
-		self.date_fields = list(date_fields)
-		return
-
-
-	def addUserLimitation(self):
-		# prepare the query as a subquery to the must-queries, so that it is guarantied that it is AND connected. 
-		# this is in contrast to should filters where the addition of other should filters might disable the AND connection
-		if self.restrict_to_users_projects is False:
-			# when open data without withhold should be shown
-			self.user_limitation = {"bool": {"should": [{"terms": {"Projects.DB_ProjectID": self.users_project_ids}}, {"bool": {"must": [{"term": {"IUWithhold": "false"}}, {"term": {"SpecimenWithhold": "false"}}]}}], "minimum_should_match": 1}}
-		else:
-			# when only the data from the users projects should be shown
-			self.user_limitation = {"terms": {"Projects.DB_ProjectID": self.users_project_ids}}
-		
-		self.query["bool"]["must"].append(self.user_limitation)
 		return
 
 
@@ -171,15 +173,18 @@ class ES_Searcher():
 
 	def setQuery(self):
 		self.query = {"bool": {"must": [], "should": [], "filter": []}}
-		#pudb.set_trace()
+		pudb.set_trace()
+		
+		
 		if 'term_filters' in self.search_params:
 			connector = 'AND'
 			if 'term_filters_connector' in self.search_params:
 				connector = self.search_params['term_filters_connector']
 			
-			# append source fields from term_filters not yet in self.bucket_fields
+			
+			# append source fields from term_filters not yet in self.term_filters
 			# this is due to the term_filters comming from hierarchy aggregations
-			hierarchy_bucket_fields = list(self.bucket_fields)
+			hierarchy_bucket_fields = list(self.term_filters)
 			for key in self.search_params['term_filters']:
 				if key not in hierarchy_bucket_fields:
 					hierarchy_bucket_fields.append(key)
@@ -188,6 +193,7 @@ class ES_Searcher():
 			self.query['bool']["filter"].extend(filter_queries)
 		
 		#pudb.set_trace()
+		'''
 		if 'range_queries' in self.search_params:
 			connector = 'AND'
 			if 'term_filters_connector' in self.search_params:
@@ -198,6 +204,7 @@ class ES_Searcher():
 			
 			
 			pass
+		'''
 		
 		outer_query = StackedOuterQuery()
 		
@@ -222,7 +229,7 @@ class ES_Searcher():
 				logger.debug(self.query)
 		
 		
-		self.addUserLimitation()
+		self.__addUserLimitation()
 		self.deleteEmptySubqueries()
 
 
@@ -251,7 +258,7 @@ class ES_Searcher():
 		buckets = []
 		if 'aggregations' in response:
 			self.raw_aggregations = response['aggregations']
-			buckets = self.getBucketListFromAggregation(self.raw_aggregations[hierarchy_name])
+			buckets = self.__getBucketListFromAggregation(self.raw_aggregations[hierarchy_name])
 		
 		return buckets
 	'''
@@ -280,7 +287,7 @@ class ES_Searcher():
 		'''
 		if 'aggregations' in response:
 			self.raw_aggregations = response['aggregations']
-			buckets = self.getBucketListFromCompositeAggregation(self.raw_aggregations[aggregation_name])
+			buckets = self.__getBucketListFromCompositeAggregation(self.raw_aggregations[aggregation_name])
 		'''
 		return aggregations
 
@@ -288,14 +295,19 @@ class ES_Searcher():
 	def singleAggregationSearch(self, aggregation_name, buckets_search_term = None, size = 5000, buckets_sort_alphanum = True, buckets_sort_dir = 'asc'):
 		self.setQuery()
 		pudb.set_trace()
-		if aggregation_name in self.fielddefs.date_fields:
+		
+		if aggregation_name in self.fieldconfig.date_fields:
 			buckets_query = DateAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size, 
 				buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
+			aggs = buckets_query.getAggregationsQuery()
 		
-		else:
+		elif aggregation_name in self.fieldconfig.term_fields:
 			buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size, 
 				buckets_search_term = buckets_search_term, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
-		aggs = buckets_query.getAggregationsQuery()
+			aggs = buckets_query.getAggregationsQuery()
+		
+		else:
+			aggs = None
 		
 		logger.debug(json.dumps(aggs))
 		logger.debug(json.dumps(self.query))
@@ -307,13 +319,13 @@ class ES_Searcher():
 		buckets = []
 		if 'aggregations' in response:
 			self.raw_aggregations = response['aggregations']
-			buckets = self.getBucketListFromAggregation(self.raw_aggregations[aggregation_name])
+			buckets = self.__getBucketListFromAggregation(self.raw_aggregations[aggregation_name])
 		
 		return buckets
 
 
 	def suggestionsSearch(self, buckets_search_term, size = 10, buckets_sort_alphanum = True, buckets_sort_dir = 'asc'):
-		
+		# do suggestion search only for term filters, makes no sence for dates and hierarchies?!
 		self.setQuery()
 		buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = [], size = size, 
 			buckets_search_term = buckets_search_term, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir, add_include_filter = True)
@@ -336,7 +348,7 @@ class ES_Searcher():
 
 	def countResultDocsSearch(self):
 		self.updateMaxResultWindow(max_result_window=2000000)
-		self.setPageSize()
+		self.__setPageSize()
 		self.setQuery()
 		aggs = None
 		logger.debug(json.dumps(self.query))
@@ -344,7 +356,7 @@ class ES_Searcher():
 		response = self.client.search(index=self.index, size=self.pagesize, query=self.query, from_=self.start, source=False, track_total_hits=True)
 		
 		resultnum = response['hits']['total']['value']
-		maxpage = self.getMaxPage(resultnum)
+		maxpage = self.__getMaxPage(resultnum)
 		return maxpage, resultnum
 
 
@@ -355,9 +367,9 @@ class ES_Searcher():
 		return docs for the specified result page
 		csv export code iterates over the existing pages
 		"""
-		self.setPageSize()
-		self.setStartRow(page)
-		self.setSorting()
+		self.__setPageSize()
+		self.__setStartRow(page)
+		self.__setSorting()
 		
 		self.setQuery()
 		
@@ -366,17 +378,17 @@ class ES_Searcher():
 		if len(self.source_fields) <= 0:
 			source_fields = True
 		else:
-			self.__setRequiredSourceFields()
+			self.__addRequiredSourceFields()
 			source_fields = self.source_fields
 		
 		response = self.client.search(index=self.index, size=self.pagesize, sort=self.sort, query=self.query, from_=self.start, source=source_fields, track_total_hits=True)
 		
 		resultnum = response['hits']['total']['value']
-		maxpage = self.getMaxPage(resultnum)
+		maxpage = self.__getMaxPage(resultnum)
 		
 		if self.start > resultnum:
 			self.search_params['page'] = maxpage
-			self.setStartRow()
+			self.__setStartRow()
 			response = self.client.search(index=self.index, size=self.pagesize, sort=self.sort, query=self.query, from_=self.start, source=source_fields, track_total_hits=True)
 		
 		docs = [doc for doc in response['hits']['hits']]
@@ -389,27 +401,27 @@ class ES_Searcher():
 	def paginatedSearch(self):
 		pudb.set_trace()
 		self.updateMaxResultWindow(max_result_window=2000000)
-		self.setPageSize()
-		self.setStartRow()
-		self.setSorting()
+		self.__setPageSize()
+		self.__setStartRow()
+		self.__setSorting()
 		
 		#self.queryConstructor is set in the derived classes
 		self.setQuery()
 		
 		aggs = None
-		if len(self.bucket_fields) > 0:
-			buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = self.bucket_fields)
+		if len(self.term_filters) > 0:
+			buckets_query = BucketAggregations(users_project_ids = self.users_project_ids, source_fields = self.term_filters)
 			aggs = buckets_query.getAggregationsQuery()
 		
-		if len(self.date_fields) > 0:
-			date_aggregator = DateAggregations(users_project_ids = self.users_project_ids, source_fields = self.date_fields)
+		if len(self.date_filters) > 0:
+			date_aggregator = DateAggregations(users_project_ids = self.users_project_ids, source_fields = self.date_filters)
 			if aggs is not None:
 				aggs.update(date_aggregator.getAggregationsQuery())
 			else:
 				aggs = date_aggregator.getAggregationsQuery()
 		
-		if len(self.hierarchy_fields) > 0:
-			hierarchies_query = HierarchyQueries(hierarchy_pathes_dict = self.hierarchy_pathes_dict, users_project_ids = self.users_project_ids, source_fields = self.hierarchy_fields)
+		if len(self.hierarchy_filters) > 0:
+			hierarchies_query = HierarchyQueries(hierarchy_pathes_dict = self.hierarchy_pathes_dict, users_project_ids = self.users_project_ids, source_fields = self.hierarchy_filters)
 			if aggs is not None:
 				aggs.update(hierarchies_query.getHierarchiesQuery())
 			else:
@@ -423,17 +435,17 @@ class ES_Searcher():
 		if len(self.source_fields) <= 0:
 			source_fields = True
 		else:
-			self.__setRequiredSourceFields()
+			self.__addRequiredSourceFields()
 			source_fields = self.source_fields
 		
 		response = self.client.search(index=self.index, size=self.pagesize, sort=self.sort, query=self.query, from_=self.start, source=source_fields, track_total_hits=True, aggs=aggs)
 		
 		resultnum = response['hits']['total']['value']
-		maxpage = self.getMaxPage(resultnum)
+		maxpage = self.__getMaxPage(resultnum)
 		
 		if self.start > resultnum:
 			self.search_params['page'] = maxpage
-			self.setStartRow()
+			self.__setStartRow()
 			response = self.client.search(index=self.index, size=self.pagesize, sort=self.sort, query=self.query, from_=self.start, source=source_fields, track_total_hits=True, aggs=aggs)
 		
 		if 'aggregations' in response:
@@ -447,7 +459,7 @@ class ES_Searcher():
 		return docs, maxpage, resultnum
 
 
-	def __setRequiredSourceFields(self):
+	def __addRequiredSourceFields(self):
 		# add the fields that are needed for filtering the results in WithholdFilters.applyFiltersToSources()
 		if 'Projects.DB_ProjectID' not in self.source_fields:
 			self.source_fields.append('Projects.DB_ProjectID')
@@ -481,7 +493,7 @@ class ES_Searcher():
 		return
 
 
-	def getBucketListFromAggregation(self, raw_aggregation):
+	def __getBucketListFromAggregation(self, raw_aggregation):
 		pudb.set_trace()
 		buckets = []
 		if 'buckets' in raw_aggregation:
@@ -489,13 +501,13 @@ class ES_Searcher():
 				for bucket in raw_aggregation['buckets']:
 					buckets.append([bucket['key'], bucket['doc_count']])
 			elif isinstance(raw_aggregation['buckets'], dict) and 'buckets' in raw_aggregation['buckets']:
-				buckets = self.getBucketListFromAggregation(raw_aggregation['buckets'])
+				buckets = self.__getBucketListFromAggregation(raw_aggregation['buckets'])
 			else:
 				buckets = []
 		return buckets
 
 
-	def getBucketListFromCompositeAggregation(self, raw_aggregation):
+	def __getBucketListFromCompositeAggregation(self, raw_aggregation):
 		#pudb.set_trace()
 		buckets = []
 		

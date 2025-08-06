@@ -7,23 +7,7 @@ class IUPartsTable():
 	def __init__(self, selected_sourcefields):
 		self.fieldconf = FieldConfig()
 		self.required_sourcefields = ['StableIdentifierURL', ]
-		self.__setSelectedSourceFields(selected_sourcefields)
-		
-
-	def __setSelectedSourceFields(self, sourcefields = []):
-		self.selected_sourcefields = []
-		if len(sourcefields) <= 0:
-			for fieldname in self.fieldconf.result_fields:
-				self.selected_sourcefields.append(fieldname)
-		
-		else:
-			for sourcefield in sourcefields:
-				if sourcefield in self.fieldconf.result_fields:
-					self.selected_sourcefields.append(sourcefield)
-			if 'PartAccessionNumber' not in self.selected_sourcefields:
-				self.selected_sourcefields.insert(0, 'PartAccessionNumber')
-		return
-
+		self.selected_sourcefields = selected_sourcefields
 
 	def __getComplexElements(self, doc_element, keys_list, valuelist = []):
 		for key in keys_list:

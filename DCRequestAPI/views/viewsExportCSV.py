@@ -62,9 +62,7 @@ class ExportCSVView():
 		response.app_iter = csv_generator.yield_CSV_pages()
 		response.headers['Content-Disposition'] = ("attachment; filename={0}".format(filename))
 		return response
-		
-		
-		
+
 
 class CSVGenerator():
 	def __init__(self, search_params, uid, users_project_ids):
@@ -78,18 +76,17 @@ class CSVGenerator():
 		# set pagesize to 10000 because large pagesizes are faster than small pagesizes
 		search_params['pagesize'] = 10000
 		
-		self.iupartstable = IUPartsTable()
-		if len(self.search_params['result_table_columns']) > 0:
-			self.iupartstable.setSelectedSourceFields(self.search_params['result_table_columns'])
+		self.iupartstable = IUPartsTable(self.search_params['result_table_columns'])
 		self.selected_sourcefields = self.iupartstable.selected_sourcefields
-		
-	
+
+
 	def set_es_searcher(self):
 		self.es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
 		self.es_searcher.setSourceFields(self.selected_sourcefields)
 		self.maxpage, self.resultnum = self.es_searcher.countResultDocsSearch()
 		return
-	
+
+
 	def get_header_row(self):
 		coldefs = self.iupartstable.coldefs
 		headers = []
@@ -100,7 +97,8 @@ class CSVGenerator():
 				headers.append('')
 		header_row = ', '.join(["'" + head + "'" for head in headers])
 		return header_row
-	
+
+
 	def yield_CSV_pages(self):
 		page = 1
 		header_row = self.get_header_row()

@@ -22,7 +22,7 @@ class AggsSuggestions(QueryConstructor):
 		
 		fielddefs = FieldDefinitions()
 		if len(self.source_fields) <= 0:
-			self.source_fields = fielddefs.bucketfields
+			self.source_fields = fielddefs.term_fields
 		
 		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.source_fields)
 		
