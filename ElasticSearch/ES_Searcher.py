@@ -84,7 +84,6 @@ class ES_Searcher():
 
 
 	def __setSorting(self):
-		#pudb.set_trace()
 		self.__readIndexMapping()
 		self.sort = [{"PartAccessionNumber.keyword_lc":{"order":"asc"}}]
 		
@@ -146,7 +145,7 @@ class ES_Searcher():
 				self.term_filters.append(field)
 			elif field in self.fieldconfig.date_fields:
 				self.date_filters.append(field)
-			elif field in self.fieldconfig.hierarchy_fields:
+			elif field in self.fieldconfig.hierarchy_filter_fields:
 				self.hierarchy_filters.append(field)
 		return
 
@@ -494,7 +493,6 @@ class ES_Searcher():
 
 
 	def __getBucketListFromAggregation(self, raw_aggregation):
-		pudb.set_trace()
 		buckets = []
 		if 'buckets' in raw_aggregation:
 			if isinstance(raw_aggregation['buckets'], list) or isinstance(raw_aggregation['buckets'], tuple):
@@ -508,7 +506,6 @@ class ES_Searcher():
 
 
 	def __getBucketListFromCompositeAggregation(self, raw_aggregation):
-		#pudb.set_trace()
 		buckets = []
 		
 		try:

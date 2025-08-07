@@ -240,7 +240,7 @@ class DefaultParamsSetter():
 	def set_hierarchy_filters(self):
 		hierarchy_filters = {}
 		for key in self.search_params['hierarchies']:
-			if key in self.fieldconf.hierarchy_fields:
+			if key in self.fieldconf.hierarchy_filter_fields:
 				hierarchy_filters[key] = self.search_params['hierarchies'][key]
 		self.search_params['hierarchies'] = hierarchy_filters
 
@@ -283,7 +283,7 @@ class DefaultParamsSetter():
 	def set_open_hierarchy_selectors(self):
 		open_hierarchy_selectors = []
 		for field in self.search_params['open_hierarchy_selectors']:
-			if field in self.fieldconf.hierarchy_fields:
+			if field in self.fieldconf.hierarchy_filter_fields:
 				open_hierarchy_selectors.append(field)
 		self.search_params['open_hierarchy_selectors'] = open_hierarchy_selectors
 	'''

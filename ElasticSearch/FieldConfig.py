@@ -111,7 +111,7 @@ class FieldConfig:
 			{'MatchedTaxaTree.Subfamily': [True, False, 'term']},
 			{'MatchedTaxaTree.Genus': [True, False, 'term']},
 			#{'MatchedTaxaTree.Subgenus': [False, False, 'term']},
-			{'MatchedTaxaHierarchyString': [True, False, 'hierarchy']},
+			#{'MatchedTaxaHierarchyString': [False, False, 'hierarchy']},
 			{'TypeStatus': [True, True, 'term']},
 			{'CountryCache': [True, True, 'term']},
 			{'CollectionDate': [True, True, 'date']},
@@ -316,6 +316,7 @@ class FieldConfig:
 			if hierarchy_filter in self.fielddefinitions:
 				hierarchy_filter_names[hierarchy_filter] = self.fielddefinitions[hierarchy_filter]['names']
 		return hierarchy_filter_names
+
 
 	def setFieldDefinitions(self):
 		"""

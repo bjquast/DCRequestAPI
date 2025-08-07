@@ -19,7 +19,6 @@ import json
 
 class HierarchiesView():
 	def __init__(self, request):
-		
 		self.request = request
 		self.uid = self.request.authenticated_userid
 		

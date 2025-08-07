@@ -3,6 +3,7 @@ from pyramid.renderers import render_to_response
 from pyramid.view import (view_config, view_defaults)
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPSeeOther
 
+from ElasticSearch.FieldConfig import FieldConfig
 from ElasticSearch.ES_Searcher import ES_Searcher
 
 from DCRequestAPI.lib.SearchResults.IUPartsTable import IUPartsTable
@@ -66,6 +67,7 @@ class ExportCSVView():
 
 class CSVGenerator():
 	def __init__(self, search_params, uid, users_project_ids):
+		self.fieldconf = FieldConfig()
 		self.search_params = search_params
 		self.uid = uid
 		self.users_project_ids = users_project_ids
@@ -88,11 +90,11 @@ class CSVGenerator():
 
 
 	def get_header_row(self):
-		coldefs = self.iupartstable.coldefs
+		colnames = self.fieldconf.getColNames()
 		headers = []
 		for source_field in self.selected_sourcefields:
-			if source_field in coldefs:
-				headers.append(coldefs[source_field]['en'])
+			if source_field in colnames:
+				headers.append(colnames[source_field]['en'])
 			else:
 				headers.append('')
 		header_row = ', '.join(["'" + head + "'" for head in headers])
