@@ -99,7 +99,6 @@ class IUPartsListView():
 	@view_config(route_name='iupartslist', accept='text/html', renderer="DCRequestAPI:templates/iupartslist.pt")
 	def IUPartsListHTML(self):
 		pudb.set_trace()
-		
 		column_names = self.fieldconfig.getColNames()
 		filter_names = self.fieldconfig.getFilterNames()
 		hierarchy_filter_names = self.fieldconfig.getHierarchyFilterNames()
@@ -153,7 +152,6 @@ class IUPartsListView():
 			'authenticated_user': self.uid,
 			'messages': self.messages
 		}
-		pudb.set_trace()
 		return pagecontent
 
 

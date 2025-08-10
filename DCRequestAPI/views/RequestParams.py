@@ -8,6 +8,7 @@ from ElasticSearch.FieldConfig import FieldConfig
 class RequestParams():
 	def __init__(self, request):
 		self.request = request
+		self.fieldconf = FieldConfig()
 		
 		self.read_request_params()
 		self.read_search_params()
@@ -36,8 +37,8 @@ class RequestParams():
 
 
 	def read_stack_queries_params(self):
-		
-		terms_pattern = re.compile(r'stack_query_terms_(\d+)_(\d+)$')
+		pudb.set_trace()
+		query_pattern = re.compile(r'stack_query_((terms)|(date_from)|(date_to))_(\d+)_(\d+)$')
 		
 		query_dicts = {}
 		query_counts = []
@@ -45,48 +46,62 @@ class RequestParams():
 		
 		for param in self.params_dict:
 			if param.startswith('stack_query_terms_'):
-				m = terms_pattern.match(param)
+				m = query_pattern.match(param)
 				if m is not None:
-					query_count = m.group(1)
-					term_count = m.group(2)
+					query_type = 'term'
+					if m.group(1) in ['date_from', 'date_to']:
+						query_type = 'date'
+					query_count = m.group(5)
+					subquery_count = m.group(6)
 					
-					term = self.params_dict.get('stack_query_terms_{0}_{1}'.format(query_count, term_count), [''])[-1]
-					field = self.params_dict.get('stack_query_fields_{0}_{1}'.format(query_count, term_count), [''])[-1]
+					query_string = self.params_dict.get('stack_query_terms_{0}_{1}'.format(query_count, subquery_count), [''])[-1]
+					field = self.params_dict.get('stack_query_fields_{0}_{1}'.format(query_count, subquery_count), [''])[-1]
 					
-					if term is not None and field is not None:
+					if query_string and field and query_type:
+						
 						if query_count not in query_dicts:
 							query_counts.append(query_count)
 							query_dicts[query_count] = {
 								'terms': [],
 								'fields': [],
+								'query_types': [],
 								'outer_connector': self.params_dict.get('stack_search_outer_connector_{0}'.format(query_count), ['AND'])[-1],
 								'inner_connector': self.params_dict.get('stack_search_inner_connector_{0}'.format(query_count), ['AND'])[-1]
 							}
 							if 'stack_search_add_subquery_{0}'.format(query_count) in self.params_dict:
 								query_dicts[query_count]['add_subquery'] = True
-							if 'stack_search_delete_subquery_{0}'.format(query_count) in self.params_dict:
-								query_dicts[query_count]['delete_subquery'] = True
+							#if 'stack_search_delete_subquery_{0}'.format(query_count) in self.params_dict:
+							#	query_dicts[query_count]['delete_subquery'] = True
 						
-						query_dicts[query_count]['terms'].append(term)
+						query_dicts[query_count]['terms'].append(query_string)
 						query_dicts[query_count]['fields'].append(field)
+						query_dicts[query_count]['query_types'].append(query_type)
 		
 		for query_count in query_dicts:
+			'''
+			# is 'delete_subquery' needed? The buttons for deleting subqueries were not shown any more
+			# and subqueries are deleted when their query_string is empty
 			if 'delete_subquery' in query_dicts[query_count] and len(query_dicts[query_count]['terms']) > 1:
 				query_dicts[query_count]['terms'].pop()
 				query_dicts[query_count]['fields'].pop()
+				query_dicts[query_count]['query_types'].pop()
+			'''
 			
 			terms_copy = []
 			fields_copy = []
+			types_copy = []
 			for i in range(len(query_dicts[query_count]['terms'])):
 				if len(query_dicts[query_count]['terms'][i]) > 0:
 					terms_copy.append(query_dicts[query_count]['terms'][i])
 					fields_copy.append(query_dicts[query_count]['fields'][i])
+					types_copy.append(query_dicts[query_count]['query_types'][i])
 			query_dicts[query_count]['terms'] = terms_copy
 			query_dicts[query_count]['fields'] = fields_copy
+			query_dicts[query_count]['query_types'] = types_copy
 			
 			if len(query_dicts[query_count]['terms']) > 0:
 				self.search_params['stack_queries'].append(query_dicts[query_count])
-		
+		pudb.set_trace()
 		return
 
 

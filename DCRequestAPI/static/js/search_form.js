@@ -11,6 +11,7 @@ const stacked_search = new StackedSearch();
 
 $(document).ready( function() {
 	stacked_search.add_subsearch_events();
+	stacked_search.add_field_selector_events();
 	
 	filterlists.add_filter_events();
 	filterlists.set_more_button_events();

@@ -18,7 +18,6 @@ import json
 
 class AggregationView():
 	def __init__(self, request):
-		pudb.set_trace()
 		self.request = request
 		self.uid = self.request.authenticated_userid
 		
@@ -55,8 +54,6 @@ class AggregationView():
 
 	@view_config(route_name='aggregation', accept='application/json', renderer="json")
 	def viewAggregationJSON(self):
-		pudb.set_trace()
-		
 		if 'buckets_search_term' in self.search_params:
 			buckets_search_term = self.search_params['buckets_search_term']
 		else:

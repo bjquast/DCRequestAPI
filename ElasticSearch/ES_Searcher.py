@@ -172,8 +172,6 @@ class ES_Searcher():
 
 	def setQuery(self):
 		self.query = {"bool": {"must": [], "should": [], "filter": []}}
-		pudb.set_trace()
-		
 		
 		if 'term_filters' in self.search_params:
 			connector = 'AND'
@@ -191,7 +189,6 @@ class ES_Searcher():
 			filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids, source_fields = hierarchy_bucket_fields, connector = connector).getTermFilterQueries(self.search_params['term_filters'])
 			self.query['bool']["filter"].extend(filter_queries)
 		
-		#pudb.set_trace()
 		'''
 		if 'range_queries' in self.search_params:
 			connector = 'AND'
@@ -253,7 +250,7 @@ class ES_Searcher():
 		source_fields = False
 		
 		response = self.client.search(index=self.index, query=self.query, source=source_fields, aggs=aggs, size = 0)
-		pudb.set_trace()
+		
 		buckets = []
 		if 'aggregations' in response:
 			self.raw_aggregations = response['aggregations']
@@ -398,7 +395,6 @@ class ES_Searcher():
 
 
 	def paginatedSearch(self):
-		pudb.set_trace()
 		self.updateMaxResultWindow(max_result_window=2000000)
 		self.__setPageSize()
 		self.__setStartRow()
