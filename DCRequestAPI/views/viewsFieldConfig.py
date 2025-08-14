@@ -50,7 +50,6 @@ class FieldConfigView():
 
 	@view_config(route_name='get_field_type', accept='application/json', renderer='json')
 	def get_field_type(self):
-		pudb.set_trace()
 		if 'fieldname' in self.request.matchdict:
 			fieldname = self.request.matchdict['fieldname']
 		else:

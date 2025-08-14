@@ -43,29 +43,33 @@ class StackedSearch {
 		.done( function(data) {
 			console.log(data);
 			self.query_type = data['field_type'];
-			
+			self.set_input_field(query_id);
 		})
 	}
 	
 	set_input_field(query_id) {
 		let self = this;
 		let query_count_string = query_id.substring(16);
-		let current_query_type = $('#' + query_id).data('query-type');
+		let current_query_type = $('#' + query_id).attr('data-query-type');
+		
+		console.log('##########', current_query_type, self.query_type);
 		if (current_query_type != self.query_type) {
+			console.log('####### aaaaaaaaaa');
 			if (self.query_type == 'date') {
-				$('#' + query_id + ' > input[type=text]').each( function () {
-					$(this).remove();
-					$(this).append('<label>Date from: </label>');
-					$(this).append('<input type="date" class="width-8em with_clearbutton" name="stack_query_dates_from_' + query_count_string +'" />');
-					$(this).append('<label>Date to: </label>');
-					$(this).append('<input type="date" class="width-8em with_clearbutton" name="stack_query_dates_to_' + query_count_string +'" />');
-				});
+				console.log('####### 22222222222');
+				
+				$('#' + query_id).empty();
+				$('#' + query_id).append('<label>Date from: </label>');
+				$('#' + query_id).append('<input type="date" class="width-8em with_clearbutton" name="stack_query_dates_from_' + query_count_string +'" />');
+				$('#' + query_id).append('<label>Date to: </label>');
+				$('#' + query_id).append('<input type="date" class="width-8em with_clearbutton" name="stack_query_dates_to_' + query_count_string +'" />');
+				$('#' + query_id).attr('data-query-type', 'date');
 			}
 			else if (self.query_type == 'term') {
-				$('#' + query_id + ' > input[type=date]').each( function () {
-					$(this).remove();
-					$(this).append('<input type="text" class="width-8em with_clearbutton" value="" name="stack_query_terms_' + query_count_string +'" />');
-				});
+				console.log('####### cccccccccc');
+				$('#' + query_id).empty();
+				$('#' + query_id).append('<input type="text" class="width-8em with_clearbutton" value="" name="stack_query_terms_' + query_count_string +'" />');
+				$('#' + query_id).attr('data-query-type', 'term');
 			}
 		}
 		

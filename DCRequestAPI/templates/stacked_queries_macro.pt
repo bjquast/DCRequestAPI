@@ -96,7 +96,7 @@
 						</select>
 					</div>
 					<!-- input for search terms -->
-					<div id="stack_query_id_${i}_0">
+					<div id="stack_query_id_${i}_0" data-query-type="term">
 						<span class="invisible">(</span>
 						<input id="stack_query_terms_${i}_0" form="search_form" class="width-8em with_clearbutton" type="text" name="stack_query_terms_${i}_0" value=""/>
 						

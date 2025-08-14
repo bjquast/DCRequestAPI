@@ -201,6 +201,7 @@ class FieldConfig:
 			'HabitatDescription',
 			'CollectingMethod',
 			'CountryCache',
+			'CollectionDate',
 			'CollectionAgents.CollectorsName',
 			'LifeStage',
 			'Gender',
