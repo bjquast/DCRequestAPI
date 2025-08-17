@@ -1,4 +1,4 @@
-<div>
+<div id="stacked_queries_macro">
 	<fieldset id="stacked_queries_search" class="flex-space-between-no-margin">
 		<legend>Search</legend>
 		<div class="flex-start-no-margin">
@@ -21,12 +21,12 @@
 										<!-- the starting parenthesis for subguery -->
 										<span tal:attributes="class '' if (len(search_params['stack_queries'][i]['terms']) > 1 or 'add_subquery' in search_params['stack_queries'][i]) and j == 0 else 'invisible'">(</span>
 										<!-- a filled search field -->
-										<span tal:condition="python: len(search_term) > 0" id="stack_query_id_${i}_${j}" data-query-type="${search_params['stack_queries'][i]['query_types'][j]}">
-											<input tal:condition="python: search_params['stack_queries'][i]['query_types'][j] == 'term'" form="search_form" type="text" class="width-8em with_clearbutton" value="${search_term}" name="stack_query_terms_${i}_${j}" />
-											<label tal:condition="python: search_params['stack_queries'][i]['query_types'][j] == 'date'">Date from: </label>
-											<input tal:condition="python: search_params['stack_queries'][i]['query_types'][j] == 'date'" form="search_form" type="date" class="width-8em with_clearbutton" value="${search_term}" name="stack_query_dates_from_${i}_${j}" />
-											<label tal:condition="python: search_params['stack_queries'][i]['query_types'][j] == 'date'">Date to: </label>
-											<input tal:condition="python: search_params['stack_queries'][i]['query_types'][j] == 'date'" form="search_form" type="date" class="width-8em with_clearbutton" value="${search_term}" name="stack_query_dates_to_${i}_${j}" />
+										<span tal:condition="python: len(search_term) > 0" id="stack_query_id_${i}_${j}">
+											<input tal:condition="python: search_params['stack_queries'][i]['fields'][j] not in date_fields" form="search_form" type="text" class="width-8em with_clearbutton" value="${search_term}" name="stack_query_terms_${i}_${j}" />
+											<label tal:condition="python: search_params['stack_queries'][i]['fields'][j] in date_fields">Date from: </label>
+											<input tal:condition="python: search_params['stack_queries'][i]['fields'][j] in date_fields" form="search_form" type="date" class="width-8em with_clearbutton" value="${search_term}" name="stack_query_dates_from_${i}_${j}" />
+											<label tal:condition="python: search_params['stack_queries'][i]['fields'][j] in date_fields">Date to: </label>
+											<input tal:condition="python: search_params['stack_queries'][i]['fields'][j] in date_fields" form="search_form" type="date" class="width-8em with_clearbutton" value="${search_term}" name="stack_query_dates_to_${i}_${j}" />
 											<select form="search_form" name="stack_query_fields_${i}_${j}" class="width-8em stack_query_field_selector">
 												<option tal:attributes="selected 'selected' if search_params['stack_queries'][i]['fields'][j] == 'all fields' else None" value="all fields">all fields</option>
 												<block tal:repeat="source_field stacked_query_fields" tal:omit-tag="">
@@ -45,7 +45,7 @@
 								<!-- empty subquery -->
 								<div tal:condition="'add_subquery' in search_params['stack_queries'][i]" class="no-whitespace-wrap">
 									<block tal:define="j len(search_params['stack_queries'][i]['terms'])" tal:omit-tag="">
-										<span id="stack_query_id_${i}_${j}" data-query-type="${search_params['stack_queries'][i]['query_types'][j]}">
+										<span id="stack_query_id_${i}_${j}">
 											<span class="invisible">(</span>
 											<input id="stack_query_terms_${i}_${j}" form="search_form" class="width-8em with_clearbutton" type="text" name="stack_query_terms_${i}_${j}" value=""/>
 											<!-- field selector -->
@@ -87,32 +87,42 @@
 				</block>
 				
 				<!-- add an empty input field -->
-				<block tal:define="i len(search_params['stack_queries']) | 0" tal:omit-tag="">
+				<block tal:define="next_i len(search_params['stack_queries']) | 0" tal:omit-tag="">
 					<!-- outer connector for the rows. first is empty -->
 					<div>
-						<select name="stack_search_outer_connector_${i}" tal:attributes="class 'hidden' if i < 1 else None">
+						<select name="stack_search_outer_connector_${next_i}" tal:attributes="class 'hidden' if next_i < 1 else None">
 							<option>AND</option>
 							<option>OR</option>
 						</select>
 					</div>
 					<!-- input for search terms -->
-					<div id="stack_query_id_${i}_0" data-query-type="term">
+					<div id="stack_query_id_${next_i}_0">
 						<span class="invisible">(</span>
-						<input id="stack_query_terms_${i}_0" form="search_form" class="width-8em with_clearbutton" type="text" name="stack_query_terms_${i}_0" value=""/>
-						
-						<!-- field selector -->
-						<select form="search_form" name="stack_query_fields_${i}_0" class="width-8em stack_query_field_selector">
-							<option value="all fields">all fields</option>
-							<option tal:repeat="source_field stacked_query_fields" value="${source_field}">
-								${coldefs[source_field]['en']}
-							</option>
-						</select>
+						<block tal:condition="python: len(search_params['stack_queries']) <= 0" tal:omit-tag="">
+							<input id="stack_query_terms_${next_i}_0" form="search_form" class="width-8em with_clearbutton" type="text" name="stack_query_terms_${next_i}_0" value=""/>
+							<select form="search_form" name="stack_query_fields_${next_i}_0" class="width-8em stack_query_field_selector">
+								<option value="all fields">all fields</option>
+								<option tal:repeat="source_field stacked_query_fields" value="${source_field}">
+									${coldefs[source_field]['en']}
+								</option>
+							</select>
+						</block>
+						<block tal:condition="python: len(search_params['stack_queries']) > 0" tal:omit-tag="">
+							<input id="stack_query_terms_${next_i}_0" form="search_form" class="width-8em with_clearbutton" type="text" name="stack_query_terms_${next_i}_0" value=""/>
+							<!-- field selector -->
+							<select form="search_form" name="stack_query_fields_${next_i}_0" class="width-8em stack_query_field_selector">
+								<option value="all fields">all fields</option>
+								<option tal:repeat="source_field stacked_query_fields" value="${source_field}">
+									${coldefs[source_field]['en']}
+								</option>
+							</select>
+						</block>
 						
 						<!-- inner search terms connector -->
-						<block tal:define="token_num len(search_params['stack_queries'][i]['terms']) | 0" tal:omit-tag="">
+						<block tal:define="token_num len(search_params['stack_queries'][next_i]['terms']) | 0" tal:omit-tag="">
 							<span tal:attributes="class 'hidden' if token_num < 1 else None">
 								<label> connect by </label>
-								<select name="stack_search_inner_connector_${i}">
+								<select name="stack_search_inner_connector_${next_i}">
 									<option>AND</option>
 									<option>OR</option>
 								</select>

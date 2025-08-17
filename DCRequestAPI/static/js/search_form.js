@@ -12,7 +12,8 @@ const stacked_search = new StackedSearch();
 $(document).ready( function() {
 	stacked_search.add_subsearch_events();
 	stacked_search.add_field_selector_events();
-	
+	stacked_search.set_input_clearbuttons();
+
 	filterlists.add_filter_events();
 	filterlists.set_more_button_events();
 	filterlists.add_collapsible_filters_events();
@@ -26,8 +27,6 @@ $(document).ready( function() {
 	
 	aggs_suggestions.add_suggestion_events();
 	appliedfilters.add_remove_filter_events();
-	
-	set_input_clearbuttons();
 	
 	add_users_projects_restriction_event();
 	
@@ -87,18 +86,6 @@ function add_logout_event() {
 		$("#search_form").submit();
 	});
 }
-
-function set_input_clearbuttons() {
-	$('.input_delete_wrapper').remove();
-	$('.delete_icon').remove();
-	$('input.with_clearbutton').each( function() {
-		
-		$(this).wrap('<span class="input_delete_wrapper"></span>').after($('<span class="delete_icon">x</span>').click(function() {
-			$(this).prev('input').val('').trigger('change').focus();
-		}));
-	});
-}
-
 
 function add_column_selector_event() {
 	$('#column_preferences').on('toggle', function() {

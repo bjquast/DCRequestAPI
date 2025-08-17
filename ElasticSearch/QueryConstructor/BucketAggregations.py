@@ -40,7 +40,7 @@ class BucketAggregations(QueryConstructor):
 		self.setSubFilters()
 
 
-	def getSearchQuery(self, field_defs, field, case_insensitive):
+	def __getSearchQuery(self, field_defs, field, case_insensitive):
 		search_filter = {}
 		if self.buckets_search_term is not None:
 			if self.prefix_or_match == 'prefix':
@@ -78,7 +78,7 @@ class BucketAggregations(QueryConstructor):
 		for field in self.simple_fields:
 			
 			case_insensitive = self.getCaseInsensitiveValue(self.simple_fields[field])
-			search_query = self.getSearchQuery(self.simple_fields, field, case_insensitive)
+			search_query = self.__getSearchQuery(self.simple_fields, field, case_insensitive)
 			
 			self.aggs_query[field] = {
 				"filter": {
@@ -110,7 +110,7 @@ class BucketAggregations(QueryConstructor):
 		for field in self.nested_fields:
 			
 			case_insensitive = self.getCaseInsensitiveValue(self.nested_fields[field])
-			search_query = self.getSearchQuery(self.nested_fields, field, case_insensitive)
+			search_query = self.__getSearchQuery(self.nested_fields, field, case_insensitive)
 			
 			self.aggs_query[field] = {
 				'nested': {
@@ -157,7 +157,7 @@ class BucketAggregations(QueryConstructor):
 		for field in self.nested_restricted_fields:
 			
 			case_insensitive = self.getCaseInsensitiveValue(self.nested_restricted_fields[field])
-			search_query = self.getSearchQuery(self.nested_restricted_fields, field, case_insensitive)
+			search_query = self.__getSearchQuery(self.nested_restricted_fields, field, case_insensitive)
 			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.nested_restricted_fields[field]['withholdflags']]
 			
 			self.aggs_query[field] = {
@@ -215,7 +215,7 @@ class BucketAggregations(QueryConstructor):
 		for field in self.simple_restricted_fields:
 			
 			case_insensitive = self.getCaseInsensitiveValue(self.simple_restricted_fields[field])
-			search_query = self.getSearchQuery(self.simple_restricted_fields, field, case_insensitive)
+			search_query = self.__getSearchQuery(self.simple_restricted_fields, field, case_insensitive)
 			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.simple_restricted_fields[field]['withholdflags']]
 			
 			self.aggs_query[field] = {

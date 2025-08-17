@@ -8,7 +8,8 @@ from DCRequestAPI.views.RequestParams import RequestParams
 
 import pudb
 
-class FieldConfigView():
+
+class StackQueriesFormView():
 	def __init__(self, request):
 		self.request = request
 		self.uid = self.request.authenticated_userid
@@ -43,23 +44,15 @@ class FieldConfigView():
 		self.messages.extend(self.userlogin.get_messages())
 
 
-	@view_config(route_name='get_field_type', accept='application/json', renderer='json')
-	def get_field_type(self):
-		if 'fieldname' in self.request.matchdict:
-			fieldname = self.request.matchdict['fieldname']
-		else:
-			return HTTPBadRequest(detail = 'Field name missing in request. Add field name to the end of the url: {0}/get_field_type/{fieldname}'.format(self.request.application_url))
-		
+	@view_config(route_name='stacked_queries_form', accept='application/json', renderer='DCRequestAPI:templates/stacked_queries_macro.pt')
+	def stacked_queries_form(self):
+		pudb.set_trace()
 		response = {
-			'field_type': None
+			'search_params': self.search_params,
+			'coldefs': self.fieldconfig.getColNames(),
+			'stacked_query_fields': self.fieldconfig.stacked_query_fields,
+			'term_fields': self.fieldconfig.term_fields,
+			'date_fields': self.fieldconfig.date_fields,
+			'authenticated_user': self.uid,
 		}
-		
-		if fieldname in self.fieldconfig.date_fields:
-			response['field_type'] = 'date'
-		else:
-			response['field_type'] = 'term'
-		
 		return response
-
-
-

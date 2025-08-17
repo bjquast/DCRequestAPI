@@ -290,7 +290,6 @@ class ES_Searcher():
 
 	def singleAggregationSearch(self, aggregation_name, buckets_search_term = None, size = 5000, buckets_sort_alphanum = True, buckets_sort_dir = 'asc'):
 		self.setQuery()
-		pudb.set_trace()
 		
 		if aggregation_name in self.fieldconfig.date_fields:
 			buckets_query = DateAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size, 

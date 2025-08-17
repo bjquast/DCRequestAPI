@@ -648,18 +648,17 @@ class FieldConfig:
 			
 			field_keys = field.split('.')
 			
-			sub_dict = dict(self.es_mappings)
+			mapping = dict(self.es_mappings)
 			for key in field_keys:
-				if key in sub_dict['properties']:
-					sub_dict = sub_dict['properties'][key]
+				if key in mapping['properties']:
+					mapping = mapping['properties'][key]
 			
-					if 'type' in sub_dict:
+					if 'type' in mapping:
 						if 'buckets' in self.fielddefinitions[field]:
-							self.fielddefinitions[field]['buckets']['types'] = [sub_dict['type']]
-							if 'fields' in sub_dict:
-								for typename in sub_dict['fields']:
+							self.fielddefinitions[field]['buckets']['types'] = [mapping['type']]
+							if 'fields' in mapping:
+								for typename in mapping['fields']:
 									self.fielddefinitions[field]['buckets']['types'].append(typename)
-		
 		return
 
 

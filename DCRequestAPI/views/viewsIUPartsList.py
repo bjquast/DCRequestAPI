@@ -98,7 +98,6 @@ class IUPartsListView():
 
 	@view_config(route_name='iupartslist', accept='text/html', renderer="DCRequestAPI:templates/iupartslist.pt")
 	def IUPartsListHTML(self):
-		pudb.set_trace()
 		column_names = self.fieldconfig.getColNames()
 		filter_names = self.fieldconfig.getFilterNames()
 		hierarchy_filter_names = self.fieldconfig.getHierarchyFilterNames()
@@ -145,6 +144,8 @@ class IUPartsListView():
 			'open_filter_selectors': self.search_params['open_filter_selectors'],
 			'selected_filter_sections': self.search_params['selected_filter_sections'],
 			'stacked_query_fields': self.fieldconfig.stacked_query_fields,
+			'term_fields': self.fieldconfig.term_fields,
+			'date_fields': self.fieldconfig.date_fields,
 			'hierarchy_filter_fields': hierarchy_filter_fields,
 			'open_hierarchy_selectors': self.search_params['open_hierarchy_selectors'],
 			'hierarchy_pathes_dict': self.search_params['hierarchies'],
@@ -152,6 +153,7 @@ class IUPartsListView():
 			'authenticated_user': self.uid,
 			'messages': self.messages
 		}
+		pudb.set_trace()
 		return pagecontent
 
 

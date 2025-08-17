@@ -37,6 +37,7 @@ def main(global_config, **settings):
 	config.add_route('logout', '/logout')
 	
 	config.add_route('get_field_type', '/get_field_type/{fieldname}')
+	config.add_route('stacked_queries_form', '/stacked_queries_form')
 	
 	config.add_static_view(name='static', path='DCRequestAPI:static')
 	
