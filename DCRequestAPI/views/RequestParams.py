@@ -47,10 +47,11 @@ class RequestParams():
 					query_type = m.group(1)
 					query_count = m.group(5)
 					subquery_count = m.group(6)
-					
+					# if there are more than one parameter with the same query_count and subquery_count take only the last one, if there is no parameter value
+					# for the parameter add an empty string
 					query_string = self.params_dict.get('stack_query_{0}_{1}_{2}'.format(query_type, query_count, subquery_count), [''])[-1]
 					field = self.params_dict.get('stack_query_fields_{0}_{1}'.format(query_count, subquery_count), [''])[-1]
-					if query_string:
+					if field != '':
 						if query_count not in query_dicts:
 							query_dicts[query_count] = {
 								'terms': [],
@@ -85,7 +86,6 @@ class RequestParams():
 			query_dicts[query_count]['fields'] = fields_copy
 			
 			self.search_params['stack_queries'].append(query_dicts[query_count])
-		pudb.set_trace()
 		return
 
 

@@ -43,9 +43,7 @@ class StackedSearch {
 		let self = this
 		let form = document.getElementById("search_form");
 		let formdata= new FormData(form);
-
-		console.log('####', formdata);
-
+		
 		$.ajax({
 			url: "./stacked_queries_form",
 			type: 'POST',
@@ -57,7 +55,6 @@ class StackedSearch {
 			console.log(textStatus, errorThrown);
 		})
 		.done( function(data) {
-			console.log('#########################', data);
 			self.update_stacked_queries(data);
 		})
 	}
