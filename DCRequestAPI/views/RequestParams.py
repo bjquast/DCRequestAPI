@@ -51,11 +51,12 @@ class RequestParams():
 					# for the parameter add an empty string
 					query_string = self.params_dict.get('stack_query_{0}_{1}_{2}'.format(query_type, query_count, subquery_count), [''])[-1]
 					field = self.params_dict.get('stack_query_fields_{0}_{1}'.format(query_count, subquery_count), [''])[-1]
-					if field != '':
+					if query_string:
 						if query_count not in query_dicts:
 							query_dicts[query_count] = {
 								'terms': [],
 								'fields': [],
+								'query_types': [],
 								'outer_connector': self.params_dict.get('stack_search_outer_connector_{0}'.format(query_count), ['AND'])[-1],
 								'inner_connector': self.params_dict.get('stack_search_inner_connector_{0}'.format(query_count), ['AND'])[-1]
 							}
@@ -66,6 +67,11 @@ class RequestParams():
 						
 						query_dicts[query_count]['terms'].append(query_string)
 						query_dicts[query_count]['fields'].append(field)
+						if query_type in ['date_from', 'date_to']:
+							query_dicts[query_count]['query_types'].append('date')
+						elif query_type in ['terms']:
+							query_dicts[query_count]['query_types'].append('term')
+						
 		
 		for query_count in query_dicts:
 			'''
@@ -79,11 +85,14 @@ class RequestParams():
 			
 			terms_copy = []
 			fields_copy = []
+			query_types_copy = []
 			for i in range(len(query_dicts[query_count]['terms'])):
 				terms_copy.append(query_dicts[query_count]['terms'][i])
 				fields_copy.append(query_dicts[query_count]['fields'][i])
+				query_types_copy.append(query_dicts[query_count]['query_types'][i])
 			query_dicts[query_count]['terms'] = terms_copy
 			query_dicts[query_count]['fields'] = fields_copy
+			query_dicts[query_count]['query_types'] = query_types_copy
 			
 			self.search_params['stack_queries'].append(query_dicts[query_count])
 		return

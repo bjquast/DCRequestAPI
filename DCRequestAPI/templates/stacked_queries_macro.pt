@@ -21,7 +21,7 @@
 										<!-- the starting parenthesis for subguery -->
 										<span tal:attributes="class '' if (len(search_params['stack_queries'][i]['terms']) > 1 or 'add_subquery' in search_params['stack_queries'][i]) and j == 0 else 'invisible'">(</span>
 										<!-- a filled search field -->
-										<span tal:condition="python: len(search_term) > 0" id="stack_query_id_${i}_${j}">
+										<span tal:condition="python: len(search_term) > 0" id="stack_query_id_${i}_${j}" data-query-type="search_params['stack_queries'][i]['query_types'][j]">
 											<input tal:condition="python: search_params['stack_queries'][i]['fields'][j] not in date_fields" form="search_form" type="text" class="width-8em with_clearbutton" value="${search_term}" name="stack_query_terms_${i}_${j}" />
 											<label tal:condition="python: search_params['stack_queries'][i]['fields'][j] in date_fields">Date from: </label>
 											<input tal:condition="python: search_params['stack_queries'][i]['fields'][j] in date_fields" form="search_form" type="date" class="width-8em with_clearbutton" value="${search_term}" name="stack_query_dates_from_${i}_${j}" />
@@ -45,7 +45,7 @@
 								<!-- empty subquery -->
 								<div tal:condition="'add_subquery' in search_params['stack_queries'][i]" class="no-whitespace-wrap">
 									<block tal:define="j len(search_params['stack_queries'][i]['terms'])" tal:omit-tag="">
-										<span id="stack_query_id_${i}_${j}">
+										<span id="stack_query_id_${i}_${j}" data-query-type="search_params['stack_queries'][i]['query_types'][j]">
 											<span class="invisible">(</span>
 											<input id="stack_query_terms_${i}_${j}" form="search_form" class="width-8em with_clearbutton" type="text" name="stack_query_terms_${i}_${j}" value=""/>
 											<!-- field selector -->
@@ -96,7 +96,7 @@
 						</select>
 					</div>
 					<!-- input for search terms -->
-					<div id="stack_query_id_${next_i}_0">
+					<div id="stack_query_id_${next_i}_0" data-query-type="term">
 						<span class="invisible">(</span>
 						<block tal:condition="python: len(search_params['stack_queries']) <= 0" tal:omit-tag="">
 							<input id="stack_query_terms_${next_i}_0" form="search_form" class="width-8em with_clearbutton" type="text" name="stack_query_terms_${next_i}_0" value=""/>
