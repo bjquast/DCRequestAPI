@@ -53,6 +53,11 @@ class StackedSearch {
 
 
 	change_input_type(query_id, field) {
+		/* 
+		 * read the type of the field as defined in FielddConfig.py
+		 * to access the data from FieldConfig.py do a jsonp request
+		 * change the input fields and labels accordingly with self.set_input_field();
+		*/
 		let self = this;
 		console.log(query_id);
 		console.log(field);
@@ -73,14 +78,12 @@ class StackedSearch {
 
 	set_input_field(query_id, query_type, field) {
 		let self = this;
-		let query_count_string = query_id.substring(16);
+		let query_index = query_id.substring(15);
 		let current_query_type = $('#' + query_id).attr('data-query-type');
 		
 		if (current_query_type != query_type) {
-			console.log('##########', query_type);
-			
+			console.log('##########', current_query_type, query_type);
 			if (query_type == 'date') {
-				console.log('####### 22222222222');
 				
 				$('#' + query_id + ' label').each( function () {
 					$(this).remove();
@@ -92,11 +95,10 @@ class StackedSearch {
 					$(this).remove();
 				});
 				
-				console.log( $('#' + query_id + ' input').val(), '###############', $('#' + query_id + ' input'));
-				$('#' + query_id).prepend('<input type="date" class="width-8em with_clearbutton" name="stack_query_dates_to_' + query_count_string +'" />');
+				$('#' + query_id).prepend('<input type="date" class="width-8em with_clearbutton" name="stack_query_date_to_' + query_index +'" />');
 				$('#' + query_id).prepend('<label>Date to: </label>');
 				
-				$('#' + query_id).prepend('<input type="date" class="width-8em with_clearbutton" name="stack_query_dates_from_' + query_count_string +'" />');
+				$('#' + query_id).prepend('<input type="date" class="width-8em with_clearbutton" name="stack_query_date_from_' + query_index +'" />');
 				$('#' + query_id).prepend('<label>Date from: </label>');
 				
 				$('#' + query_id + ' input.with_clearbutton').each( function() {
@@ -116,7 +118,7 @@ class StackedSearch {
 					$(this).remove();
 				});
 				
-				$('#' + query_id).prepend('<input type="text" class="width-8em with_clearbutton" value="" name="stack_query_terms_' + query_count_string +'" />');
+				$('#' + query_id).prepend('<input type="text" class="width-8em with_clearbutton" value="" name="stack_query_string_' + query_index +'" />');
 				$('#' + query_id + ' input').wrap('<span class="input_delete_wrapper"></span>').after($('<span class="delete_icon">x</span>').click(function() {
 					$('#' + query_id + ' input').prev('input').val('').trigger('change').focus();
 				}));

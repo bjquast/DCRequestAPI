@@ -12,10 +12,10 @@ class StackedInnerQuery(QueryConstructor):
 	def __init__(self, query_dict, users_project_ids = []):
 		QueryConstructor.__init__(self)
 		
-		self.query_dict = query_dict
+		self.request_dict = query_dict
 		self.users_project_ids = users_project_ids
 		
-		self.source_fields = self.query_dict['fields']
+		self.source_fields = self.request_dict['field']
 		
 		self.readQueryDict()
 		
@@ -26,22 +26,22 @@ class StackedInnerQuery(QueryConstructor):
 	def readQueryDict(self):
 		self.single_query_dicts = []
 		
-		if len(self.query_dict['terms']) > 0 and len(self.query_dict['terms']) == len(self.query_dict['fields']):
+		if len(self.request_dict['string']) > 0 and len(self.request_dict['string']) == len(self.request_dict['field']):
 			
 			# check if 'all fields' are selected
-			for i in range(len(self.query_dict['terms'])):
-				if self.query_dict['fields'][i] == 'all fields':
+			for i in range(len(self.request_dict['string'])):
+				if self.request_dict['field'][i] == 'all fields':
 					
 					query_dict = {
-						'term': self.query_dict['terms'][i],
+						'term': self.request_dict['string'][i],
 						'fields': self.fieldconf.stacked_query_fields
 					}
 					self.single_query_dicts.append(query_dict)
 			
 				else:
 					query_dict = {
-						'term': self.query_dict['terms'][i],
-						'fields': [self.query_dict['fields'][i]]
+						'term': self.request_dict['string'][i],
+						'fields': [self.request_dict['field'][i]]
 					}
 					self.single_query_dicts.append(query_dict)
 			
@@ -274,7 +274,7 @@ class StackedInnerQuery(QueryConstructor):
 					self.appendNestedRestrictedStringQueries(query_dict['term'])
 			
 			if len(self.query_list) > 0:
-				if self.query_dict['inner_connector'] == 'OR':
+				if self.request_dict['inner_connector'] == 'OR':
 					self.string_query['bool']['should'].extend(self.query_list)
 					self.string_query['bool']['minimum_should_match'] = 1
 					

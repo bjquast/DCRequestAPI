@@ -37,64 +37,82 @@ class RequestParams():
 
 
 	def read_stack_queries_params(self):
-		query_pattern = re.compile(r'stack_query_((terms)|(date_from)|(date_to))_(\d+)_(\d+)$')
-		query_dicts = {}
-		self.search_params['stack_queries'] = []
+		query_pattern = re.compile(r'stack_query_((string)|(date_from)|(date_to))_(\d+)_(\d+)$')
+		cache_dicts = {}
+		#pudb.set_trace()
+		
+		"""
+		generate a dict from all stack_query parameters
+		TODO: currently, this dict is converted into a dict of lists with subqueries later on, due to the stacked_queries_macro template
+		and the methods in ES_Searcher. They should be changed to use a dict of dicts, perhaps with arbitrary depth
+		"""
 		for param in self.params_dict:
 			if param.startswith('stack_query_'):
 				m = query_pattern.match(param)
 				if m is not None:
 					query_type = m.group(1)
 					query_count = m.group(5)
-					subquery_count = m.group(6)
-					# if there are more than one parameter with the same query_count and subquery_count take only the last one, if there is no parameter value
+					sub_query_count = m.group(6)
+					# if there are more than one parameter with the same query_count and sub_query_count take only the last one, if there is no parameter value
 					# for the parameter add an empty string
-					query_string = self.params_dict.get('stack_query_{0}_{1}_{2}'.format(query_type, query_count, subquery_count), [''])[-1]
-					field = self.params_dict.get('stack_query_fields_{0}_{1}'.format(query_count, subquery_count), [''])[-1]
-					if query_string:
-						if query_count not in query_dicts:
-							query_dicts[query_count] = {
-								'terms': [],
-								'fields': [],
-								'query_types': [],
+					query_string = self.params_dict.get('stack_query_string_{0}_{1}'.format(query_count, sub_query_count), [''])[-1]
+					date_from = self.params_dict.get('stack_query_date_from_{0}_{1}'.format(query_count, sub_query_count), [''])[-1]
+					date_to = self.params_dict.get('stack_query_date_to_{0}_{1}'.format(query_count, sub_query_count), [''])[-1]
+					field = self.params_dict.get('stack_query_field_{0}_{1}'.format(query_count, sub_query_count), [''])[-1]
+					if query_string or date_from or date_to:
+						if query_count not in cache_dicts:
+							cache_dicts[query_count] = {
 								'outer_connector': self.params_dict.get('stack_search_outer_connector_{0}'.format(query_count), ['AND'])[-1],
 								'inner_connector': self.params_dict.get('stack_search_inner_connector_{0}'.format(query_count), ['AND'])[-1]
 							}
 							if 'stack_search_add_subquery_{0}'.format(query_count) in self.params_dict:
-								query_dicts[query_count]['add_subquery'] = True
-							# if 'stack_search_delete_subquery_{0}'.format(query_count) in self.params_dict:
-							# 	query_dicts[query_count]['delete_subquery'] = True
+								cache_dicts[query_count]['add_subquery'] = True
+							
+							cache_dicts[query_count]['subqueries'] = {}
 						
-						query_dicts[query_count]['terms'].append(query_string)
-						query_dicts[query_count]['fields'].append(field)
+						if sub_query_count not in cache_dicts[query_count]['subqueries']:
+							cache_dicts[query_count]['subqueries'][sub_query_count] = {}
+						
+						cache_dicts[query_count]['subqueries'][sub_query_count]['string'] = query_string
+						cache_dicts[query_count]['subqueries'][sub_query_count]['date_from'] = date_to
+						cache_dicts[query_count]['subqueries'][sub_query_count]['date_to'] = date_from
+						cache_dicts[query_count]['subqueries'][sub_query_count]['field'] = field
 						if query_type in ['date_from', 'date_to']:
-							query_dicts[query_count]['query_types'].append('date')
-						elif query_type in ['terms']:
-							query_dicts[query_count]['query_types'].append('term')
-						
+							cache_dicts[query_count]['subqueries'][sub_query_count]['query_type'] = 'date'
+						elif query_type in ['string']:
+							cache_dicts[query_count]['subqueries'][sub_query_count]['query_type'] = 'term'
 		
-		for query_count in query_dicts:
-			'''
-			# is 'delete_subquery' needed? The buttons for deleting subqueries were not shown any more
-			# and subqueries are deleted when their query_string is empty
-			if 'delete_subquery' in query_dicts[query_count] and len(query_dicts[query_count]['terms']) > 1:
-				query_dicts[query_count]['terms'].pop()
-				query_dicts[query_count]['fields'].pop()
-				query_dicts[query_count]['query_types'].pop()
-			'''
+		"""
+		convert to a dict of queries with lists of subqueries
+		reset the count of the queries to sequential numbers starting with 0
+		"""
+		pudb.set_trace()
+		self.search_params['stack_queries'] = []
+		query_dicts = {}
+		i = 0
+		for query_count in cache_dicts:
+			if i not in query_dicts:
+				query_dicts[i] = {
+					'string': [],
+					'date_from': [],
+					'date_to': [],
+					'field': [],
+					'query_type': [],
+				}
+			query_dicts[i]['outer_connector'] = cache_dicts[query_count]['outer_connector']
+			query_dicts[i]['inner_connector'] = cache_dicts[query_count]['inner_connector']
+			if 'add_subquery' in cache_dicts[query_count]:
+				query_dicts[i]['add_subquery'] = cache_dicts[query_count]['add_subquery']
 			
-			terms_copy = []
-			fields_copy = []
-			query_types_copy = []
-			for i in range(len(query_dicts[query_count]['terms'])):
-				terms_copy.append(query_dicts[query_count]['terms'][i])
-				fields_copy.append(query_dicts[query_count]['fields'][i])
-				query_types_copy.append(query_dicts[query_count]['query_types'][i])
-			query_dicts[query_count]['terms'] = terms_copy
-			query_dicts[query_count]['fields'] = fields_copy
-			query_dicts[query_count]['query_types'] = query_types_copy
+			for sub_query_count in cache_dicts[query_count]['subqueries']:
+				query_dicts[i]['string'].append(cache_dicts[query_count]['subqueries'][sub_query_count]['string'])
+				query_dicts[i]['date_from'].append(cache_dicts[query_count]['subqueries'][sub_query_count]['date_from'])
+				query_dicts[i]['date_to'].append(cache_dicts[query_count]['subqueries'][sub_query_count]['date_to'])
+				query_dicts[i]['field'].append(cache_dicts[query_count]['subqueries'][sub_query_count]['field'])
+				query_dicts[i]['query_type'].append(cache_dicts[query_count]['subqueries'][sub_query_count]['query_type'])
 			
-			self.search_params['stack_queries'].append(query_dicts[query_count])
+			self.search_params['stack_queries'].append(query_dicts[i])
+			i = i + 1
 		return
 
 
