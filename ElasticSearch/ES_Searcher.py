@@ -16,7 +16,8 @@ from ElasticSearch.QueryConstructor.BucketAggregations import BucketAggregations
 from ElasticSearch.QueryConstructor.DateAggregations import DateAggregations
 from ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
 from ElasticSearch.QueryConstructor.HierarchyQueries import HierarchyQueries
-from ElasticSearch.QueryConstructor.StackedQueries import StackedInnerQuery, StackedOuterQuery
+from ElasticSearch.QueryConstructor.StackedQueries import StackedQueries
+#from ElasticSearch.QueryConstructor.StackedQueries import StackedInnerQuery, StackedOuterQuery
 #from ElasticSearch.QueryConstructor.RangeQueries import RangeQueries
 from ElasticSearch.FieldConfig import FieldConfig
 
@@ -202,28 +203,10 @@ class ES_Searcher():
 			pass
 		'''
 		
-		outer_query = StackedOuterQuery()
+		stacked_queries = StackedQueries(self.search_params, self.users_project_ids)
 		
-		if 'stack_queries' in self.search_params:
-			# set outer connector to AND for the first query, otherwise it might result in all documents matched when it starts with an OR query and it is the only query
-			if len(self.search_params['stack_queries']) > 0:
-				self.search_params['stack_queries'][0]['outer_connector'] = 'AND'
-			for stack_query in self.search_params['stack_queries']:
-				inner_query = StackedInnerQuery(stack_query, users_project_ids = self.users_project_ids)
-				inner_string_query = inner_query.getInnerStackQuery()
-				
-				if inner_string_query is not None:
-					if stack_query['outer_connector'] == 'AND':
-						outer_query.addMustQuery(inner_string_query)
-					else:
-						outer_query.addShouldQuery(inner_string_query)
-				
-			
-			if len(outer_query.query_stack) > 0:
-				# add them all to must to ensure that the stacked query results must be fullfilled when connected with other query types
-				self.query['bool']['must'].append(outer_query.query_stack)
-				logger.debug(self.query)
-		
+		self.query['bool']['must'].append(stacked_queries.query_stack)
+		logger.debug(self.query)
 		
 		self.__addUserLimitation()
 		self.deleteEmptySubqueries()

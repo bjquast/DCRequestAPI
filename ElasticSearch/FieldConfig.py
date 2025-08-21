@@ -180,6 +180,13 @@ class FieldConfig:
 		return
 
 
+	def setStackedTermFields(self):
+		self.stacked_term_fields = []
+		for field in self.stacked_query_fields:
+			if field in self.term_fields:
+				self.stacked_term_fields.append(field)
+		return
+		
 
 	def setStackedQueryFields(self):
 		"""
@@ -279,6 +286,7 @@ class FieldConfig:
 		self.setTermFields()
 		self.setDefaultFilterSections()
 		self.setStackedQueryFields()
+		self.setStackedTermFields()
 		self.setHierarchyFilterFields()
 		self.setSuggestionFields()
 		self.setDateFields()

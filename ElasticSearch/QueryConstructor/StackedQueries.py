@@ -8,6 +8,70 @@ import pudb
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
+class StackedQueries():
+	def __init__(self, search_params, users_project_ids):
+		self.search_params = search_params
+		self.users_project_ids = users_project_ids
+		
+		self.query_stack = {
+			'bool': {
+				'must': []
+			}
+		}
+		self.create_query_stack()
+
+
+	def create_query_stack(self):
+		"""
+		iterate over the stack_queries list wich contains dicts with:
+		{
+			['string']: list,
+			['date_from']: list,
+			['date_to']: list,
+			['field']: list,
+			['query_type']: list,
+			['outer_connector']: string 'AND'/'OR',
+			['inner_connector']: string 'AND'/'OR'
+		}
+		
+		the elements lists define a sub query each, so if there are 2 strings and 2 fields etc. these are 2 sub queries with:
+		query[0] = {'string' = search_params['stack_queries'][0]['string'][0], 'field': search_params['stack_queries'][0]['field'][0], ...}
+		query[1] = {'string' = search_params['stack_queries'][0]['string'][1], 'field': search_params['stack_queries'][0]['field'][1], ...}
+		
+		the queries are separated by StackedInnerQuery.readQueryDict()
+		
+		inner queries are appended to a list of queries connected to each other according to the inner_connector
+		these inner queries are then appended to a list of outer queries according to the outer_connector
+		
+		TODO: this has to be adopted for separate requests on strings and date ranges and other query types
+		"""
+		pudb.set_trace()
+		outer_query = StackedOuterQuery()
+		
+		if 'stack_queries' in self.search_params:
+			# set outer connector to AND for the first query, otherwise it might result in all documents matched when it starts with an OR query and it is the only query
+			if len(self.search_params['stack_queries']) > 0:
+				self.search_params['stack_queries'][0]['outer_connector'] = 'AND'
+			
+			# iterate over the outer queries,
+			# the StackedInnerQuery class then iterates over the inner queries
+			for stack_query in self.search_params['stack_queries']:
+				inner_query = StackedInnerQuery(stack_query, users_project_ids = self.users_project_ids)
+				inner_string_query = inner_query.getInnerStackQuery()
+				
+				if inner_string_query is not None:
+					if stack_query['outer_connector'] == 'AND':
+						outer_query.addMustQuery(inner_string_query)
+					else:
+						outer_query.addShouldQuery(inner_string_query)
+				
+			
+			if len(outer_query.query_stack) > 0:
+				# add them all to must to ensure that the stacked query results must be fullfilled when connected with other query types
+				self.query_stack = outer_query.query_stack
+		return
+
+
 class StackedInnerQuery(QueryConstructor):
 	def __init__(self, query_dict, users_project_ids = []):
 		QueryConstructor.__init__(self)
@@ -19,31 +83,44 @@ class StackedInnerQuery(QueryConstructor):
 		
 		self.readQueryDict()
 		
-		self.query_type = 'simple_query_string'
-
+		self.string_type = 'simple_query_string'
 
 
 	def readQueryDict(self):
+		"""
+		# iterate over the inner queries and set fields for string queries when 'all fields' is chosen by the user
+		"""
+		
 		self.single_query_dicts = []
 		
-		if len(self.request_dict['string']) > 0 and len(self.request_dict['string']) == len(self.request_dict['field']):
+		
+		if len(self.request_dict['query_type']) > 0 and len(self.request_dict['string']) == len(self.request_dict['field']):
+			
 			
 			# check if 'all fields' are selected
-			for i in range(len(self.request_dict['string'])):
-				if self.request_dict['field'][i] == 'all fields':
-					
-					query_dict = {
-						'term': self.request_dict['string'][i],
-						'fields': self.fieldconf.stacked_query_fields
-					}
-					self.single_query_dicts.append(query_dict)
-			
-				else:
-					query_dict = {
-						'term': self.request_dict['string'][i],
-						'fields': [self.request_dict['field'][i]]
-					}
-					self.single_query_dicts.append(query_dict)
+			for i in range(len(self.request_dict['query_type'])):
+				if self.request_dict['query_type'][i] == 'term' and self.request_dict['string'][i]:
+					if self.request_dict['field'][i] == 'all fields':
+						
+						query_dict = {
+							'term': self.request_dict['string'][i],
+							'fields': self.fieldconf.stacked_term_fields
+						}
+						self.single_query_dicts.append(query_dict)
+					else:
+						query_dict = {
+							'term': self.request_dict['string'][i],
+							'fields': [self.request_dict['field'][i]]
+						}
+						self.single_query_dicts.append(query_dict)
+				elif self.request_dict['query_type'][i] == 'date' and (self.request_dict['date_from'][i] or self.request_dict['date_from'][i]):
+					if self.request_dict['field'][i] in self.fieldconf.date_fields:
+						query_dict = {
+							'date_from': self.request_dict['date_from'][i],
+							'date_to': self.request_dict['date_to'][i],
+							'fields': [self.request_dict['field'][i]]
+						}
+						self.single_query_dicts.append(query_dict)
 			
 		else:
 			raise ValueError('count of terms and fields must be the same')
@@ -53,10 +130,10 @@ class StackedInnerQuery(QueryConstructor):
 
 	def setQueryType(self, querystring):
 		if querystring.startswith('*') or querystring.startswith('?') or querystring.startswith('%'):
-			self.querytype = 'query_string'
+			self.string_type = 'query_string'
 			#self.escapeReservedCharacters
 		else:
-			self.querytype = 'simple_query_string'
+			self.string_type = 'simple_query_string'
 		return
 
 
@@ -88,7 +165,7 @@ class StackedInnerQuery(QueryConstructor):
 
 	def appendSimpleStringQueries(self, query_string):
 		self.setQueryType(query_string)
-		if self.querytype == 'query_string':
+		if self.string_type == 'query_string':
 			query_string = self.escapeReservedCharacters(query_string)
 		query_string = self.replaceWildcards(query_string)
 		
@@ -98,7 +175,7 @@ class StackedInnerQuery(QueryConstructor):
 		
 		if len(search_fields) > 0:
 			query = {
-				self.querytype: {
+				self.string_type: {
 					'query': query_string,
 					'fields': search_fields,
 					'default_operator': 'AND'
@@ -110,16 +187,15 @@ class StackedInnerQuery(QueryConstructor):
 
 	def appendNestedStringQueries(self, query_string):
 		self.setQueryType(query_string)
-		if self.querytype == 'query_string':
+		if self.string_type == 'query_string':
 			query_string = self.escapeReservedCharacters(query_string)
 		
 		query_string = self.replaceWildcards(query_string)
 		
 		search_fields = []
 		for field in self.nested_fields:
-			search_fields.append(self.getStringQuerySearchField(field, self.nested_fields[field]))
-		
-		if len(search_fields) > 0:
+			search_field = self.getStringQuerySearchField(field, self.nested_fields[field])
+			
 			query = {
 				'nested': {
 					'path': self.nested_fields[field]['path'],
@@ -127,9 +203,9 @@ class StackedInnerQuery(QueryConstructor):
 						'bool': {
 							'must': [
 								{
-									self.querytype: {
+									self.string_type: {
 										'query': query_string,
-										'fields': search_fields,
+										'fields': [search_field],
 										'default_operator': 'AND'
 									}
 								}
@@ -145,7 +221,7 @@ class StackedInnerQuery(QueryConstructor):
 
 	def appendSimpleRestrictedStringQueries(self, query_string):
 		self.setQueryType(query_string)
-		if self.querytype == 'query_string':
+		if self.string_type == 'query_string':
 			query_string = self.escapeReservedCharacters(query_string)
 		
 		query_string = self.replaceWildcards(query_string)
@@ -160,7 +236,7 @@ class StackedInnerQuery(QueryConstructor):
 				'bool': {
 					'must': [
 						{
-							self.querytype: {
+							self.string_type: {
 								'query': query_string,
 								'fields': [search_field],
 								'default_operator': 'AND'
@@ -190,7 +266,7 @@ class StackedInnerQuery(QueryConstructor):
 
 	def appendNestedRestrictedStringQueries(self, query_string):
 		self.setQueryType(query_string)
-		if self.querytype == 'query_string':
+		if self.string_type == 'query_string':
 			query_string = self.escapeReservedCharacters(query_string)
 		
 		query_string = self.replaceWildcards(query_string)
@@ -199,7 +275,6 @@ class StackedInnerQuery(QueryConstructor):
 		# that can not be queried together in one question
 		for field in self.nested_restricted_fields:
 			search_field = self.getStringQuerySearchField(field, self.nested_restricted_fields[field])
-			
 			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.nested_restricted_fields[field]['withholdflags']]
 			
 			query = {
@@ -209,7 +284,7 @@ class StackedInnerQuery(QueryConstructor):
 						'bool': {
 							'must': [
 								{
-									self.querytype: {
+									self.string_type: {
 										'query': query_string,
 										'fields': [search_field],
 										'default_operator': 'AND'
@@ -249,6 +324,8 @@ class StackedInnerQuery(QueryConstructor):
 				'must': []
 			}
 		}
+		
+		# TODO: can this integrate the code from 
 		
 		for query_dict in self.single_query_dicts:
 			
