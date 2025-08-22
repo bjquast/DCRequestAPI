@@ -86,7 +86,6 @@ class RequestParams():
 		convert to a dict of queries with lists of subqueries
 		reset the count of the queries to sequential numbers starting with 0
 		"""
-		pudb.set_trace()
 		self.search_params['stack_queries'] = []
 		query_dicts = {}
 		i = 0

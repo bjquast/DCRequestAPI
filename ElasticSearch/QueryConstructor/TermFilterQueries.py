@@ -46,6 +46,7 @@ class TermFilterQueries(QueryConstructor):
 		if self.connector.upper() == 'AND':
 			for filter_key in self.term_queries:
 				if len(self.term_queries[filter_key]) > 1:
+					# should is used instead of must when more than one source fileds are available because the query should then match even if the term is only found in one field
 					should_query = {'bool': {'should': self.term_queries[filter_key], 'minimum_should_match': 1}}
 					filter_queries.append(should_query)
 				elif len(self.term_queries[filter_key]) == 1:

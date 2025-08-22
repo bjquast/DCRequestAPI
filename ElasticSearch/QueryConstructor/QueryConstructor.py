@@ -20,9 +20,14 @@ class QueryConstructor():
 		self.fielddefinitions = self.fieldconf.fielddefinitions
 
 
-	def set_source_fields(self, source_fields = []):
+	def set_source_fields(self, source_fields = None):
 		# allow to set the source fields later for queries with different source fields
 		# this is currently used in StackedInnerQuery to set a single source field when a stacked query searches for a defined field only
+		
+		# test that self.source_fields is a list
+		if not isinstance(source_fields, list):
+			raise TypeError('QueryConstructor.set_source_fields(): source_fields must be a list')
+		
 		if len(source_fields) > 0:
 			self.source_fields = source_fields
 		return

@@ -6,6 +6,7 @@ logger = logging.getLogger('elastic_queries')
 import pudb
 
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
+from ElasticSearch.QueryConstructor.StringQueries import StringQueries
 
 
 class StackedQueries():
@@ -45,7 +46,7 @@ class StackedQueries():
 		
 		TODO: this has to be adopted for separate requests on strings and date ranges and other query types
 		"""
-		pudb.set_trace()
+		#pudb.set_trace()
 		outer_query = StackedOuterQuery()
 		
 		if 'stack_queries' in self.search_params:
@@ -81,302 +82,92 @@ class StackedInnerQuery(QueryConstructor):
 		
 		self.source_fields = self.request_dict['field']
 		
-		self.readQueryDict()
-		
 		self.string_type = 'simple_query_string'
+		
+		self.readQueryDict()
 
 
 	def readQueryDict(self):
 		"""
-		# iterate over the inner queries and set fields for string queries when 'all fields' is chosen by the user
+		# iterate over the inner queries and put them together into a list of dicts
+		TODO: needs to be reworked together with RequestParams where the stacked queries are set
 		"""
 		
-		self.single_query_dicts = []
-		
-		
-		if len(self.request_dict['query_type']) > 0 and len(self.request_dict['string']) == len(self.request_dict['field']):
-			
-			
-			# check if 'all fields' are selected
-			for i in range(len(self.request_dict['query_type'])):
-				if self.request_dict['query_type'][i] == 'term' and self.request_dict['string'][i]:
-					if self.request_dict['field'][i] == 'all fields':
-						
-						query_dict = {
-							'term': self.request_dict['string'][i],
-							'fields': self.fieldconf.stacked_term_fields
-						}
-						self.single_query_dicts.append(query_dict)
-					else:
-						query_dict = {
-							'term': self.request_dict['string'][i],
-							'fields': [self.request_dict['field'][i]]
-						}
-						self.single_query_dicts.append(query_dict)
-				elif self.request_dict['query_type'][i] == 'date' and (self.request_dict['date_from'][i] or self.request_dict['date_from'][i]):
-					if self.request_dict['field'][i] in self.fieldconf.date_fields:
-						query_dict = {
-							'date_from': self.request_dict['date_from'][i],
-							'date_to': self.request_dict['date_to'][i],
-							'fields': [self.request_dict['field'][i]]
-						}
-						self.single_query_dicts.append(query_dict)
-			
-		else:
+		#pudb.set_trace()
+		if not len(self.request_dict['query_type']) > 0 and len(self.request_dict['string']) == len(self.request_dict['field']):
 			raise ValueError('count of terms and fields must be the same')
 		
-		return
-
-
-	def setQueryType(self, querystring):
-		if querystring.startswith('*') or querystring.startswith('?') or querystring.startswith('%'):
-			self.string_type = 'query_string'
-			#self.escapeReservedCharacters
-		else:
-			self.string_type = 'simple_query_string'
-		return
-
-
-	def escapeReservedCharacters(self, query_string):
-		reserved_characters = ['+', '-', '=', '&', '|', '!', '(', ')', '{', '}', '[', ']', '^', '~', ':', '/']
-		count = query_string.count('"')
-		if count % 2 != 0:
-			reserved_characters.append('"')
+		self.query_list = []
 		
-		for character in reserved_characters:
-			#pass
-			query_string = query_string.replace(character, r'\{0}'.format(character))
-		for character in ['>', '<']:
-			query_string = query_string.replace(character, '?')
-			pass
-			#query_string = query_string.replace(character, '*')
-		
-		return query_string
-
-
-	def replaceWildcards(self, query_string):
-		wildcards = ['%']
-		
-		for character in wildcards:
-			query_string = query_string.replace(character, r'*')
-		
-		return query_string
-
-
-	def appendSimpleStringQueries(self, query_string):
-		self.setQueryType(query_string)
-		if self.string_type == 'query_string':
-			query_string = self.escapeReservedCharacters(query_string)
-		query_string = self.replaceWildcards(query_string)
-		
-		search_fields = []
-		for field in self.simple_fields:
-			search_fields.append(self.getStringQuerySearchField(field, self.simple_fields[field]))
-		
-		if len(search_fields) > 0:
-			query = {
-				self.string_type: {
-					'query': query_string,
-					'fields': search_fields,
-					'default_operator': 'AND'
-				}
-			}
-			self.query_list.append(query)
-		return
-
-
-	def appendNestedStringQueries(self, query_string):
-		self.setQueryType(query_string)
-		if self.string_type == 'query_string':
-			query_string = self.escapeReservedCharacters(query_string)
-		
-		query_string = self.replaceWildcards(query_string)
-		
-		search_fields = []
-		for field in self.nested_fields:
-			search_field = self.getStringQuerySearchField(field, self.nested_fields[field])
-			
-			query = {
-				'nested': {
-					'path': self.nested_fields[field]['path'],
-					'query': { 
-						'bool': {
-							'must': [
-								{
-									self.string_type: {
-										'query': query_string,
-										'fields': [search_field],
-										'default_operator': 'AND'
-									}
-								}
-							]
-						}
+		# check if 'all fields' are selected
+		for i in range(len(self.request_dict['query_type'])):
+			if self.request_dict['query_type'][i] == 'term' and self.request_dict['string'][i]:
+				
+				# TODO: it is not useful to give a dictionary as parameter when fields and connector are set in the constructor of StringQueries()
+				# it comes from the idea that multiple queries can be send to StringQueries() and the class is in charge to put them together
+				# see TODO in StringQueries.setQueryList()
+				
+				if self.request_dict['field'][i] == 'all fields':
+					query_dict = {
+						'term': self.request_dict['string'][i],
+						'fields': self.fieldconf.stacked_term_fields,
+						'inner_connector': self.request_dict['inner_connector']
 					}
-				}
-			}
-			
-			self.query_list.append(query)
-		return
-
-
-	def appendSimpleRestrictedStringQueries(self, query_string):
-		self.setQueryType(query_string)
-		if self.string_type == 'query_string':
-			query_string = self.escapeReservedCharacters(query_string)
-		
-		query_string = self.replaceWildcards(query_string)
-		
-		# restricted fields must be queried one by one because they all have their own withholdterms
-		# that can not be queried together in one question
-		for field in self.simple_restricted_fields:
-			search_field = self.getStringQuerySearchField(field, self.simple_restricted_fields[field])
-			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.simple_restricted_fields[field]['withholdflags']]
-			
-			query = {
-				'bool': {
-					'must': [
-						{
-							self.string_type: {
-								'query': query_string,
-								'fields': [search_field],
-								'default_operator': 'AND'
-							}
-						}
-					],
-					'filter': [
-						{
-							'bool': {
-								'should': [
-									{"terms": {"Projects.DB_ProjectID": self.users_project_ids}},
-									{
-										"bool": {
-											"must": withholdterms
-										}
-									}
-								],
-								"minimum_should_match": 1
-							}
-						}
-					]
-				}
-			}
-			self.query_list.append(query)
-		return
-
-
-	def appendNestedRestrictedStringQueries(self, query_string):
-		self.setQueryType(query_string)
-		if self.string_type == 'query_string':
-			query_string = self.escapeReservedCharacters(query_string)
-		
-		query_string = self.replaceWildcards(query_string)
-		
-		# restricted fields must be queried one by one because they all have their own withholdterms
-		# that can not be queried together in one question
-		for field in self.nested_restricted_fields:
-			search_field = self.getStringQuerySearchField(field, self.nested_restricted_fields[field])
-			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.nested_restricted_fields[field]['withholdflags']]
-			
-			query = {
-				'nested': {
-					'path': self.nested_restricted_fields[field]['path'],
-					'query': {
-						'bool': {
-							'must': [
-								{
-									self.string_type: {
-										'query': query_string,
-										'fields': [search_field],
-										'default_operator': 'AND'
-									}
-								}
-							],
-							'filter': [
-								{
-									'bool': {
-										'should': [
-											# need to use the DB_ProjectID within the path for nested objects otherwise the filter fails
-											{"terms": {"{0}.DB_ProjectID".format(self.nested_restricted_fields[field]['path']): self.users_project_ids}},
-											{
-												"bool": {
-													"must": withholdterms
-												}
-											}
-										],
-										"minimum_should_match": 1
-									}
-								}
-							]
-						}
+					self.query_list.append(query_dict)
+				else:
+					query_dict = {
+						'term': self.request_dict['string'][i],
+						'fields': [self.request_dict['field'][i]],
+						'inner_connector': self.request_dict['inner_connector']
 					}
+					self.query_list.append(query_dict)
+			
+			elif self.request_dict['query_type'][i] == 'date' and (self.request_dict['date_from'][i] or self.request_dict['date_from'][i]):
+				query_dict = {
+					'date_from': self.request_dict.get(['date_from'][i], ''),
+					'date_to': self.request_dict.get(['date_to'][i], ''),
+					'fields': [self.request_dict['field'][i]],
+					'inner_connector': self.request_dict['inner_connector']
 				}
-			}
-			self.query_list.append(query)
-		return
+				self.query_list.append(query_dict)
+		
+		return 
 
 
 
 	def getInnerStackQuery(self):
-		
-		self.string_query = {
+		inner_queries = []
+		inner_query = {
 			'bool': {
 				'should': [],
 				'must': []
 			}
 		}
 		
-		# TODO: can this integrate the code from 
+		for query_dict in self.query_list:
+			if 'term' in query_dict:
+				string_query = StringQueries(self.users_project_ids, query_dict['fields'], query_dict['inner_connector'])
+				q = string_query.getQueries([query_dict])
+				
+				if query_dict['inner_connector'].upper() == 'OR':
+					inner_query['bool']['should'].extend(q)
+				elif query_dict['inner_connector'].upper() == 'AND':
+					inner_query['bool']['must'].extend(q)
+				
+			elif 'date_from' in self.query_list or 'date_to' in self.query_list:
+				#date_range_query = DateRangeQueries(self.users_project_ids, query_dict['fields'], query_dict['inner_connector'])
+				#q = string_query.getQueries([query_dict])
+				
+				#if query_dict['inner_connector'].upper() == 'OR':
+				#	inner_query['bool']['should'].extend(q)
+				#elif query_dict['inner_connector'].upper() == 'AND':
+				#	inner_query['bool']['must'].extend(q)
+				pass
 		
-		for query_dict in self.single_query_dicts:
-			
-			self.set_source_fields(query_dict['fields'])
-			self.sort_queries_by_definitions()
-			
-			# set the query_list for each query separately because i have to differentiate between queries in multiple fields and queries in one field when 
-			# combining them with the AND inner connector
-			self.query_list = []
-			
-			if query_dict['term'] is not None and len(query_dict['term']) > 0:
-				
-				if len(self.simple_fields) > 0:
-					self.appendSimpleStringQueries(query_dict['term'])
-				
-				if len(self.nested_fields) > 0:
-					self.appendNestedStringQueries(query_dict['term'])
-				
-				if len(self.simple_restricted_fields) > 0:
-					self.appendSimpleRestrictedStringQueries(query_dict['term'])
-				
-				if len(self.nested_restricted_fields) > 0:
-					self.appendNestedRestrictedStringQueries(query_dict['term'])
-			
-			if len(self.query_list) > 0:
-				if self.request_dict['inner_connector'] == 'OR':
-					self.string_query['bool']['should'].extend(self.query_list)
-					self.string_query['bool']['minimum_should_match'] = 1
-					
-				
-				else:
-					
-					# query within one field
-					if len(self.query_list) == 1:
-						self.string_query['bool']['must'].extend(self.query_list)
-					# query in multiple fields
-					elif len(self.query_list) > 1:
-						query_dict = {
-							'bool': {
-								'should': [],
-								'minimum_should_match': 1
-							}
-						}
-						
-						query_dict['bool']['should'].extend(self.query_list)
-						self.string_query['bool']['must'].append(query_dict)
+		if len(inner_query['bool']['must']) < 1 and len(inner_query['bool']['should']) < 1:
+			inner_query = None
 		
-		if len(self.string_query['bool']['must']) < 1 and len(self.string_query['bool']['should']) < 1:
-			self.string_query = None
-		
-		return self.string_query
+		return inner_query
 
 
 
