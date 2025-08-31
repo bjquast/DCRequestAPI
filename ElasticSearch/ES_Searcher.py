@@ -13,12 +13,12 @@ from ElasticSearch.ES_Mappings import MappingsDict
 
 from ElasticSearch.WithholdFilters import WithholdFilters
 from ElasticSearch.QueryConstructor.BucketAggregations import BucketAggregations
-from ElasticSearch.QueryConstructor.DateAggregations import DateAggregations
+#from ElasticSearch.QueryConstructor.DateAggregations import DateAggregations
+from ElasticSearch.QueryConstructor.DateHistogramAggregations import DateHistogramAggregations
 from ElasticSearch.QueryConstructor.TermFilterQueries import TermFilterQueries
 from ElasticSearch.QueryConstructor.HierarchyQueries import HierarchyQueries
 from ElasticSearch.QueryConstructor.StackedQueries import StackedQueries
-#from ElasticSearch.QueryConstructor.StackedQueries import StackedInnerQuery, StackedOuterQuery
-#from ElasticSearch.QueryConstructor.RangeQueries import RangeQueries
+from ElasticSearch.QueryConstructor.RangeQueries import RangeQueries
 from ElasticSearch.FieldConfig import FieldConfig
 
 
@@ -179,7 +179,6 @@ class ES_Searcher():
 			if 'term_filters_connector' in self.search_params:
 				connector = self.search_params['term_filters_connector']
 			
-			
 			# append source fields from term_filters not yet in self.term_filters
 			# this is due to the term_filters comming from hierarchy aggregations
 			hierarchy_bucket_fields = list(self.term_filters)
@@ -190,18 +189,18 @@ class ES_Searcher():
 			filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids, source_fields = hierarchy_bucket_fields, connector = connector).getTermFilterQueries(self.search_params['term_filters'])
 			self.query['bool']["filter"].extend(filter_queries)
 		
-		'''
 		if 'range_queries' in self.search_params:
 			connector = 'AND'
 			if 'term_filters_connector' in self.search_params:
 				connector = self.search_params['term_filters_connector']
 			
-			range_queries = RangeQueries(users_project_ids = self.users_project_ids, source_fields = source_fields, connector = connector).setRangeQueries(self.search_params['range_queries'])
-			self.query['bool']["filter"].extend(filter_queries)
+			#pudb.set_trace()
+			
+			range_queries = RangeQueries(users_project_ids = self.users_project_ids).setRangeQueries(self.search_params['range_queries'])
+			self.query['bool']["filter"].extend(range_queries)
 			
 			
 			pass
-		'''
 		
 		stacked_queries = StackedQueries(self.search_params, self.users_project_ids)
 		
@@ -275,7 +274,7 @@ class ES_Searcher():
 		self.setQuery()
 		
 		if aggregation_name in self.fieldconfig.date_fields:
-			buckets_query = DateAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size, 
+			buckets_query = DateHistogramAggregations(users_project_ids = self.users_project_ids, source_fields = [aggregation_name], size = size, 
 				buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir)
 			aggs = buckets_query.getAggregationsQuery()
 		
@@ -391,7 +390,7 @@ class ES_Searcher():
 			aggs = buckets_query.getAggregationsQuery()
 		
 		if len(self.date_filters) > 0:
-			date_aggregator = DateAggregations(users_project_ids = self.users_project_ids, source_fields = self.date_filters)
+			date_aggregator = DateHistogramAggregations(users_project_ids = self.users_project_ids, source_fields = self.date_filters)
 			if aggs is not None:
 				aggs.update(date_aggregator.getAggregationsQuery())
 			else:
@@ -464,6 +463,8 @@ class ES_Searcher():
 				if colname not in self.aggregations:
 					self.aggregations[colname] = []
 				for bucket in raw_aggregation['buckets']:
+					if 'key_as_string' in bucket:
+						bucket['key'] = bucket['key_as_string']
 					self.aggregations[colname].append(bucket)
 			elif isinstance(raw_aggregation['buckets'], dict) and 'buckets' in raw_aggregation['buckets']:
 				self.parseRawAggregation(raw_aggregation['buckets'], colname)
@@ -475,6 +476,8 @@ class ES_Searcher():
 		if 'buckets' in raw_aggregation:
 			if isinstance(raw_aggregation['buckets'], list) or isinstance(raw_aggregation['buckets'], tuple):
 				for bucket in raw_aggregation['buckets']:
+					if 'key_as_string' in bucket:
+						bucket['key'] = bucket['key_as_string']
 					buckets.append([bucket['key'], bucket['doc_count']])
 			elif isinstance(raw_aggregation['buckets'], dict) and 'buckets' in raw_aggregation['buckets']:
 				buckets = self.__getBucketListFromAggregation(raw_aggregation['buckets'])

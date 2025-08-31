@@ -6,11 +6,10 @@ logger = logging.getLogger('elastic_queries')
 import pudb
 
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
-from ElasticSearch.QueryConstructor.DateRangesGenerator import DateRangesGenerator
 
 
-class DateAggregations(QueryConstructor):
-	def __init__(self, users_project_ids = [], source_fields = [], size = 10, startdate = '1800-01-01', enddate = None, interval = 'year', interval_multiplicator = 1, buckets_sort_alphanum = False, buckets_sort_dir = None):
+class DateHistogramAggregations(QueryConstructor):
+	def __init__(self, users_project_ids = [], source_fields = [], size = 10, interval = 'year', buckets_sort_alphanum = False, buckets_sort_dir = None):
 		QueryConstructor.__init__(self)
 		
 		self.source_fields = source_fields
@@ -25,11 +24,30 @@ class DateAggregations(QueryConstructor):
 		self.buckets_sort_dir = buckets_sort_dir
 		self.setBucketsSorting()
 		
+		self.__setCalendarInterval(interval)
+		
 		self.es_date_format = 'yyyy-MM-dd'
 		
-		self.date_ranges = DateRangesGenerator(startdate = startdate, enddate = enddate, interval = interval, interval_multiplicator = interval_multiplicator).generate_ranges()
-		
 		self.sort_queries_by_definitions()
+
+
+	def __setCalendarInterval(self, interval):
+		if interval.lower() == 'month':
+			self.calendar_interval = '1M'
+		else:
+			self.calendar_interval = '1y'
+		return
+
+
+	def __setExtendedBounds(self, min_bound = None, max_bound = None):
+		# is that useful? extended bounds are needed when the 0 values at the start and end of an histogram should be 
+		# added to the aggs. because the aggs here are limited to buckets with min_doc_count = 1 the extended bounds do not make sense?!
+		self.extended_bounds = {}
+		if min_bound is not None:
+			self.extended_bounds['min'] = min_bound
+		if max_bound is not None:
+			self.extended_bounds['max'] = max_bound
+		return
 
 
 	def getAggregationsQuery(self):
@@ -54,10 +72,12 @@ class DateAggregations(QueryConstructor):
 				},
 				"aggs": {
 					"buckets": {
-						"date_range": {
+						"date_histogram": {
 							"field": field,
 							"format": self.es_date_format,
-							"ranges": self.date_ranges
+							"calendar_interval":  self.calendar_interval,
+							"min_doc_count": 1,
+							#"extended_bounds": self.extended_bounds
 						},
 						"aggs": {
 							"limit": {
@@ -92,10 +112,12 @@ class DateAggregations(QueryConstructor):
 						},
 						"aggs": {
 							"buckets": {
-								"date_range": {
+								"date_histogram": {
 									"field": field,
 									"format": self.es_date_format,
-									"ranges": self.date_ranges
+									"calendar_interval":  self.calendar_interval,
+									"min_doc_count": 1,
+									#"extended_bounds": self.extended_bounds
 								},
 								"aggs": {
 									"limit": {
@@ -144,10 +166,12 @@ class DateAggregations(QueryConstructor):
 						},
 						"aggs": {
 							"buckets": {
-								"date_range": {
+								"date_histogram": {
 									"field": field,
 									"format": self.es_date_format,
-									"ranges": self.date_ranges
+									"calendar_interval":  self.calendar_interval,
+									"min_doc_count": 1,
+									#"extended_bounds": self.extended_bounds
 								},
 								"aggs": {
 									"limit": {
@@ -190,10 +214,12 @@ class DateAggregations(QueryConstructor):
 				},
 				"aggs": {
 					"buckets": {
-						"date_range": {
+						"date_histogram": {
 							"field": field,
 							"format": self.es_date_format,
-							"ranges": self.date_ranges
+							"calendar_interval":  self.calendar_interval,
+							"min_doc_count": 1,
+							#"extended_bounds": self.extended_bounds
 						},
 						"aggs": {
 							"limit": {

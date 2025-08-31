@@ -74,8 +74,8 @@ class RequestParams():
 							cache_dicts[query_count]['subqueries'][sub_query_count] = {}
 						
 						cache_dicts[query_count]['subqueries'][sub_query_count]['string'] = query_string
-						cache_dicts[query_count]['subqueries'][sub_query_count]['date_from'] = date_to
-						cache_dicts[query_count]['subqueries'][sub_query_count]['date_to'] = date_from
+						cache_dicts[query_count]['subqueries'][sub_query_count]['date_from'] = date_from
+						cache_dicts[query_count]['subqueries'][sub_query_count]['date_to'] = date_to
 						cache_dicts[query_count]['subqueries'][sub_query_count]['field'] = field
 						if query_type in ['date_from', 'date_to']:
 							cache_dicts[query_count]['subqueries'][sub_query_count]['query_type'] = 'date'

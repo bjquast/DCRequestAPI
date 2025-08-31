@@ -7,6 +7,7 @@ import pudb
 
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 from ElasticSearch.QueryConstructor.StringQueries import StringQueries
+from ElasticSearch.QueryConstructor.RangeQueries import RangeQueries
 
 
 class StackedQueries():
@@ -123,9 +124,10 @@ class StackedInnerQuery(QueryConstructor):
 					self.query_list.append(query_dict)
 			
 			elif self.request_dict['query_type'][i] == 'date' and (self.request_dict['date_from'][i] or self.request_dict['date_from'][i]):
+				pudb.set_trace()
 				query_dict = {
-					'date_from': self.request_dict.get(['date_from'][i], ''),
-					'date_to': self.request_dict.get(['date_to'][i], ''),
+					'date_from': self.request_dict.get('date_from', [''])[i],
+					'date_to': self.request_dict.get('date_to', [''])[i],
 					'fields': [self.request_dict['field'][i]],
 					'inner_connector': self.request_dict['inner_connector']
 				}
@@ -144,6 +146,7 @@ class StackedInnerQuery(QueryConstructor):
 			}
 		}
 		
+		pudb.set_trace()
 		for query_dict in self.query_list:
 			if 'term' in query_dict:
 				string_query = StringQueries(self.users_project_ids, query_dict['fields'], query_dict['inner_connector'])
@@ -154,14 +157,14 @@ class StackedInnerQuery(QueryConstructor):
 				elif query_dict['inner_connector'].upper() == 'AND':
 					inner_query['bool']['must'].extend(q)
 				
-			elif 'date_from' in self.query_list or 'date_to' in self.query_list:
-				#date_range_query = DateRangeQueries(self.users_project_ids, query_dict['fields'], query_dict['inner_connector'])
-				#q = string_query.getQueries([query_dict])
+			elif 'date_from' in query_dict or 'date_to' in query_dict:
+				date_range_query = RangeQueries(self.users_project_ids)
+				q = date_range_query.getQueries([query_dict])
 				
-				#if query_dict['inner_connector'].upper() == 'OR':
-				#	inner_query['bool']['should'].extend(q)
-				#elif query_dict['inner_connector'].upper() == 'AND':
-				#	inner_query['bool']['must'].extend(q)
+				if query_dict['inner_connector'].upper() == 'OR':
+					inner_query['bool']['should'].extend(q)
+				elif query_dict['inner_connector'].upper() == 'AND':
+					inner_query['bool']['must'].extend(q)
 				pass
 		
 		if len(inner_query['bool']['must']) < 1 and len(inner_query['bool']['should']) < 1:

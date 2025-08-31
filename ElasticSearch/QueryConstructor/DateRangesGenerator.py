@@ -28,15 +28,20 @@ class DateRangesGenerator():
 		self.interval = interval
 		if self.interval is None:
 			self.date_delta = relativedelta(years=self.i_multiplicator)
+			self.key_delta = relativedelta(years=self.i_multiplicator - 1)
 		elif self.interval.lower() in ['year', 'years', 'y']:
 			self.date_delta = relativedelta(years=self.i_multiplicator)
+			self.key_delta = relativedelta(years=self.i_multiplicator - 1)
 		elif self.interval.lower() in['month', 'months', 'm']:
 			self.date_delta = relativedelta(months=self.i_multiplicator)
+			self.key_delta = relativedelta(month=self.i_multiplicator - 1)
 		# days take long and not needed in DCRequestAPI DateAggregations
 		#elif self.interval.lower() in ['day', 'days', 'd']:
 		#	self.date_delta = relativedelta(days=self.i_multiplicator)
+		#	self.key_delta = relativedelta(days=self.i_multiplicator - 1)
 		else:
 			self.date_delta = relativedelta(years=self.i_multiplicator)
+			self.key_delta = relativedelta(years=self.i_multiplicator - 1)
 		return
 
 	def set_key_format(self, interval):
@@ -66,8 +71,9 @@ class DateRangesGenerator():
 
 		while next_start <= self.enddate:
 			next_end = next_start + self.date_delta
+			key_date = next_start + (self.key_delta)
 			range_dict = {
-				"key": next_end.strftime(self.date_format),
+				"key": key_date.strftime(self.date_format),
 				"from": next_start.strftime('%Y-%m-%d'),
 				"to": next_end.strftime('%Y-%m-%d')
 			}

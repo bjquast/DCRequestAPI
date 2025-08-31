@@ -39,7 +39,7 @@ class StringQueries(QueryConstructor):
 			self.appendNestedRestrictedStringQueries()
 		return
 
-	
+
 	def getQueries(self, query_dicts):
 		"""
 		get the queries put together by the connector value set in the constructor.
