@@ -126,7 +126,8 @@ class RequestParams():
 							'term_filters_connector', 'buckets_search_term', 'overlay_remaining_all_select', 'buckets_sort_dir', 'buckets_size',
 							'path_to_remove'
 						]
-		complex_params = ['term_filters', 'hierarchies', 'date']
+		complex_params = ['term_filters', 'hierarchies']
+		#complex_params = ['term_filters', 'hierarchies', 'date']
 		
 		#range_params = ['date']
 		
@@ -218,10 +219,6 @@ class RequestParams():
 		return
 
 
-
-
-
-
 class DefaultParamsSetter():
 	"""
 	set default values for missing search_params, concatenate parent parameters and fix some params
@@ -237,7 +234,6 @@ class DefaultParamsSetter():
 
 	def set_default_params(self):
 		self.set_term_filters()
-		self.set_date_filters()
 		self.set_hierarchy_filters()
 		
 		self.set_selected_filter_sections()
@@ -247,19 +243,23 @@ class DefaultParamsSetter():
 
 
 	def set_term_filters(self):
+		# check if term_filters in term_fields or date_fields
+		# if term_filters are in date_fields, check if the values are year[-month-day]
 		term_filters = {}
+		date_pattern = re.compile(r'^\s*((\d{4})(-\d{2})?(-\d{2})?)\s*$')
 		for key in self.search_params['term_filters']:
 			if key in self.fieldconf.term_fields:
 				term_filters[key] = self.search_params['term_filters'][key]
+			elif key in self.fieldconf.date_fields:
+				date_values = []
+				for value in self.search_params['term_filters'][key]:
+					m = date_pattern.search(value)
+					if m is not None:
+						date_values.append(m.group(1))
+				if len(date_values) > 0:
+					term_filters[key] = date_values
 		self.search_params['term_filters'] = term_filters
-
-
-	def set_date_filters(self):
-		date_filters = {}
-		for key in self.search_params['date']:
-			if key in self.fieldconf.date_fields:
-				date_filters[key] = self.search_params['date'][key]
-		self.search_params['date'] = date_filters
+		return
 
 
 	def set_hierarchy_filters(self):
@@ -278,8 +278,8 @@ class DefaultParamsSetter():
 				selected_filters.append(field)
 			elif field in self.search_params['term_filters']:
 				selected_filters.append(field)
-			elif field in self.search_params['date']:
-				selected_filters.append(field)
+			#elif field in self.search_params['date']:
+			#	selected_filters.append(field)
 			elif field in self.search_params['hierarchies']:
 				selected_filters.append(field)
 		if len(selected_filters) <= 0:
@@ -296,8 +296,8 @@ class DefaultParamsSetter():
 				open_filters.append(field)
 			elif field in self.search_params['term_filters']:
 				open_filters.append(field)
-			elif field in self.search_params['date']:
-				open_filters.append(field)
+			#elif field in self.search_params['date']:
+			#	open_filters.append(field)
 			elif field in self.search_params['hierarchies']:
 				open_filters.append(field)
 		self.search_params['open_filter_selectors'] = open_filters

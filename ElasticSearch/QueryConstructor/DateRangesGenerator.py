@@ -16,7 +16,7 @@ class DateRangesGenerator():
 
 	def set_start_end_range(self, startdate_string = None, enddate_string = None):
 		if startdate_string is None:
-			self.startdate = datetime.strptime('1800-01-01', '%Y-%m-%d').date()
+			self.startdate = datetime.strptime('1700-01-01', '%Y-%m-%d').date()
 		else:
 			self.startdate = datetime.strptime(startdate_string, '%Y-%m-%d').date()
 		if enddate_string is None:

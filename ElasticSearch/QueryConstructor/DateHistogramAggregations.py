@@ -24,9 +24,8 @@ class DateHistogramAggregations(QueryConstructor):
 		self.buckets_sort_dir = buckets_sort_dir
 		self.setBucketsSorting()
 		
-		self.__setCalendarInterval(interval)
-		
 		self.es_date_format = 'yyyy-MM-dd'
+		self.__setCalendarInterval(interval)
 		
 		self.sort_queries_by_definitions()
 
@@ -34,8 +33,10 @@ class DateHistogramAggregations(QueryConstructor):
 	def __setCalendarInterval(self, interval):
 		if interval.lower() == 'month':
 			self.calendar_interval = '1M'
+			self.es_date_format = 'yyyy-MM'
 		else:
 			self.calendar_interval = '1y'
+			self.es_date_format = 'yyyy'
 		return
 
 

@@ -118,7 +118,7 @@ class IUPartsListView():
 		
 		iupartstable = IUPartsTable(self.search_params['result_table_columns'])
 		iupartslist = iupartstable.getRowContent(doc_sources = doc_sources)
-		pudb.set_trace()
+		
 		pagecontent = {
 			'pagetitle': 'LIB collections cataloque',
 			# parameters from the request

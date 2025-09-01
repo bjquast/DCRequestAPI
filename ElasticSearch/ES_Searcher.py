@@ -8,6 +8,10 @@ import math
 
 import pudb
 
+import re
+from datetime import date, datetime
+from dateutil.relativedelta import relativedelta
+
 from ElasticSearch.ES_Connector import ES_Connector
 from ElasticSearch.ES_Mappings import MappingsDict
 
@@ -179,26 +183,34 @@ class ES_Searcher():
 			if 'term_filters_connector' in self.search_params:
 				connector = self.search_params['term_filters_connector']
 			
+			term_searches = {}
+			term_filter_fields = []
+			date_searches = []
+			date_filter_fields = []
+			
+			for key in self.search_params['term_filters']:
+				if key in self.fieldconfig.term_fields or key in self.fieldconfig.hierarchy_filter_fields:
+					term_filter_fields.append(key)
+					term_searches[key] = self.search_params['term_filters'][key]
+				
+				elif key in self.fieldconfig.date_fields:
+					date_filter_fields.append(key)
+					
+					date_searches.extend(self.getDateFilterDictsFromTermFilter(key))
+			
+			filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids, source_fields = term_filter_fields, connector = connector).getTermFilterQueries(term_searches)
+			self.query['bool']["filter"].extend(filter_queries)
+			range_queries = RangeQueries(users_project_ids = self.users_project_ids).getQueries(date_searches, connector = 'OR', greater_op = 'gte', less_op = 'lt')
+			self.query['bool']["filter"].extend(range_queries)
+			
+			'''
 			# append source fields from term_filters not yet in self.term_filters
 			# this is due to the term_filters comming from hierarchy aggregations
 			hierarchy_bucket_fields = list(self.term_filters)
 			for key in self.search_params['term_filters']:
 				if key not in hierarchy_bucket_fields:
 					hierarchy_bucket_fields.append(key)
-			
-			filter_queries = TermFilterQueries(users_project_ids = self.users_project_ids, source_fields = hierarchy_bucket_fields, connector = connector).getTermFilterQueries(self.search_params['term_filters'])
-			self.query['bool']["filter"].extend(filter_queries)
-		
-		if 'range_queries' in self.search_params:
-			connector = 'AND'
-			if 'term_filters_connector' in self.search_params:
-				connector = self.search_params['term_filters_connector']
-			
-			#pudb.set_trace()
-			
-			range_queries = RangeQueries(users_project_ids = self.users_project_ids).setRangeQueries(self.search_params['range_queries'])
-			self.query['bool']["filter"].extend(range_queries)
-			
+			'''
 			
 			pass
 		
@@ -209,6 +221,45 @@ class ES_Searcher():
 		
 		self.__addUserLimitation()
 		self.deleteEmptySubqueries()
+
+
+	def getDateFilterDictsFromTermFilter(self, key):
+		query_dicts = []
+		
+		dates = self.search_params['term_filters'][key]
+		
+		for date_from in dates:
+			query_dict = {
+				"fields": [key],
+				"date_from": date_from
+			}
+			
+			p = re.compile(r'^\s*((\d{4})(-(\d{2}))?(-(\d{2}))?)\s*$')
+			m = p.search(date_from)
+			
+			if m is not None:
+				year = m.group(2)
+				month = m.group(4)
+				day = m.group(6)
+				
+				delta = None
+				if day is not None and month is not None and year is not None:
+					startdate = datetime.strptime(date_from, '%Y-%m-%d').date()
+					delta = relativedelta(days=1)
+				elif month is not None and year is not None:
+					startdate = datetime.strptime(date_from, '%Y-%m').date()
+					delta = relativedelta(months=1)
+				elif year is not None:
+					startdate = datetime.strptime(date_from, '%Y').date()
+					delta = relativedelta(years=1)
+				
+				if delta is not None:
+					enddate = startdate + delta
+					date_to = datetime.strftime(enddate, '%Y-%m-%d')
+					query_dict['date_to'] = date_to
+					query_dicts.append(query_dict)
+		
+		return query_dicts
 
 
 	def updateMaxResultWindow(self, max_result_window):

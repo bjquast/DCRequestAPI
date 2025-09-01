@@ -124,7 +124,6 @@ class StackedInnerQuery(QueryConstructor):
 					self.query_list.append(query_dict)
 			
 			elif self.request_dict['query_type'][i] == 'date' and (self.request_dict['date_from'][i] or self.request_dict['date_from'][i]):
-				pudb.set_trace()
 				query_dict = {
 					'date_from': self.request_dict.get('date_from', [''])[i],
 					'date_to': self.request_dict.get('date_to', [''])[i],
@@ -146,7 +145,6 @@ class StackedInnerQuery(QueryConstructor):
 			}
 		}
 		
-		pudb.set_trace()
 		for query_dict in self.query_list:
 			if 'term' in query_dict:
 				string_query = StringQueries(self.users_project_ids, query_dict['fields'], query_dict['inner_connector'])

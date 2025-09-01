@@ -10,7 +10,7 @@ from ElasticSearch.QueryConstructor.DateRangesGenerator import DateRangesGenerat
 
 
 class DateAggregations(QueryConstructor):
-	def __init__(self, users_project_ids = [], source_fields = [], size = 10, startdate = '1800-01-01', enddate = None, interval = 'year', interval_multiplicator = 1, buckets_sort_alphanum = False, buckets_sort_dir = None):
+	def __init__(self, users_project_ids = [], source_fields = [], size = 10, startdate = '1700-01-01', enddate = None, interval = 'year', interval_multiplicator = 1, buckets_sort_alphanum = False, buckets_sort_dir = None):
 		QueryConstructor.__init__(self)
 		
 		self.source_fields = source_fields

@@ -38,8 +38,9 @@ class RangeQueries(QueryConstructor):
 		return
 
 
-	def getQueries(self, range_requests, connector = 'AND'):
+	def getQueries(self, range_requests, connector = 'AND', greater_op = 'gte', less_op = 'lte'):
 		self.connector = connector
+		self.setGreaterLessOperators(greater_op, less_op)
 		
 		self.setQueryList(range_requests)
 		
@@ -60,16 +61,26 @@ class RangeQueries(QueryConstructor):
 		return connected_range_queries
 
 
+	def setGreaterLessOperators(self, greater_op, less_op):
+		self.greater_op = greater_op
+		self.less_op = less_op
+		if self.greater_op.lower() not in ['gt', 'gte']:
+			self.greater_op = 'gte'
+		if self.less_op.lower() not in ['lt', 'lte']:
+			self.less_op = 'lte'
+		return
+
+
 	def setRangeValues(self, range_request):
 		self.gte_lte_values = {}
 		if 'range_from' in range_request and range_request['range_from']:
-			self.gte_lte_values['gte'] = range_request['range_from']
+			self.gte_lte_values[self.greater_op] = range_request['range_from']
 		if 'date_from' in range_request and range_request['date_from']:
-			self.gte_lte_values['gte'] = range_request['date_from']
+			self.gte_lte_values[self.greater_op] = range_request['date_from']
 		if 'range_to' in range_request and range_request['range_to']:
-			self.gte_lte_values['lte'] = range_request['range_to']
+			self.gte_lte_values[self.less_op] = range_request['range_to']
 		if 'date_to' in range_request and range_request['date_to']:
-			self.gte_lte_values['lte'] = range_request['date_to']
+			self.gte_lte_values[self.less_op] = range_request['date_to']
 		return
 
 
