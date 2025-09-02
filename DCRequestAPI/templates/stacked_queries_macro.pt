@@ -24,12 +24,12 @@
 											<!-- a filled search field -->
 											<span tal:condition="python: len(search_term) > 0 or len(date_from) > 0 or len(date_to) > 0" id="stack_query_id_${i}_${j}" data-query-type="${search_params['stack_queries'][i]['query_type'][j]}">
 												
-												<input tal:condition="python: search_params['stack_queries'][i]['field'][j] not in date_fields" form="search_form" type="text" class="width-8em with_clearbutton" value="${search_term}" name="stack_query_string_${i}_${j}" />
+												<input tal:condition="python: search_params['stack_queries'][i]['field'][j] not in date_fields" form="search_form" type="text" class="width-11em with_clearbutton" value="${search_term}" name="stack_query_string_${i}_${j}" />
 												<label tal:condition="python: search_params['stack_queries'][i]['field'][j] in date_fields">Date from: </label>
-												<input tal:condition="python: search_params['stack_queries'][i]['field'][j] in date_fields" form="search_form" type="date" class="width-8em with_clearbutton" value="${date_from}" name="stack_query_date_from_${i}_${j}" />
+												<input tal:condition="python: search_params['stack_queries'][i]['field'][j] in date_fields" form="search_form" type="date" class="width-11em with_clearbutton" value="${date_from}" name="stack_query_date_from_${i}_${j}" />
 												<label tal:condition="python: search_params['stack_queries'][i]['field'][j] in date_fields">Date to: </label>
-												<input tal:condition="python: search_params['stack_queries'][i]['field'][j] in date_fields" form="search_form" type="date" class="width-8em with_clearbutton" value="${date_to}" name="stack_query_date_to_${i}_${j}" />
-												<select form="search_form" name="stack_query_field_${i}_${j}" class="width-8em stack_query_field_selector">
+												<input tal:condition="python: search_params['stack_queries'][i]['field'][j] in date_fields" form="search_form" type="date" class="width-11em with_clearbutton" value="${date_to}" name="stack_query_date_to_${i}_${j}" />
+												<select form="search_form" name="stack_query_field_${i}_${j}" class="width-11em stack_query_field_selector">
 													<option tal:attributes="selected 'selected' if search_params['stack_queries'][i]['field'][j] == 'all fields' else None" value="all fields">all fields</option>
 													<block tal:repeat="source_field stacked_query_fields" tal:omit-tag="">
 														<option value="${source_field}" tal:attributes="selected 'selected' if search_params['stack_queries'][i]['field'][j] == source_field else None">
@@ -50,10 +50,10 @@
 									<block tal:define="j len(search_params['stack_queries'][i]['string'])" tal:omit-tag="">
 										<span id="stack_query_id_${i}_${j}" data-query-type="term">
 											<span class="invisible">(</span>
-											<input id="stack_query_string_${i}_${j}" form="search_form" class="width-8em with_clearbutton" type="text" name="stack_query_string_${i}_${j}" value=""/>
+											<input id="stack_query_string_${i}_${j}" form="search_form" class="width-11em with_clearbutton" type="text" name="stack_query_string_${i}_${j}" value=""/>
 											<!-- field selector -->
 											<block tal:define="j len(search_params['stack_queries'][i]['string'])" tal:omit-tag="">
-												<select form="search_form" name="stack_query_field_${i}_${j}" class="width-8em stack_query_field_selector">
+												<select form="search_form" name="stack_query_field_${i}_${j}" class="width-11em stack_query_field_selector">
 													<option value="all fields">all fields</option>
 													<option tal:repeat="source_field stacked_query_fields" value="${source_field}">
 														${coldefs[source_field]['en']}
@@ -96,8 +96,8 @@
 					<div id="stack_query_id_${next_i}_0" data-query-type="term">
 						<span class="invisible">(</span>
 						<block tal:condition="python: len(search_params['stack_queries']) <= 0" tal:omit-tag="">
-							<input id="stack_query_string_${next_i}_0" form="search_form" class="width-8em with_clearbutton" type="text" name="stack_query_string_${next_i}_0" value=""/>
-							<select form="search_form" name="stack_query_field_${next_i}_0" class="width-8em stack_query_field_selector">
+							<input id="stack_query_string_${next_i}_0" form="search_form" class="width-11em with_clearbutton" type="text" name="stack_query_string_${next_i}_0" value=""/>
+							<select form="search_form" name="stack_query_field_${next_i}_0" class="width-11em stack_query_field_selector">
 								<option value="all fields">all fields</option>
 								<option tal:repeat="source_field stacked_query_fields" value="${source_field}">
 									${coldefs[source_field]['en']}
@@ -105,9 +105,9 @@
 							</select>
 						</block>
 						<block tal:condition="python: len(search_params['stack_queries']) > 0" tal:omit-tag="">
-							<input id="stack_query_string_${next_i}_0" form="search_form" class="width-8em with_clearbutton" type="text" name="stack_query_string_${next_i}_0" value=""/>
+							<input id="stack_query_string_${next_i}_0" form="search_form" class="width-11em with_clearbutton" type="text" name="stack_query_string_${next_i}_0" value=""/>
 							<!-- field selector -->
-							<select form="search_form" name="stack_query_field_${next_i}_0" class="width-8em stack_query_field_selector">
+							<select form="search_form" name="stack_query_field_${next_i}_0" class="width-11em stack_query_field_selector">
 								<option value="all fields">all fields</option>
 								<option tal:repeat="source_field stacked_query_fields" value="${source_field}">
 									${coldefs[source_field]['en']}

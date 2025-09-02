@@ -82,7 +82,6 @@ class StackedSearch {
 		let current_query_type = $('#' + query_id).attr('data-query-type');
 		
 		if (current_query_type != query_type) {
-			console.log('##########', current_query_type, query_type);
 			if (query_type == 'date') {
 				
 				$('#' + query_id + ' label').each( function () {
@@ -95,10 +94,10 @@ class StackedSearch {
 					$(this).remove();
 				});
 				
-				$('#' + query_id).prepend('<input type="date" class="width-8em with_clearbutton" name="stack_query_date_to_' + query_index +'" />');
+				$('#' + query_id).prepend('<input type="date" class="width-11em with_clearbutton" name="stack_query_date_to_' + query_index +'" />');
 				$('#' + query_id).prepend('<label>Date to: </label>');
 				
-				$('#' + query_id).prepend('<input type="date" class="width-8em with_clearbutton" name="stack_query_date_from_' + query_index +'" />');
+				$('#' + query_id).prepend('<input type="date" class="width-11em with_clearbutton" name="stack_query_date_from_' + query_index +'" />');
 				$('#' + query_id).prepend('<label>Date from: </label>');
 				
 				$('#' + query_id + ' input.with_clearbutton').each( function() {
@@ -118,7 +117,7 @@ class StackedSearch {
 					$(this).remove();
 				});
 				
-				$('#' + query_id).prepend('<input type="text" class="width-8em with_clearbutton" value="" name="stack_query_string_' + query_index +'" />');
+				$('#' + query_id).prepend('<input type="text" class="width-11em with_clearbutton" value="" name="stack_query_string_' + query_index +'" />');
 				$('#' + query_id + ' input').wrap('<span class="input_delete_wrapper"></span>').after($('<span class="delete_icon">x</span>').click(function() {
 					$('#' + query_id + ' input').prev('input').val('').trigger('change').focus();
 				}));

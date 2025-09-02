@@ -126,6 +126,10 @@ input{
 	width: 8em;
 }
 
+.width-11em {
+	width: 11em;
+}
+
 .add_subsearch_label, .delete_subsearch_label {
 	padding: 4px;
 	background-color: #eeeeeeff;
