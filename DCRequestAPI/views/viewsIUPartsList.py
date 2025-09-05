@@ -98,14 +98,18 @@ class IUPartsListView():
 
 	@view_config(route_name='iupartslist', accept='text/html', renderer="DCRequestAPI:templates/iupartslist.pt")
 	def IUPartsListHTML(self):
+		
 		column_names = self.fieldconfig.getColNames()
 		filter_names = self.fieldconfig.getFilterNames()
 		hierarchy_filter_names = self.fieldconfig.getHierarchyFilterNames()
-		hierarchy_filter_fields = self.fieldconfig.hierarchy_filter_fields
+		hierarchy_fields = self.fieldconfig.hierarchy_fields
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
 		es_searcher.setSourceFields(self.search_params['result_table_columns'])
-		es_searcher.setFilterFields(self.search_params['open_filter_selectors'])
+		
+		open_filter_fields = self.search_params['open_filter_selectors']
+		open_filter_fields.extend(self.search_params['open_hierarchy_selectors'])
+		es_searcher.setFilterFields(open_filter_fields)
 		
 		es_searcher.setHierarchyPathesDict(self.search_params['hierarchies'])
 		
@@ -146,7 +150,7 @@ class IUPartsListView():
 			'stacked_query_fields': self.fieldconfig.stacked_query_fields,
 			'term_fields': self.fieldconfig.term_fields,
 			'date_fields': self.fieldconfig.date_fields,
-			'hierarchy_filter_fields': hierarchy_filter_fields,
+			'hierarchy_fields': hierarchy_fields,
 			'open_hierarchy_selectors': self.search_params['open_hierarchy_selectors'],
 			'hierarchy_pathes_dict': self.search_params['hierarchies'],
 			# authentication
@@ -156,13 +160,13 @@ class IUPartsListView():
 		return pagecontent
 
 
-	def reduce_hierarchical_term_filters(self, term_filters, hierarchy_filter_fields):
+	def reduce_hierarchical_term_filters(self, term_filters, hierarchy_fields):
 		# when term_filters are used with hierarchies
 		# filter out the term_filters that are parents of other term_filters
 		# to have a specific search
 		new_term_filters = {}
 		for key in term_filters:
-			if key in hierarchy_filter_fields:
+			if key in hierarchy_fields:
 				
 				filter_dict = {}
 				

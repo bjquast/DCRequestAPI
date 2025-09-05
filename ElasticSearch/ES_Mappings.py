@@ -109,7 +109,7 @@ MappingsDict['iuparts'] = {
 		
 		'StableIdentifierURL': {'type': 'keyword'},
 		'LastUpdated': {"type": "date",
-			"format": "yyyy-MM-dd HH:mm:ss.SSS",
+			"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
 			'ignore_malformed': True
 		},
 		
@@ -120,13 +120,13 @@ MappingsDict['iuparts'] = {
 		'SpecimenVersion': {'type': 'integer'},
 		'SpecimenCreatedWhen':{
 			"type": "date",
-			"format": "yyyy-MM-dd HH:mm:ss.SSS",
+			"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
 			'ignore_malformed': True
 		},
 		'SpecimenCreatedBy': {'type': 'keyword'},
 		'SpecimenUpdatedWhen':{
 			"type": "date",
-			"format": "yyyy-MM-dd HH:mm:ss.SSS",
+			"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
 			'ignore_malformed': True
 		},
 		'SpecimenUpdatedBy': {'type': 'keyword'},

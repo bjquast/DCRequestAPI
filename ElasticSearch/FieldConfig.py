@@ -47,6 +47,8 @@ class FieldConfig:
 			'PartAccessionNumber',
 			#'StableIdentifierURL',
 			'LastIdentificationCache',
+			'SpecimenCreatedWhen',
+			'AccessionDate',
 			'VernacularTerms',
 			'MatchedSynonyms.Synonym',
 			#'FamilyCache',
@@ -81,7 +83,7 @@ class FieldConfig:
 		"""
 		all filters that may occur in filters,
 		this list exists to give the order of the filters
-		the lists term_fields, self.hierarchy_filter_fields, date_fields
+		the lists term_fields, self.hierarchy_fields, date_fields
 		provide the filters ordered by data type, default_filter_sections
 		sets the list of filters when no filters are selected
 		"""
@@ -92,9 +94,10 @@ class FieldConfig:
 			{'DatabaseAccronym': [True, True, 'term']},
 			{'AccessionDate': [True, False, 'date']},
 			#{'CollectionsTree.CollectionName': [False, False, 'term']},
+			{'SpecimenCreatedWhen': [True, False, 'date']},
 			{'CollectionName': [True, True, 'term']},
 			#{'CollectionsTree': [False, False, 'term']},
-			{'CollectionHierarchyString': [True, False, 'hierarchy']},
+			#{'CollectionHierarchyString': [False, False, 'hierarchy']},
 			{'Projects.Project': [True, True, 'term']},
 			{'LastIdentificationCache': [True, True, 'term']},
 			{'MatchedTaxon': [True, True, 'term']},
@@ -195,6 +198,7 @@ class FieldConfig:
 		self.stacked_query_fields = [
 			'PartAccessionNumber',
 			'LastIdentificationCache',
+			'SpecimenCreatedWhen',
 			'VernacularTerms',
 			'MatchedSynonyms.Synonym',
 			#'FamilyCache',
@@ -228,7 +232,7 @@ class FieldConfig:
 		"""
 		all fields used in hierarchy based filters
 		"""
-		self.hierarchy_filter_fields = [
+		self.hierarchy_fields = [
 			'MatchedTaxaHierarchyString',
 			'CollectionHierarchyString'
 		]
@@ -321,7 +325,7 @@ class FieldConfig:
 
 	def getHierarchyFilterNames(self):
 		hierarchy_filter_names = {}
-		for hierarchy_filter in self.hierarchy_filter_fields:
+		for hierarchy_filter in self.hierarchy_fields:
 			if hierarchy_filter in self.fielddefinitions:
 				hierarchy_filter_names[hierarchy_filter] = self.fielddefinitions[hierarchy_filter]['names']
 		return hierarchy_filter_names
@@ -431,7 +435,7 @@ class FieldConfig:
 			},
 			
 			'AccessionDate': {
-				'names': {'en': 'Date of accession'},
+				'names': {'en': 'Accession date'},
 				'buckets': {
 					'field_query': 'AccessionDate',
 					'type': 'date'
@@ -439,7 +443,7 @@ class FieldConfig:
 			},
 			
 			'SpecimenCreatedWhen': {
-				'names': {'en': 'Date of database submission'},
+				'names': {'en': 'Data aquisition date'},
 				'buckets': {
 					'field_query': 'SpecimenCreatedWhen',
 					'type': 'date'
@@ -490,7 +494,8 @@ class FieldConfig:
 				'names': {'en': 'Collection date'},
 				'buckets': {
 					'field_query': 'CollectionDate',
-					'type': 'date'
+					'type': 'date',
+					'withholdflags': ['EventWithhold', 'embargo_event_but_country', 'embargo_event_but_country_after_1992', 'embargo_coll_date'],
 				}
 			},
 			

@@ -102,7 +102,7 @@ class RangeQueries(QueryConstructor):
 		return
 
 
-	def appendSimpleRestrictedRangeQuery(self, range_field, range_from, range_to):
+	def appendSimpleRestrictedRangeQuery(self, range_field):
 		withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.simple_restricted_fields[range_field]['withholdflags']]
 		
 		range_query = {
@@ -135,7 +135,7 @@ class RangeQueries(QueryConstructor):
 		return
 
 
-	def appendNestedRangeQuery(self, range_field, range_from, range_to):
+	def appendNestedRangeQuery(self, range_field):
 		
 		range_query = {
 			"nested": {
@@ -164,7 +164,7 @@ class RangeQueries(QueryConstructor):
 		return
 
 
-	def appendNestedRestrictedRangeQuery(self, range_field, range_from, range_to):
+	def appendNestedRestrictedRangeQuery(self, range_field):
 		
 		withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.nested_restricted_fields[range_field]['withholdflags']]
 		

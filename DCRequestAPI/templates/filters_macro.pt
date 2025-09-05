@@ -17,7 +17,7 @@
 			<block tal:condition="python: 'term_filters' in search_params">
 				<block tal:repeat="filter_key search_params['term_filters']">
 					<block tal:repeat="filter_value search_params['term_filters'][filter_key]">
-						<div tal:condition="python: filter_key in available_filter_fields or filter_key in hierarchy_filter_fields" data-filter-id="filter_${filter_key}_${filter_value}" class="filter_checkbox">
+						<div tal:condition="python: filter_key in available_filter_fields or filter_key in hierarchy_fields" data-filter-id="filter_${filter_key}_${filter_value}" class="filter_checkbox">
 							<input type="checkbox" form="search_form" checked="checked" value="${filter_key}:${filter_value}" name="term_filters" data-filter-id="filter_${filter_key}_${filter_value}">
 							<label tal:condition="python: filter_key in bucketdefs"><b>${bucketdefs[filter_key]['en']}:</b> ${filter_value}</label>
 							<label tal:condition="python: filter_key in hierarchy_filter_names"><b>${hierarchy_filter_names[filter_key]['en']}:</b> ${filter_value}</label>

@@ -150,7 +150,7 @@ class ES_Searcher():
 				self.term_filters.append(field)
 			elif field in self.fieldconfig.date_fields:
 				self.date_filters.append(field)
-			elif field in self.fieldconfig.hierarchy_filter_fields:
+			elif field in self.fieldconfig.hierarchy_fields:
 				self.hierarchy_filters.append(field)
 		return
 
@@ -189,7 +189,7 @@ class ES_Searcher():
 			date_filter_fields = []
 			
 			for key in self.search_params['term_filters']:
-				if key in self.fieldconfig.term_fields or key in self.fieldconfig.hierarchy_filter_fields:
+				if key in self.fieldconfig.term_fields or key in self.fieldconfig.hierarchy_fields:
 					term_filter_fields.append(key)
 					term_searches[key] = self.search_params['term_filters'][key]
 				
@@ -448,13 +448,14 @@ class ES_Searcher():
 				aggs = date_aggregator.getAggregationsQuery()
 		
 		if len(self.hierarchy_filters) > 0:
+			# should be better to use self.hierarchy_pathes_dict because it dos not rely on the extra variable self.hierarchy_filters that must be set in setFilterFields
+			#if len(self.hierarchy_pathes_dict) > 0:
 			hierarchies_query = HierarchyQueries(hierarchy_pathes_dict = self.hierarchy_pathes_dict, users_project_ids = self.users_project_ids, source_fields = self.hierarchy_filters)
 			if aggs is not None:
 				aggs.update(hierarchies_query.getHierarchiesQuery())
 			else:
 				aggs = hierarchies_query.getHierarchiesQuery()
 		
-		#logger.debug(self.sort)
 		logger.debug(json.dumps(aggs))
 		logger.debug(json.dumps(self.query))
 		#logger.debug(json.dumps(self.sort))
@@ -588,8 +589,6 @@ if __name__ == "__main__":
 		'stack_queries': 'Rulik',
 	}
 	
-	
-	pudb.set_trace()
 	es_search = ES_Searcher(search_params = search_params, user_id = 'bquast', users_project_ids = [634, 30000])
 	es_search.paginatedSearch()
 	facets = es_search.raw_aggregations

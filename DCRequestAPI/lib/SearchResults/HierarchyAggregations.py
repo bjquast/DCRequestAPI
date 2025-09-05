@@ -8,7 +8,7 @@ class HierarchyAggregations():
 		self.aggregations = aggregations
 		
 		fielddefs = FieldConfig()
-		self.hierarchy_fields = fielddefs.hierarchy_filter_fields
+		self.hierarchy_fields = fielddefs.hierarchy_fields
 		
 		self.hierarchies_dict = {}
 

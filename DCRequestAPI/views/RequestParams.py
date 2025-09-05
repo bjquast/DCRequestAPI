@@ -150,7 +150,7 @@ class RequestParams():
 			if param_name in self.params_dict and len(self.params_dict[param_name]) > 0:
 				self.search_params[param_name] = self.params_dict[param_name][-1]
 		
-		for param_name in complex_params: 
+		for param_name in complex_params:
 			if param_name in self.params_dict and len(self.params_dict[param_name]) > 0:
 				for searchquery in self.params_dict[param_name]:
 					query = searchquery.split(':', 1)
@@ -225,7 +225,6 @@ class DefaultParamsSetter():
 	"""
 	def __init__(self, search_params):
 		self.fieldconf = FieldConfig()
-		
 		self.search_params = search_params
 		self.set_default_params()
 		
@@ -250,6 +249,8 @@ class DefaultParamsSetter():
 		for key in self.search_params['term_filters']:
 			if key in self.fieldconf.term_fields:
 				term_filters[key] = self.search_params['term_filters'][key]
+			elif key in self.fieldconf.hierarchy_fields:
+				term_filters[key] = self.search_params['term_filters'][key]
 			elif key in self.fieldconf.date_fields:
 				date_values = []
 				for value in self.search_params['term_filters'][key]:
@@ -265,7 +266,7 @@ class DefaultParamsSetter():
 	def set_hierarchy_filters(self):
 		hierarchy_filters = {}
 		for key in self.search_params['hierarchies']:
-			if key in self.fieldconf.hierarchy_filter_fields:
+			if key in self.fieldconf.hierarchy_fields:
 				hierarchy_filters[key] = self.search_params['hierarchies'][key]
 		self.search_params['hierarchies'] = hierarchy_filters
 
@@ -308,7 +309,7 @@ class DefaultParamsSetter():
 	def set_open_hierarchy_selectors(self):
 		open_hierarchy_selectors = []
 		for field in self.search_params['open_hierarchy_selectors']:
-			if field in self.fieldconf.hierarchy_filter_fields:
+			if field in self.fieldconf.hierarchy_fields:
 				open_hierarchy_selectors.append(field)
 		self.search_params['open_hierarchy_selectors'] = open_hierarchy_selectors
 	'''
@@ -333,12 +334,12 @@ class DefaultParamsSetter():
 		# when term_filters are used with hierarchies
 		# filter out the term_filters that are parents of other term_filters
 		
-		hierarchy_filter_fields = self.fieldconf.hierarchy_filter_fields
+		hierarchy_fields = self.fieldconf.hierarchy_fields
 		term_filters = self.search_params['term_filters']
 		
 		new_term_filters = {}
 		for key in term_filters:
-			if key in hierarchy_filter_fields:
+			if key in hierarchy_fields:
 				
 				filter_dict = {}
 				
