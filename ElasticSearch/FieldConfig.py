@@ -47,8 +47,6 @@ class FieldConfig:
 			'PartAccessionNumber',
 			#'StableIdentifierURL',
 			'LastIdentificationCache',
-			'SpecimenCreatedWhen',
-			'AccessionDate',
 			'VernacularTerms',
 			'MatchedSynonyms.Synonym',
 			#'FamilyCache',
@@ -75,6 +73,8 @@ class FieldConfig:
 			'SpecimenPartID',
 			'Barcodes.Methods.region',
 			'DatabaseAccronym',
+			'SpecimenCreatedWhen',
+			'AccessionDate',
 		]
 		return
 
@@ -88,47 +88,44 @@ class FieldConfig:
 		sets the list of filters when no filters are selected
 		"""
 		
-		# each entry has a list with values for: [available, is shown by default in filters, type of filter]
+		# each entry has a list with values for: [available, is shown by default in filters, used in stacked query, type of filter]
 		
 		self.filter_defs = [
-			{'DatabaseAccronym': [True, True, 'term']},
-			{'AccessionDate': [True, False, 'date']},
-			#{'CollectionsTree.CollectionName': [False, False, 'term']},
-			{'SpecimenCreatedWhen': [True, False, 'date']},
-			{'CollectionName': [True, True, 'term']},
-			#{'CollectionsTree': [False, False, 'term']},
-			#{'CollectionHierarchyString': [False, False, 'hierarchy']},
-			{'Projects.Project': [True, True, 'term']},
-			{'LastIdentificationCache': [True, True, 'term']},
-			{'MatchedTaxon': [True, True, 'term']},
-			{'VernacularTerms': [True, True, 'term']},
-			{'MatchedSynonyms.Synonym': [True, True, 'term']},
-			{'MatchedTaxaTree': [True, True, 'term']},
-			{'MatchedTaxaTree.Phylum': [True, False, 'term']},
-			{'MatchedTaxaTree.Subphylum': [True, False, 'term']},
-			{'MatchedTaxaTree.Class': [True, False, 'term']},
-			{'MatchedTaxaTree.Subclass': [True, False, 'term']},
-			{'MatchedTaxaTree.Order': [True, False, 'term']},
-			{'MatchedTaxaTree.Suborder': [True, False, 'term']},
-			{'MatchedTaxaTree.Family': [True, False, 'term']},
-			{'MatchedTaxaTree.Subfamily': [True, False, 'term']},
-			{'MatchedTaxaTree.Genus': [True, False, 'term']},
-			#{'MatchedTaxaTree.Subgenus': [False, False, 'term']},
-			#{'MatchedTaxaHierarchyString': [False, False, 'hierarchy']},
-			{'TypeStatus': [True, True, 'term']},
-			{'CountryCache': [True, True, 'term']},
-			{'CollectionDate': [True, True, 'date']},
-			{'CollectingMethod': [True, False, 'term']},
-			{'CollectionAgents.CollectorsName': [True, False, 'term']},
-			{'LocalityVerbatim': [True, False, 'term']},
-			{'LocalityDescription': [True, False, 'term']},
-			{'HabitatDescription': [True, False, 'term']},
-			{'MaterialCategory': [True, False, 'term']},
-			{'LifeStage': [True, False, 'term']},
-			{'Gender': [True, False, 'term']},
-			{'NumberOfUnits': [True, False, 'term']},
-			{'Barcodes.Methods.region': [True, False, 'term']},
-			{'ImagesAvailable': [True, True, 'term']}
+			{'PartAccessionNumber': [False, False, True, 'term']},
+			{'DatabaseAccronym': [True, True, True, 'term']},
+			{'AccessionDate': [True, False, False, 'date']},
+			{'SpecimenCreatedWhen': [True, False, True, 'date']},
+			{'CollectionName': [True, True, True, 'term']},
+			{'Projects.Project': [True, True, True, 'term']},
+			{'LastIdentificationCache': [True, True, True, 'term']},
+			{'MatchedTaxon': [True, True, False, 'term']},
+			{'MatchedParentTaxa': [False, False, True, 'term']},
+			{'VernacularTerms': [True, True, True, 'term']},
+			{'MatchedSynonyms.Synonym': [True, True, True, 'term']},
+			{'MatchedTaxaTree': [True, True, False, 'term']},
+			{'MatchedTaxaTree.Phylum': [True, False, False, 'term']},
+			{'MatchedTaxaTree.Subphylum': [True, False, False, 'term']},
+			{'MatchedTaxaTree.Class': [True, False, False, 'term']},
+			{'MatchedTaxaTree.Subclass': [True, False, False, 'term']},
+			{'MatchedTaxaTree.Order': [True, False, False, 'term']},
+			{'MatchedTaxaTree.Suborder': [True, False, False, 'term']},
+			{'MatchedTaxaTree.Family': [True, False, False, 'term']},
+			{'MatchedTaxaTree.Subfamily': [True, False, False, 'term']},
+			{'MatchedTaxaTree.Genus': [True, False, False, 'term']},
+			{'TypeStatus': [True, True, True, 'term']},
+			{'CountryCache': [True, True, True, 'term']},
+			{'CollectionDate': [True, True, True, 'date']},
+			{'CollectingMethod': [True, False, True, 'term']},
+			{'CollectionAgents.CollectorsName': [True, False, True, 'term']},
+			{'LocalityVerbatim': [True, False, True, 'term']},
+			{'LocalityDescription': [True, False, True, 'term']},
+			{'HabitatDescription': [True, False, True, 'term']},
+			{'MaterialCategory': [True, False, True, 'term']},
+			{'LifeStage': [True, False, True, 'term']},
+			{'Gender': [True, False, True, 'term']},
+			{'NumberOfUnits': [True, False, True, 'term']},
+			{'Barcodes.Methods.region': [True, False, True, 'term']},
+			{'ImagesAvailable': [True, True, False, 'term']}
 			
 		]
 		return
@@ -152,7 +149,7 @@ class FieldConfig:
 		
 		for field in self.filter_defs:
 			for key in field:
-				if field[key][0] is True and field[key][2] == 'term':
+				if field[key][0] is True and field[key][3] == 'term':
 					self.term_fields.append(key)
 		return
 
@@ -165,7 +162,7 @@ class FieldConfig:
 		
 		for field in self.filter_defs:
 			for key in field:
-				if field[key][0] is True and field[key][2] == 'date':
+				if field[key][0] is True and field[key][3] == 'date':
 					self.date_fields.append(key)
 		return
 
@@ -185,9 +182,11 @@ class FieldConfig:
 
 	def setStackedTermFields(self):
 		self.stacked_term_fields = []
-		for field in self.stacked_query_fields:
-			if field in self.term_fields:
-				self.stacked_term_fields.append(field)
+		
+		for field in self.filter_defs:
+			for key in field:
+				if key in self.stacked_query_fields and field[key][2] is True:
+					self.stacked_term_fields.append(key)
 		return
 		
 

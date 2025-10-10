@@ -110,7 +110,6 @@ class StackedSearch {
 				$('#' + query_id).attr('data-query-type', 'date');
 			}
 			else if (query_type == 'term') {
-				console.log('####### cccccccccc');
 				$('#' + query_id + ' label').remove();
 				$('#' + query_id + ' input').remove();
 				$('#' + query_id + ' .input_delete_wrapper, .delete_icon').each( function () {
