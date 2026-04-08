@@ -4,9 +4,13 @@ config.ini
 **/*.pyc
 *.egg-info/*
 **/data/**
+docker/dcrequestapi/data/**
+**/SQLDumps/*.sql
 **/TaxaMergerDB_Dump/**
 *.env
 *.*~
+**/.db_and_es_data/**
+.idea
 **/.venv/**
 **/.idea
 .venv/

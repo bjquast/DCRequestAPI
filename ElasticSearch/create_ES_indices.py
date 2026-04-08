@@ -79,7 +79,7 @@ class DataPage():
 			self.setMatchedTaxa(self.iuparts_dict)
 		else:
 			self.matchedtaxa_dict = {}
-			self.synonyms_dict = {}
+			self.matchedsynonyms_dict = {}
 		return
 
 

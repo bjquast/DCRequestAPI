@@ -21,6 +21,7 @@ import json
 class IUPartsListView():
 	def __init__(self, request):
 		self.request = request
+		
 		self.uid = self.request.authenticated_userid
 		
 		self.roles = self.request.identity['dwb_roles']
@@ -44,10 +45,12 @@ class IUPartsListView():
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
 		if 'username' in self.credentials and 'password' in self.credentials:
+			pudb.set_trace()
 			self.token = self.userlogin.authenticate_user(self.credentials['username'], self.credentials['password'])
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		
 		elif 'token' in self.credentials:
+			pudb.set_trace()
 			self.userlogin.authenticate_by_token(self.credentials['token'])
 			self.uid, self.roles, self.users_projects, self.users_project_ids = self.userlogin.get_identity()
 		

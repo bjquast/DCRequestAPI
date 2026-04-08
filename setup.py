@@ -23,7 +23,9 @@ requires = [
 	'cryptography',
 	'bcrypt',
 	'redis',
-	'python-dateutil'
+	'python-dateutil',
+	'pytest',
+	'webtest'
 ]
 
 setup(name='DCRequestAPI',
