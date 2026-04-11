@@ -139,7 +139,10 @@ services:
     networks:
       - dcrequestapi_net
     ports:
-      - ${ES_PORT}:9200
+      - target: 9200
+        published: ${ES_PORT}
+        protocol: tcp
+        mode: host
     environment:
       - node.name=es01
       - cluster.name=${CLUSTER_NAME}

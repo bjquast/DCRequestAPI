@@ -27,7 +27,7 @@ RUN git clone -b main --single-branch https://github.com/bjquast/DCRequestAPI.gi
 COPY set_config.py ./DCRequestAPI/set_config.py
 
 ENTRYPOINT cd ./DCRequestAPI && python3 set_config.py config.ini.template config.ini && python3 set_config.py production.ini.template production.ini && pserve production.ini
-
+#ENTRYPOINT cd ./DCRequestAPI && python3 set_config.py config.ini.template config.ini && python3 set_config.py production.ini.template production.ini && tail -f /dev/null
 CMD /usr/bin/bash
 
 EXPOSE $PYRAMID_PORT
