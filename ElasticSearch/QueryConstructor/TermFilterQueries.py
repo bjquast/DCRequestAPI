@@ -5,22 +5,21 @@ logger = logging.getLogger('elastic_queries')
 
 import pudb
 
-from ElasticSearch.FieldDefinitions import FieldDefinitions
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
 class TermFilterQueries(QueryConstructor):
 	def __init__(self, users_project_ids = [], source_fields = [], connector = 'AND'):
+		QueryConstructor.__init__(self)
+		
 		self.users_project_ids = users_project_ids
 		self.source_fields = source_fields
+		if len(self.source_fields) <= 0:
+			self.source_fields = self.fieldconf.term_fields
+			self.source_fields.extend(self.fieldconf.hierarchy_fields)
+		
 		self.connector = connector
 		
-		fielddefs = FieldDefinitions()
-		if len(self.source_fields) <= 0:
-			self.source_fields = fielddefs.bucketfields
-			self.source_fields.extend(fielddefs.hierarchy_query_fields)
-		
-		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.source_fields)
 		self.sort_queries_by_definitions()
 		self.setSubFilters()
 
@@ -47,6 +46,7 @@ class TermFilterQueries(QueryConstructor):
 		if self.connector.upper() == 'AND':
 			for filter_key in self.term_queries:
 				if len(self.term_queries[filter_key]) > 1:
+					# should is used instead of must when more than one source fileds are available because the query should then match even if the term is only found in one field
 					should_query = {'bool': {'should': self.term_queries[filter_key], 'minimum_should_match': 1}}
 					filter_queries.append(should_query)
 				elif len(self.term_queries[filter_key]) == 1:
@@ -57,8 +57,7 @@ class TermFilterQueries(QueryConstructor):
 			for filter_key in self.term_queries:
 				should_query['bool']['should'].extend(self.term_queries[filter_key])
 			filter_queries.append(should_query)
-			
-			
+		
 		return filter_queries
 
 
@@ -213,42 +212,3 @@ class TermFilterQueries(QueryConstructor):
 		
 		return
 
-
-	
-	'''
-			filter_path = filter_name.replace('.', '.properties.').split('.')
-			
-			try:
-				mapping = self.mapping
-				for path_element in filter_path:
-					element_mapping = mapping[path_element]
-			
-			except KeyError:
-				continue
-			
-			filter_type = None
-			if element_mapping['type'] == 'keyword':
-				filter_type = 'term'
-				filter_name_string = "{0}"
-			
-			elif 'fields' in element_mapping and 'keyword' in element_mapping['fields']:
-				filter_type = 'term'
-				filter_name_string = "{0}.keyword"
-			
-			else:
-				continue
-			
-			if len(filters[filter_name]) > 1:
-				term_queries = []
-				for filter_value in filters[filter_name]:
-					term_queries.append({"term": {filter_name_string.format(filter_name): {"value": filter_value, "case_insensitive": "true"}}})
-				should_query = {'bool': {'should': term_queries, 'minimum_should_match': 1}}
-				
-				filter_queries.append(should_query)
-			
-			elif len(filters[filter_name]) == 1:
-				filter_queries.append({"term": {filter_name_string.format(filter_name): {"value": filters[filter_name][0], "case_insensitive": "true"}}})
-		
-		return filter_queries
-		
-		'''

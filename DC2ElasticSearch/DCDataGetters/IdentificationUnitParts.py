@@ -36,7 +36,7 @@ class IdentificationUnitParts():
 		CASE WHEN idstemp.[embargo_event_but_country_after_1992] = 1 THEN 'true' ELSE 'false' END AS [embargo_event_but_country_after_1992],
 		CASE WHEN idstemp.[embargo_coll_date] = 1 THEN 'true' ELSE 'false' END AS [embargo_coll_date],
 		 -- end embargo columns, embargo_complete is used to set SpecimenWithhold
-		CONVERT (NVARCHAR, cs.[LogUpdatedWhen], 121) AS [LastUpdated],
+		CONVERT (NVARCHAR, cs.[LogUpdatedWhen], 120) AS [LastUpdated],
 		CONVERT(NVARCHAR, cs.[AccessionDate], 120) AS [AccessionDate], 
 		cs.[DepositorsName], 
 		cs.[DataWithholdingReason] AS SpecimenWithholdingReason, 
@@ -50,9 +50,9 @@ class IdentificationUnitParts():
 			ELSE 'true'
 		END AS SpecimenWithhold,
 		cs.Version AS SpecimenVersion,
-		CONVERT(NVARCHAR, cs.LogCreatedWhen, 121) AS SpecimenCreatedWhen,
+		CONVERT(NVARCHAR, cs.LogCreatedWhen, 120) AS SpecimenCreatedWhen,
 		cs.LogCreatedBy AS SpecimenCreatedBy,
-		CONVERT(NVARCHAR, cs.LogUpdatedWhen, 121) AS SpecimenUpdatedWhen,
+		CONVERT(NVARCHAR, cs.LogUpdatedWhen, 120) AS SpecimenUpdatedWhen,
 		cs.LogUpdatedBy AS SpecimenUpdatedBy,
 		csp.PreparationMethod,
 		CONVERT(NVARCHAR, csp.PreparationDate, 120) AS PreparationDate,

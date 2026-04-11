@@ -5,16 +5,19 @@ logger = logging.getLogger('elastic_queries')
 
 import pudb
 
-from ElasticSearch.FieldDefinitions import FieldDefinitions
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
 
 class BucketAggregations(QueryConstructor):
 	def __init__(self, users_project_ids = [], source_fields = [], size = 10, buckets_search_term = None, buckets_sort_alphanum = False, buckets_sort_dir = None, prefix_or_match = 'prefix', add_include_filter = False):
-		#pudb.set_trace()
+		QueryConstructor.__init__(self)
 		
 		self.users_project_ids = users_project_ids
+		
 		self.source_fields = source_fields
+		if len(self.source_fields) <= 0:
+			self.source_fields = self.fieldconf.term_fields
+		
 		self.size = size
 		
 		self.buckets_search_term = buckets_search_term
@@ -22,30 +25,22 @@ class BucketAggregations(QueryConstructor):
 			self.buckets_search_term = None
 		
 		self.buckets_sort_alphanum = buckets_sort_alphanum
-		
-		# keep buckets_sort_dir None if it is not set 
-		# so that the default directions asc and desc can be used for _key and _count, respectively
 		self.buckets_sort_dir = buckets_sort_dir
-		if self.buckets_sort_dir is not None:
-			self.buckets_sort_dir = self.buckets_sort_dir.lower()
+		self.setBucketsSorting()
 		
 		self.prefix_or_match = prefix_or_match
 		
 		self.add_include_filter = add_include_filter
 		self.setIncludeFilter()
 		
-		fielddefs = FieldDefinitions()
-		if len(self.source_fields) <= 0:
-			self.source_fields = fielddefs.bucketfields
-		
-		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.source_fields)
 		if self.buckets_search_term is not None:
 			self.removeNonTextFromSourceList()
+		
 		self.sort_queries_by_definitions()
 		self.setSubFilters()
 
 
-	def getSearchQuery(self, field_defs, field, case_insensitive):
+	def __getSearchQuery(self, field_defs, field, case_insensitive):
 		search_filter = {}
 		if self.buckets_search_term is not None:
 			if self.prefix_or_match == 'prefix':
@@ -78,25 +73,12 @@ class BucketAggregations(QueryConstructor):
 		return self.aggs_query
 
 
-	def getSorting(self):
-		sorting = {}
-		if self.buckets_sort_alphanum is True:
-			if self.buckets_sort_dir not in ['asc', 'desc']:
-				self.buckets_sort_dir = 'asc'
-			sorting = {"_key": self.buckets_sort_dir}
-		else:
-			if self.buckets_sort_dir not in ['asc', 'desc']:
-				self.buckets_sort_dir = 'desc'
-			sorting = {"_count": self.buckets_sort_dir}
-		return sorting
-
-
 	def setAggregationsQuery(self):
 		
 		for field in self.simple_fields:
 			
 			case_insensitive = self.getCaseInsensitiveValue(self.simple_fields[field])
-			search_query = self.getSearchQuery(self.simple_fields, field, case_insensitive)
+			search_query = self.__getSearchQuery(self.simple_fields, field, case_insensitive)
 			
 			self.aggs_query[field] = {
 				"filter": {
@@ -108,7 +90,8 @@ class BucketAggregations(QueryConstructor):
 					"buckets": {
 						"terms": {
 							"field": self.simple_fields[field]['field_query'],
-							'size': self.size
+							"size": self.size,
+							"order": self.bucket_sorting
 						}
 					}
 				}
@@ -119,10 +102,6 @@ class BucketAggregations(QueryConstructor):
 			
 			if self.include_filter_term is not None:
 				self.aggs_query[field]['aggs']["buckets"]['terms']['include'] = self.include_filter_term
-			
-			sorting_dict = self.getSorting()
-			if len(sorting_dict) > 0:
-				self.aggs_query[field]['aggs']['buckets']['terms']['order'] = sorting_dict
 		
 		return
 
@@ -131,7 +110,7 @@ class BucketAggregations(QueryConstructor):
 		for field in self.nested_fields:
 			
 			case_insensitive = self.getCaseInsensitiveValue(self.nested_fields[field])
-			search_query = self.getSearchQuery(self.nested_fields, field, case_insensitive)
+			search_query = self.__getSearchQuery(self.nested_fields, field, case_insensitive)
 			
 			self.aggs_query[field] = {
 				'nested': {
@@ -149,7 +128,8 @@ class BucketAggregations(QueryConstructor):
 							"buckets": {
 								"terms": {
 									"field": self.nested_fields[field]['field_query'],
-									'size': self.size
+									"size": self.size,
+									"order": self.bucket_sorting
 								}
 							}
 						}
@@ -169,10 +149,6 @@ class BucketAggregations(QueryConstructor):
 			if self.include_filter_term is not None:
 				self.aggs_query[field]['aggs']["buckets"]['aggs']["buckets"]['terms']['include'] = self.include_filter_term
 			
-			sorting_dict = self.getSorting()
-			if len(sorting_dict) > 0:
-				self.aggs_query[field]['aggs']["buckets"]['aggs']['buckets']['terms']['order'] = sorting_dict
-			
 		return
 
 
@@ -181,7 +157,7 @@ class BucketAggregations(QueryConstructor):
 		for field in self.nested_restricted_fields:
 			
 			case_insensitive = self.getCaseInsensitiveValue(self.nested_restricted_fields[field])
-			search_query = self.getSearchQuery(self.nested_restricted_fields, field, case_insensitive)
+			search_query = self.__getSearchQuery(self.nested_restricted_fields, field, case_insensitive)
 			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.nested_restricted_fields[field]['withholdflags']]
 			
 			self.aggs_query[field] = {
@@ -210,7 +186,8 @@ class BucketAggregations(QueryConstructor):
 							"buckets": {
 								"terms": {
 									"field": self.nested_restricted_fields[field]['field_query'],
-									'size': self.size
+									"size": self.size,
+									"order": self.bucket_sorting
 								}
 							}
 						}
@@ -230,9 +207,6 @@ class BucketAggregations(QueryConstructor):
 			if self.include_filter_term is not None:
 				self.aggs_query[field]['aggs']["buckets"]['aggs']["buckets"]['terms']['include'] = self.include_filter_term
 			
-			sorting_dict = self.getSorting()
-			if len(sorting_dict) > 0:
-				self.aggs_query[field]['aggs']['buckets']['aggs']['buckets']['terms']['order'] = sorting_dict
 		return
 
 
@@ -241,7 +215,7 @@ class BucketAggregations(QueryConstructor):
 		for field in self.simple_restricted_fields:
 			
 			case_insensitive = self.getCaseInsensitiveValue(self.simple_restricted_fields[field])
-			search_query = self.getSearchQuery(self.simple_restricted_fields, field, case_insensitive)
+			search_query = self.__getSearchQuery(self.simple_restricted_fields, field, case_insensitive)
 			withholdterms = [{"term": {withholdfield: "false"}} for withholdfield in self.simple_restricted_fields[field]['withholdflags']]
 			
 			self.aggs_query[field] = {
@@ -263,7 +237,8 @@ class BucketAggregations(QueryConstructor):
 					"buckets": {
 						"terms": {
 							"field": self.simple_restricted_fields[field]['field_query'],
-							'size': self.size
+							"size": self.size,
+							"order": self.bucket_sorting
 						}
 					}
 				}
@@ -275,9 +250,6 @@ class BucketAggregations(QueryConstructor):
 			if self.include_filter_term is not None:
 				self.aggs_query[field]['aggs']["buckets"]['terms']['include'] = self.include_filter_term
 			
-			sorting_dict = self.getSorting()
-			if len(sorting_dict) > 0:
-				self.aggs_query[field]['aggs']['buckets']['terms']['order'] = sorting_dict
 		return
 
 

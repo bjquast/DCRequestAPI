@@ -87,18 +87,22 @@ MappingsDict['iuparts'] = {
 					'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
 				}
 			},
-		'SpecimenAccessionNumber':
-			{
-				'type': 'text', 
-				'analyzer': 'whitespace_lc',
-				'fields': {
-					'keyword': {'type': 'keyword', 'ignore_above': 256},
-					'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
-				}
-			},
+		'SpecimenAccessionNumber': {
+			'type': 'text', 
+			'analyzer': 'whitespace_lc',
+			'fields': {
+				'keyword': {'type': 'keyword', 'ignore_above': 256},
+				'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}
+			}
+		},
 		'AccessionDate':
 			{"type": "date",
-			"format": "yyyy-MM-dd HH:mm:ss",
+			"fields": {
+				'keyword': {
+					'type': 'keyword', 'ignore_above': 256
+				}
+			},
+			"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
 			'ignore_malformed': True},
 		'DepositorsName': {
 			'type': 'text', 'fields': {
@@ -109,7 +113,12 @@ MappingsDict['iuparts'] = {
 		
 		'StableIdentifierURL': {'type': 'keyword'},
 		'LastUpdated': {"type": "date",
-			"format": "yyyy-MM-dd HH:mm:ss.SSS",
+			"fields": {
+				'keyword': {
+					'type': 'keyword', 'ignore_above': 256
+				}
+			},
+			"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
 			'ignore_malformed': True
 		},
 		
@@ -120,13 +129,23 @@ MappingsDict['iuparts'] = {
 		'SpecimenVersion': {'type': 'integer'},
 		'SpecimenCreatedWhen':{
 			"type": "date",
-			"format": "yyyy-MM-dd HH:mm:ss.SSS",
+			"fields": {
+				'keyword': {
+					'type': 'keyword', 'ignore_above': 256
+				}
+			},
+			"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
 			'ignore_malformed': True
 		},
 		'SpecimenCreatedBy': {'type': 'keyword'},
 		'SpecimenUpdatedWhen':{
 			"type": "date",
-			"format": "yyyy-MM-dd HH:mm:ss.SSS",
+			"fields": {
+				'keyword': {
+					'type': 'keyword', 'ignore_above': 256
+				}
+			},
+			"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
 			'ignore_malformed': True
 		},
 		'SpecimenUpdatedBy': {'type': 'keyword'},
@@ -147,7 +166,12 @@ MappingsDict['iuparts'] = {
 			},
 		'PreparationDate': {
 			"type": "date",
-			"format": "yyyy-MM-dd HH:mm:ss",
+			"fields": {
+				'keyword': {
+					'type': 'keyword', 'ignore_above': 256
+				}
+			},
+			"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
 			'ignore_malformed': True
 		},
 		'MaterialCategory': {'type': 'text', 'fields': {
@@ -217,7 +241,12 @@ MappingsDict['iuparts'] = {
 			},
 		'CollectionDate': {
 			"type": "date",
-			"format": "yyyy-MM-dd HH:mm:ss",
+			"fields": {
+				'keyword': {
+					'type': 'keyword', 'ignore_above': 256
+				}
+			},
+			"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
 			'ignore_malformed': True
 		},
 		'WGS84_Coordinate':
@@ -299,7 +328,12 @@ MappingsDict['iuparts'] = {
 				'IdentificationSequenceID': {'type': 'short'},
 				'IdentificationDate': {
 					"type": "date",
-					"format": "yyyy-MM-dd HH:mm:ss",
+					"fields": {
+						'keyword': {
+							'type': 'keyword', 'ignore_above': 256
+						}
+					},
+					"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
 					'ignore_malformed': True
 				},
 				'TaxonomicName': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
@@ -506,6 +540,11 @@ MappingsDict['iuparts'] = {
 				'LicenseHolderAgentURI': {'type': 'keyword'},
 				'LicenseYear': {
 					'type': 'date',
+					"fields": {
+						'keyword': {
+							'type': 'keyword', 'ignore_above': 256
+						}
+					},
 					"format": "yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
 					'ignore_malformed': True
 				},
@@ -526,6 +565,11 @@ MappingsDict['iuparts'] = {
 				'ResponsibleName': {'type': 'keyword'},
 				'AnalysisDate': {
 					"type": "date",
+					"fields": {
+						'keyword': {
+							'type': 'keyword', 'ignore_above': 256
+						}
+					},
 					"format": "yyyy-MM-dd HH:mm:ss.SSS||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||dd.MM.yyyy||dd.MM.yy||d.MM.yyyy||d.M.yyyy||dd.M.yyyy||d.MM.yy||d.M.yy||dd.M.yy||yyyy",
 					'ignore_malformed': True
 				},
@@ -575,6 +619,11 @@ MappingsDict['iuparts'] = {
 				'ResponsibleName': {'type': 'keyword'},
 				'AnalysisDate': {
 					"type": "date",
+					"fields": {
+						'keyword': {
+							'type': 'keyword', 'ignore_above': 256
+						}
+					},
 					"format": "yyyy-MM-dd HH:mm:ss.SSS||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||dd.MM.yyyy||dd.MM.yy||d.MM.yyyy||d.M.yyyy||dd.M.yyyy||d.MM.yy||d.M.yy||dd.M.yy||yyyy",
 					'ignore_malformed': True
 				},
@@ -618,6 +667,11 @@ MappingsDict['iuparts'] = {
 				'ResponsibleName': {'type': 'keyword'},
 				'AnalysisDate': {
 					"type": "date",
+					"fields": {
+						'keyword': {
+							'type': 'keyword', 'ignore_above': 256
+						}
+					},
 					"format": "yyyy-MM-dd HH:mm:ss.SSS||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||dd.MM.yyyy||dd.MM.yy||d.MM.yyyy||d.M.yyyy||dd.M.yyyy||d.MM.yy||d.M.yy||dd.M.yy||yyyy",
 					'ignore_malformed': True
 				},

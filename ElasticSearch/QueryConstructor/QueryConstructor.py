@@ -5,23 +5,29 @@ logger = logging.getLogger('elastic_queries')
 
 import pudb
 
-from ElasticSearch.FieldDefinitions import FieldDefinitions # fieldnames, fielddefinitions
+from ElasticSearch.FieldConfig import FieldConfig
 
 
 class QueryConstructor():
-	def __init__(self, fielddefinitions, source_fields):
-		self.source_fields = source_fields
-		
+	def __init__(self):
+		self.source_fields = []
 		self.nested_fields = {}
 		self.nested_restricted_fields = {}
 		self.simple_fields = {}
 		self.simple_restricted_fields = {}
 		
-		self.fielddefinitions = fielddefinitions
+		self.fieldconf = FieldConfig()
+		self.fielddefinitions = self.fieldconf.fielddefinitions
 
 
-	def set_source_fields(self, source_fields = []):
-		# allow to set the source fields later for queries with different source fields as in StackedInnerQuery
+	def set_source_fields(self, source_fields = None):
+		# allow to set the source fields later for queries with different source fields
+		# this is currently used in StackedInnerQuery to set a single source field when a stacked query searches for a defined field only
+		
+		# test that self.source_fields is a list
+		if not isinstance(source_fields, list):
+			raise TypeError('QueryConstructor.set_source_fields(): source_fields must be a list')
+		
 		if len(source_fields) > 0:
 			self.source_fields = source_fields
 		return
@@ -34,14 +40,21 @@ class QueryConstructor():
 		self.simple_restricted_fields = {}
 		self.simple_fields = {}
 		
-		
 		for fieldname in self.source_fields:
 			if fieldname in self.fielddefinitions:
-				if 'buckets' in self.fielddefinitions[fieldname] and 'path' in self.fielddefinitions[fieldname]['buckets'] and 'withholdflags' in self.fielddefinitions[fieldname]['buckets']:
+				if 'buckets' in self.fielddefinitions[fieldname] \
+					and 'path' in self.fielddefinitions[fieldname]['buckets'] \
+					and 'field_query' in self.fielddefinitions[fieldname]['buckets'] \
+					and 'withholdflags' in self.fielddefinitions[fieldname]['buckets']:
 					self.nested_restricted_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
-				elif 'buckets' in self.fielddefinitions[fieldname] and 'path' in self.fielddefinitions[fieldname]['buckets'] and 'withholdflags' not in self.fielddefinitions[fieldname]['buckets']:
+				elif 'buckets' in self.fielddefinitions[fieldname] \
+					and 'path' in self.fielddefinitions[fieldname]['buckets'] \
+					and 'field_query' in self.fielddefinitions[fieldname]['buckets'] \
+					and 'withholdflags' not in self.fielddefinitions[fieldname]['buckets']:
 					self.nested_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
-				elif 'buckets' in self.fielddefinitions[fieldname] and 'withholdflags' in self.fielddefinitions[fieldname]['buckets']:
+				elif 'buckets' in self.fielddefinitions[fieldname] \
+					and 'field_query' in self.fielddefinitions[fieldname]['buckets'] \
+					and 'withholdflags' in self.fielddefinitions[fieldname]['buckets']:
 					self.simple_restricted_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
 				elif 'buckets' in self.fielddefinitions[fieldname]:
 					self.simple_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
@@ -90,6 +103,31 @@ class QueryConstructor():
 		else:
 			range_type = None
 		return range_type
+
+
+	def setBucketsSorting(self):
+		"""
+		set sorting params sorting for the aggregations
+		sorting for search queries is set in ES_Searcher
+		"""
+		
+		self.bucket_sorting = {}
+		try:
+			self.buckets_sort_alphanum
+			self.buckets_sort_dir
+			
+			if self.buckets_sort_alphanum is True:
+				if self.buckets_sort_dir is None or self.buckets_sort_dir.lower() not in ['asc', 'desc']:
+					self.buckets_sort_dir = 'asc'
+				self.bucket_sorting = {"_key": self.buckets_sort_dir.lower()}
+			else:
+				if self.buckets_sort_dir is None or self.buckets_sort_dir.lower() not in ['asc', 'desc']:
+					self.buckets_sort_dir = 'desc'
+				self.bucket_sorting = {"_count": self.buckets_sort_dir.lower()}
+		
+		except AttributeError:
+			self.bucket_sorting = {"_count": 'desc'}
+		return
 
 
 	def getStringQuerySearchField(self, key, query_def):

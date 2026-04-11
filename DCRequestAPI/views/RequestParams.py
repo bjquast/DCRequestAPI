@@ -2,16 +2,21 @@ import pudb
 import json
 import re
 
+from ElasticSearch.FieldConfig import FieldConfig
+
 
 class RequestParams():
 	def __init__(self, request):
 		self.request = request
+		self.fieldconf = FieldConfig()
 		
 		self.read_request_params()
 		self.read_search_params()
 		self.read_credentials()
 		self.set_requeststring()
 		
+		default_params_setter = DefaultParamsSetter(self.search_params)
+		self.search_params = default_params_setter.search_params
 		pass
 
 
@@ -32,57 +37,81 @@ class RequestParams():
 
 
 	def read_stack_queries_params(self):
+		query_pattern = re.compile(r'stack_query_((string)|(date_from)|(date_to))_(\d+)_(\d+)$')
+		cache_dicts = {}
+		#pudb.set_trace()
 		
-		terms_pattern = re.compile(r'stack_query_terms_(\d+)_(\d+)$')
-		
-		query_dicts = {}
-		query_counts = []
-		self.search_params['stack_queries'] = []
-		
+		"""
+		generate a dict from all stack_query parameters
+		TODO: currently, this dict is converted into a dict of lists with subqueries later on, due to the stacked_queries_macro template
+		and the methods in ES_Searcher. They should be changed to use a dict of dicts, perhaps with arbitrary depth
+		"""
 		for param in self.params_dict:
-			if param.startswith('stack_query_terms_'):
-				m = terms_pattern.match(param)
+			if param.startswith('stack_query_'):
+				m = query_pattern.match(param)
 				if m is not None:
-					query_count = m.group(1)
-					term_count = m.group(2)
-					
-					term = self.params_dict.get('stack_query_terms_{0}_{1}'.format(query_count, term_count), [''])[-1]
-					field = self.params_dict.get('stack_query_fields_{0}_{1}'.format(query_count, term_count), [''])[-1]
-					
-					if term is not None and field is not None:
-						if query_count not in query_dicts:
-							query_counts.append(query_count)
-							query_dicts[query_count] = {
-								'terms': [],
-								'fields': [],
+					query_type = m.group(1)
+					query_count = m.group(5)
+					sub_query_count = m.group(6)
+					# if there are more than one parameter with the same query_count and sub_query_count take only the last one, if there is no parameter value
+					# for the parameter add an empty string
+					query_string = self.params_dict.get('stack_query_string_{0}_{1}'.format(query_count, sub_query_count), [''])[-1]
+					date_from = self.params_dict.get('stack_query_date_from_{0}_{1}'.format(query_count, sub_query_count), [''])[-1]
+					date_to = self.params_dict.get('stack_query_date_to_{0}_{1}'.format(query_count, sub_query_count), [''])[-1]
+					field = self.params_dict.get('stack_query_field_{0}_{1}'.format(query_count, sub_query_count), [''])[-1]
+					if query_string or date_from or date_to:
+						if query_count not in cache_dicts:
+							cache_dicts[query_count] = {
 								'outer_connector': self.params_dict.get('stack_search_outer_connector_{0}'.format(query_count), ['AND'])[-1],
 								'inner_connector': self.params_dict.get('stack_search_inner_connector_{0}'.format(query_count), ['AND'])[-1]
 							}
 							if 'stack_search_add_subquery_{0}'.format(query_count) in self.params_dict:
-								query_dicts[query_count]['add_subquery'] = True
-							if 'stack_search_delete_subquery_{0}'.format(query_count) in self.params_dict:
-								query_dicts[query_count]['delete_subquery'] = True
+								cache_dicts[query_count]['add_subquery'] = True
+							
+							cache_dicts[query_count]['subqueries'] = {}
 						
-						query_dicts[query_count]['terms'].append(term)
-						query_dicts[query_count]['fields'].append(field)
+						if sub_query_count not in cache_dicts[query_count]['subqueries']:
+							cache_dicts[query_count]['subqueries'][sub_query_count] = {}
+						
+						cache_dicts[query_count]['subqueries'][sub_query_count]['string'] = query_string
+						cache_dicts[query_count]['subqueries'][sub_query_count]['date_from'] = date_from
+						cache_dicts[query_count]['subqueries'][sub_query_count]['date_to'] = date_to
+						cache_dicts[query_count]['subqueries'][sub_query_count]['field'] = field
+						if query_type in ['date_from', 'date_to']:
+							cache_dicts[query_count]['subqueries'][sub_query_count]['query_type'] = 'date'
+						elif query_type in ['string']:
+							cache_dicts[query_count]['subqueries'][sub_query_count]['query_type'] = 'term'
 		
-		for query_count in query_dicts:
-			if 'delete_subquery' in query_dicts[query_count] and len(query_dicts[query_count]['terms']) > 1:
-				query_dicts[query_count]['terms'].pop()
-				query_dicts[query_count]['fields'].pop()
+		"""
+		convert to a dict of queries with lists of subqueries
+		reset the count of the queries to sequential numbers starting with 0
+		"""
+		self.search_params['stack_queries'] = []
+		query_dicts = {}
+		i = 0
+		for query_count in cache_dicts:
+			if i not in query_dicts:
+				query_dicts[i] = {
+					'string': [],
+					'date_from': [],
+					'date_to': [],
+					'field': [],
+					'query_type': [],
+				}
+			query_dicts[i]['outer_connector'] = cache_dicts[query_count]['outer_connector']
+			query_dicts[i]['inner_connector'] = cache_dicts[query_count]['inner_connector']
+			if 'add_subquery' in cache_dicts[query_count]:
+				query_dicts[i]['add_subquery'] = cache_dicts[query_count]['add_subquery']
 			
-			terms_copy = []
-			fields_copy = []
-			for i in range(len(query_dicts[query_count]['terms'])):
-				if len(query_dicts[query_count]['terms'][i]) > 0:
-					terms_copy.append(query_dicts[query_count]['terms'][i])
-					fields_copy.append(query_dicts[query_count]['fields'][i])
-			query_dicts[query_count]['terms'] = terms_copy
-			query_dicts[query_count]['fields'] = fields_copy
+			for sub_query_count in cache_dicts[query_count]['subqueries']:
+				query_dicts[i]['string'].append(cache_dicts[query_count]['subqueries'][sub_query_count]['string'])
+				query_dicts[i]['date_from'].append(cache_dicts[query_count]['subqueries'][sub_query_count]['date_from'])
+				query_dicts[i]['date_to'].append(cache_dicts[query_count]['subqueries'][sub_query_count]['date_to'])
+				query_dicts[i]['field'].append(cache_dicts[query_count]['subqueries'][sub_query_count]['field'])
+				query_dicts[i]['query_type'].append(cache_dicts[query_count]['subqueries'][sub_query_count]['query_type'])
 			
-			if len(query_dicts[query_count]['terms']) > 0:
-				self.search_params['stack_queries'].append(query_dicts[query_count])
-		
+			self.search_params['stack_queries'].append(query_dicts[i])
+			i = i + 1
 		return
 
 
@@ -97,7 +126,10 @@ class RequestParams():
 							'term_filters_connector', 'buckets_search_term', 'overlay_remaining_all_select', 'buckets_sort_dir', 'buckets_size',
 							'path_to_remove'
 						]
-		complex_params = ['term_filters', 'hierarchies',]
+		complex_params = ['term_filters', 'hierarchies']
+		#complex_params = ['term_filters', 'hierarchies', 'date']
+		
+		#range_params = ['date']
 		
 		list_params = ['open_filter_selectors', 'result_table_columns', 'selected_filter_sections', 'open_hierarchy_selectors']
 		
@@ -118,7 +150,7 @@ class RequestParams():
 			if param_name in self.params_dict and len(self.params_dict[param_name]) > 0:
 				self.search_params[param_name] = self.params_dict[param_name][-1]
 		
-		for param_name in complex_params: 
+		for param_name in complex_params:
 			if param_name in self.params_dict and len(self.params_dict[param_name]) > 0:
 				for searchquery in self.params_dict[param_name]:
 					query = searchquery.split(':', 1)
@@ -130,7 +162,7 @@ class RequestParams():
 						if query[1] not in self.search_params[param_name][query[0]]:
 							self.search_params[param_name][query[0]].append(query[1])
 					else:
-						self.search_params[param_name] = {}
+						pass
 			else:
 				self.search_params[param_name] = {}
 		
@@ -139,6 +171,28 @@ class RequestParams():
 				self.search_params[param_name] = self.params_dict[param_name]
 			else:
 				self.search_params[param_name] = []
+		
+		'''
+		for param_name in range_params:
+			if param_name in self.params_dict and len(self.params_dict[param_name]) > 0:
+				for searchquery in self.params_dict[param_name]:
+					query = searchquery.split(':', 2)
+					if len(query) == 3 and (len(query[1]) > 0 or len(query[2]) > 0):
+						if param_name not in self.search_params:
+							self.search_params[param_name] = {}
+						if query[0] not in self.search_params[param_name]:
+							self.search_params[param_name][query[0]] = []
+						range_dict = {}
+						if len(query[1]) > 0:
+							range_dict['gte'] = query[1]
+						if len(query[2]) > 0:
+							range_dict['gte'] = query[2]
+						self.search_params[param_name][query[0]].append(range_dict)
+					else:
+						pass
+			else:
+				self.search_params[param_name] = {}
+		'''
 		
 		return
 
@@ -163,3 +217,173 @@ class RequestParams():
 		
 		self.requeststring = '&'.join(paramslist)
 		return
+
+
+class DefaultParamsSetter():
+	"""
+	set default values for missing search_params, concatenate parent parameters and fix some params
+	"""
+	def __init__(self, search_params):
+		self.fieldconf = FieldConfig()
+		self.search_params = search_params
+		self.set_default_params()
+		
+		self.reduce_hierarchical_term_filters()
+
+
+	def set_default_params(self):
+		self.set_term_filters()
+		self.set_hierarchy_filters()
+		
+		self.set_selected_filter_sections()
+		self.set_open_filter_selectors()
+		#self.set_open_hierarchy_selectors()
+		self.set_result_table_columns()
+
+
+	def set_term_filters(self):
+		# check if term_filters in term_fields or date_fields
+		# if term_filters are in date_fields, check if the values are year[-month-day]
+		term_filters = {}
+		date_pattern = re.compile(r'^\s*((\d{4})(-\d{2})?(-\d{2})?)\s*$')
+		for key in self.search_params['term_filters']:
+			if key in self.fieldconf.term_fields:
+				term_filters[key] = self.search_params['term_filters'][key]
+			elif key in self.fieldconf.hierarchy_fields:
+				term_filters[key] = self.search_params['term_filters'][key]
+			elif key in self.fieldconf.date_fields:
+				date_values = []
+				for value in self.search_params['term_filters'][key]:
+					m = date_pattern.search(value)
+					if m is not None:
+						date_values.append(m.group(1))
+				if len(date_values) > 0:
+					term_filters[key] = date_values
+		self.search_params['term_filters'] = term_filters
+		return
+
+
+	def set_hierarchy_filters(self):
+		hierarchy_filters = {}
+		for key in self.search_params['hierarchies']:
+			if key in self.fieldconf.hierarchy_fields:
+				hierarchy_filters[key] = self.search_params['hierarchies'][key]
+		self.search_params['hierarchies'] = hierarchy_filters
+
+
+	def set_selected_filter_sections(self):
+		# these are the filters shown as available filters
+		selected_filters = []
+		for field in self.fieldconf.available_filter_fields:
+			if field in self.search_params['selected_filter_sections']:
+				selected_filters.append(field)
+			elif field in self.search_params['term_filters']:
+				selected_filters.append(field)
+			#elif field in self.search_params['date']:
+			#	selected_filters.append(field)
+			elif field in self.search_params['hierarchies']:
+				selected_filters.append(field)
+		if len(selected_filters) <= 0:
+			selected_filters = self.fieldconf.default_filter_sections
+		self.search_params['selected_filter_sections'] = selected_filters
+		return
+
+
+	def set_open_filter_selectors(self):
+		# these are the filters that are opend and show a list of buckets
+		open_filters = []
+		for field in self.fieldconf.available_filter_fields:
+			if field in self.search_params['open_filter_selectors']:
+				open_filters.append(field)
+			elif field in self.search_params['term_filters']:
+				open_filters.append(field)
+			#elif field in self.search_params['date']:
+			#	open_filters.append(field)
+			elif field in self.search_params['hierarchies']:
+				open_filters.append(field)
+		self.search_params['open_filter_selectors'] = open_filters
+		return
+
+
+	'''
+	def set_open_hierarchy_selectors(self):
+		open_hierarchy_selectors = []
+		for field in self.search_params['open_hierarchy_selectors']:
+			if field in self.fieldconf.hierarchy_fields:
+				open_hierarchy_selectors.append(field)
+		self.search_params['open_hierarchy_selectors'] = open_hierarchy_selectors
+	'''
+
+
+	def set_result_table_columns(self):
+		table_cols = []
+		for field in self.search_params['result_table_columns']:
+			if field in self.fieldconf.result_fields:
+				table_cols.append(field)
+		if len(table_cols) <= 0:
+			table_cols = self.fieldconf.result_fields
+		if 'PartAccessionNumber' not in table_cols:
+			table_cols.insert(0, 'PartAccessionNumber')
+		
+		self.search_params['result_table_columns'] = table_cols
+		return
+
+
+	# for hierarchy filters all term_filters must be removed that are a parent of any other term filter in the hierarchy
+	def reduce_hierarchical_term_filters(self):
+		# when term_filters are used with hierarchies
+		# filter out the term_filters that are parents of other term_filters
+		
+		hierarchy_fields = self.fieldconf.hierarchy_fields
+		term_filters = self.search_params['term_filters']
+		
+		new_term_filters = {}
+		for key in term_filters:
+			if key in hierarchy_fields:
+				
+				filter_dict = {}
+				
+				for filter_entry in term_filters[key]:
+					element_list = [element.strip() for element in filter_entry.split('>')]
+					self.set_reduced_hierarchy_dict(filter_dict, element_list)
+				
+				self.reduced_hierarchy_pathes = []
+				self.set_reduced_hierarchy_pathes(filter_dict)
+				
+				if len(self.reduced_hierarchy_pathes) > 0:
+					new_term_filters[key] = []
+					for hierarchy_path in self.reduced_hierarchy_pathes:
+						new_term_filters[key].append('>'.join(hierarchy_path))
+				
+			else:
+				new_term_filters[key] = term_filters[key]
+		
+		self.search_params['term_filters'] = new_term_filters
+		return
+
+
+	def set_reduced_hierarchy_dict(self, subdict, element_list):
+		if len(element_list) <= 0:
+			return
+		element = element_list.pop(0)
+		if element in subdict.keys():
+			self.set_reduced_hierarchy_dict(subdict[element], element_list)
+		else:
+			subdict[element] = {}
+			self.set_reduced_hierarchy_dict(subdict[element], element_list)
+		return
+
+
+	def set_reduced_hierarchy_pathes(self, sub_dict, path = None):
+		if path is None:
+			path = []
+		for key in sub_dict:
+			if isinstance(sub_dict[key], dict) and len(sub_dict[key]) > 0:
+				path.append(key)
+				self.set_reduced_hierarchy_pathes(sub_dict[key], path)
+			elif isinstance(sub_dict[key], dict) and len(sub_dict[key]) <= 0:
+				path.append(key)
+				self.reduced_hierarchy_pathes.append(path)
+				return
+		return
+	

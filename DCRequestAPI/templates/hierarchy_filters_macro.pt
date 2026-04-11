@@ -4,7 +4,7 @@
 		<h4>Hierarchies</h4>
 	</div>
 	<div class="hidden">
-		<block tal:repeat="hierarchy_selector hierarchy_filter_fields" tal:omit-tag="">
+		<block tal:repeat="hierarchy_selector hierarchy_fields" tal:omit-tag="">
 			<input class="open_hierarchy_selectors_input" type="checkbox" name="open_hierarchy_selectors" form="search_form" value="${hierarchy_selector}" tal:attributes="checked 'checked' if hierarchy_selector in open_hierarchy_selectors else None">
 			<span>${hierarchy_selector}</span>
 		</block>
@@ -18,7 +18,7 @@
 		</block>
 	</div>
 	<div id="available_hierarchy_filters">
-		<div tal:repeat="hierarchy_name hierarchy_filter_fields" class="hierarchy-filter-select-box">
+		<div tal:repeat="hierarchy_name hierarchy_fields" class="hierarchy-filter-select-box">
 			<details id="hierarchy_list_${hierarchy_name}" class="hierarchy_selectors" data-hierarchy-filter-key="${hierarchy_name}" tal:attributes="open 'open' if hierarchy_name in open_hierarchy_selectors else None">
 				<summary class="clickable">${hierarchy_filter_names[hierarchy_name]['en']}</summary>
 				<ul tal:condition="python: hierarchy_name in hierarchies_dict and hierarchy_name in open_hierarchy_selectors" class="ul-no-bullet">

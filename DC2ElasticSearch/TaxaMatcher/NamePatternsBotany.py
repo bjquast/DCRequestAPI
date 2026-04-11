@@ -9,27 +9,27 @@ class NamePatternsBotany():
 		self.author_prefix_pattern = r'(al|f|j|jr|ms|sr|v|v[ao]n|zu[rm]?|bis|d[aeiou]?|de[nrmls]?|degli|e|l[ae]s?|s|ter|t|y)'
 		
 		# ?: prevents fetching of the grouped content, can be removed when some additional parts of the name should be fetched
-		self.subgenus_pattern = '(?:\s+(?:(?:notho|n)?(?:subgenus|subgen\.|subg\.))\s+?([×]?[x]?\s?[A-Z\u00C0-\u00D6\u00D8-\u00DEa-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
-		self.sectio_pattern = '(?:\s+(?:sectio|sect\.)\s+([A-Z\u00C0-\u00D6\u00D8-\u00DEa-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
-		self.subsectio_pattern = '(?:\s+(?:subsectio|subsect\.)\s+([A-Z\u00C0-\u00D6\u00D8-\u00DEa-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
-		self.series_pattern = '(?:\s+(?:series|ser\.)\s+([A-Z\u00C0-\u00D6\u00D8-\u00DEa-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
-		self.subseries_pattern = '(?:\s+(?:subseries|subser\.)\s+([A-Z\u00C0-\u00D6\u00D8-\u00DEa-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
+		self.subgenus_pattern = r'(?:\s+(?:(?:notho|n)?(?:subgenus|subgen\.|subg\.))\s+?([×]?[x]?\s?[A-Z\u00C0-\u00D6\u00D8-\u00DEa-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
+		self.sectio_pattern = r'(?:\s+(?:sectio|sect\.)\s+([A-Z\u00C0-\u00D6\u00D8-\u00DEa-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
+		self.subsectio_pattern = r'(?:\s+(?:subsectio|subsect\.)\s+([A-Z\u00C0-\u00D6\u00D8-\u00DEa-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
+		self.series_pattern = r'(?:\s+(?:series|ser\.)\s+([A-Z\u00C0-\u00D6\u00D8-\u00DEa-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
+		self.subseries_pattern = r'(?:\s+(?:subseries|subser\.)\s+([A-Z\u00C0-\u00D6\u00D8-\u00DEa-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
 		
 		# the zoological alternative for subgenus combined with species
-		#self.subgenus_species_pattern = '(?:\s+(?:\(([A-Z\u00C0-\u00D6\u00D8-\u00DEa-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+)\)\s*)?((?!{0}[\'\s]+)[×]?[x]?\s?[a-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'.format(self.author_prefix_pattern)
+		#self.subgenus_species_pattern = r'(?:\s+(?:\(([A-Z\u00C0-\u00D6\u00D8-\u00DEa-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+)\)\s*)?((?!{0}[\'\s]+)[×]?[x]?\s?[a-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'.format(self.author_prefix_pattern)
 		
-		self.species_pattern = '(?:\s+((?!{0}[\'\s]+)[×]?[x]?\s?[a-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'.format(self.author_prefix_pattern)
+		self.species_pattern = r'(?:\s+((?!{0}[\'\s]+)[×]?[x]?\s?[a-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'.format(self.author_prefix_pattern)
 		
-		self.subspecies_pattern = '(?:\s+(?:(?:notho|n)?(?:subspecies|subsp\.|ssp\.))\s+([×]?[x]?\s?[a-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
-		self.varietas_pattern = '(?:\s+(?:(?:notho|n)?(?:varietas|variety|var\.))\s+([×]?[x]?\s?[a-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
-		self.subvarietas_pattern = '(?:\s+(?:(?:notho|n)?(?:subvarietas|subvariety|subvar\.))\s+([×]?[x]?\s?[a-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
-		self.forma_pattern = '(?:\s+(?:(?:notho|n)?(?:forma|form|f\.))\s+([×]?[x]?\s?[a-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
-		self.subforma_pattern = '(?:\s+(?:(?:notho|n)?(?:subforma|subform|subf\.))\s+([×]?[x]?\s?[a-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
+		self.subspecies_pattern = r'(?:\s+(?:(?:notho|n)?(?:subspecies|subsp\.|ssp\.))\s+([×]?[x]?\s?[a-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
+		self.varietas_pattern = r'(?:\s+(?:(?:notho|n)?(?:varietas|variety|var\.))\s+([×]?[x]?\s?[a-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
+		self.subvarietas_pattern = r'(?:\s+(?:(?:notho|n)?(?:subvarietas|subvariety|subvar\.))\s+([×]?[x]?\s?[a-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
+		self.forma_pattern = r'(?:\s+(?:(?:notho|n)?(?:forma|form|f\.))\s+([×]?[x]?\s?[a-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
+		self.subforma_pattern = r'(?:\s+(?:(?:notho|n)?(?:subforma|subform|subf\.))\s+([×]?[x]?\s?[a-z\u00DF-\u00F6\u00F8-\u00FF\-\_]+))?'
 		
-		self.basionym_author_pattern = '(\([^×]*?[A-Z\u00C0-\u00D6\u00D8-\u00DE][^\(\)]*?\))?'
+		self.basionym_author_pattern = r'(\([^×]*?[A-Z\u00C0-\u00D6\u00D8-\u00DE][^\(\)]*?\))?'
 		# self.authorship_pattern = '({0}\s*([\(]?[A-Z][^×]*?[\)]?(?<! x )))?'.format(self.basionym_author_pattern) overdefinition with look behind (?<! x ) ?
-		self.authorship_pattern = '(?:\s+({0}\s*([\(]?[^×]*?[A-Z\u00C0-\u00D6\u00D8-\u00DE][^×]*?[\)]?)))?'.format(self.basionym_author_pattern)
-		self.hybrid_species_pattern = '(?:(\s+[×x]\s*?(?:.+)?))?$'
+		self.authorship_pattern = r'(?:\s+({0}\s*([\(]?[^×]*?[A-Z\u00C0-\u00D6\u00D8-\u00DE][^×]*?[\)]?)))?'.format(self.basionym_author_pattern)
+		self.hybrid_species_pattern = r'(?:(\s+[×x]\s*?(?:.+)?))?$'
 		
 		
 		

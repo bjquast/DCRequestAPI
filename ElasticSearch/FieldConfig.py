@@ -1,12 +1,35 @@
 import pudb
 
+import threading
 from ElasticSearch.ES_Mappings import MappingsDict
 
 
 # TODO: read the fields that must be withholded from withholdfilters and add the according fields for withholdflags
 # for each item in self.fielddefinitions 
 
-class FieldDefinitions():
+# make it a singleton?!
+
+
+class FieldConfig:
+	"""
+	Class that sets the fields for the different ElasticSearch query and aggregation types and for the web interface
+	"""
+	# code to make it a singleton
+	_instance = None
+	_lock = threading.Lock()
+
+	def __new__(cls, *args, **kwargs):
+		if cls._instance is None: 
+			with cls._lock:
+				# Another thread could have created the instance
+				# before we acquired the lock. So check that the
+				# instance is still nonexistent.
+				if not cls._instance:
+					cls._instance = super().__new__(cls)
+		return cls._instance
+	# end singleton code
+
+
 	def __init__(self):
 		self.setFields()
 		self.setFieldDefinitions()
@@ -16,8 +39,11 @@ class FieldDefinitions():
 		self.setFieldTypes()
 
 
-	def setFieldNames(self):
-		self.fieldnames = [
+	def setResultFields(self):
+		"""
+		all fields that should be shown in the result table
+		"""
+		self.result_fields = [
 			'PartAccessionNumber',
 			#'StableIdentifierURL',
 			'LastIdentificationCache',
@@ -35,12 +61,11 @@ class FieldDefinitions():
 			'CollectingMethod',
 			'CountryCache',
 			'WGS84_Coordinate',
+			'CollectionDate',
 			'CollectionAgents.CollectorsName',
 			'LifeStage',
 			'Gender',
 			'NumberOfUnits',
-			# NumberOfSpecimenImages does not work. because it is a numeric type it can not be set to case_insensitiv in TermFilterQuery. Think about RangeQuery implementation 
-			# 'NumberOfSpecimenImages',
 			'CollectionName',
 			'Projects.Project',
 			'CollectionSpecimenID',
@@ -48,92 +73,131 @@ class FieldDefinitions():
 			'SpecimenPartID',
 			'Barcodes.Methods.region',
 			'DatabaseAccronym',
+			'SpecimenCreatedWhen',
+			'AccessionDate',
 		]
 		return
 
 
-	def setBucketFields(self):
-		self.bucketfields = [
-			'DatabaseAccronym',
-			#'CollectionsTree.CollectionName',
-			'CollectionName',
-			#'CollectionsTree',
-			'Projects.Project',
-			'LastIdentificationCache',
-			'MatchedTaxon',
-			'VernacularTerms',
-			'MatchedSynonyms.Synonym',
-			'MatchedTaxaTree',
-			'MatchedTaxaTree.Phylum',
-			'MatchedTaxaTree.Subphylum',
-			'MatchedTaxaTree.Class',
-			'MatchedTaxaTree.Subclass',
-			'MatchedTaxaTree.Order',
-			'MatchedTaxaTree.Suborder',
-			'MatchedTaxaTree.Family',
-			'MatchedTaxaTree.Subfamily',
-			'MatchedTaxaTree.Genus',
-			#'MatchedTaxaTree.Subgenus',
-			'TypeStatus',
-			'CountryCache',
-			'CollectingMethod',
-			'CollectionAgents.CollectorsName',
-			'LocalityVerbatim',
-			'LocalityDescription',
-			'HabitatDescription',
-			'MaterialCategory',
-			'LifeStage',
-			'Gender',
-			'NumberOfUnits',
-			'Barcodes.Methods.region',
-			'ImagesAvailable' # not working with prefix query
+	def setFilterDefs(self):
+		"""
+		all filters that may occur in filters,
+		this list exists to give the order of the filters
+		the lists term_fields, self.hierarchy_fields, date_fields
+		provide the filters ordered by data type, default_filter_sections
+		sets the list of filters when no filters are selected
+		"""
+		
+		# each entry has a list with values for: [available, is shown by default in filters, used in stacked query, type of filter]
+		
+		self.filter_defs = [
+			{'PartAccessionNumber': [False, False, True, 'term']},
+			{'DatabaseAccronym': [True, True, True, 'term']},
+			{'AccessionDate': [True, False, False, 'date']},
+			{'SpecimenCreatedWhen': [True, False, True, 'date']},
+			{'CollectionName': [True, True, True, 'term']},
+			{'Projects.Project': [True, True, True, 'term']},
+			{'LastIdentificationCache': [True, True, True, 'term']},
+			{'MatchedTaxon': [True, True, False, 'term']},
+			{'MatchedParentTaxa': [False, False, True, 'term']},
+			{'VernacularTerms': [True, True, True, 'term']},
+			{'MatchedSynonyms.Synonym': [True, True, True, 'term']},
+			{'MatchedTaxaTree': [True, True, False, 'term']},
+			{'MatchedTaxaTree.Phylum': [True, False, False, 'term']},
+			{'MatchedTaxaTree.Subphylum': [True, False, False, 'term']},
+			{'MatchedTaxaTree.Class': [True, False, False, 'term']},
+			{'MatchedTaxaTree.Subclass': [True, False, False, 'term']},
+			{'MatchedTaxaTree.Order': [True, False, False, 'term']},
+			{'MatchedTaxaTree.Suborder': [True, False, False, 'term']},
+			{'MatchedTaxaTree.Family': [True, False, False, 'term']},
+			{'MatchedTaxaTree.Subfamily': [True, False, False, 'term']},
+			{'MatchedTaxaTree.Genus': [True, False, False, 'term']},
+			{'TypeStatus': [True, True, True, 'term']},
+			{'CountryCache': [True, True, True, 'term']},
+			{'CollectionDate': [True, True, True, 'date']},
+			{'CollectingMethod': [True, False, True, 'term']},
+			{'CollectionAgents.CollectorsName': [True, False, True, 'term']},
+			{'LocalityVerbatim': [True, False, True, 'term']},
+			{'LocalityDescription': [True, False, True, 'term']},
+			{'HabitatDescription': [True, False, True, 'term']},
+			{'MaterialCategory': [True, False, True, 'term']},
+			{'LifeStage': [True, False, True, 'term']},
+			{'Gender': [True, False, True, 'term']},
+			{'NumberOfUnits': [True, False, True, 'term']},
+			{'Barcodes.Methods.region': [True, False, True, 'term']},
+			{'ImagesAvailable': [True, True, False, 'term']}
+			
 		]
+		return
+
+
+	def setFilterFields(self):
+		"""
+		set all filter fields that are available
+		containing term filters, date filters hierarchy filters ...
+		"""
+		self.available_filter_fields = []
+		for field in self.filter_defs:
+			for key in field:
+				if field[key][0] is True:
+					self.available_filter_fields.append(key)
+		return
+
+
+	def setTermFields(self):
+		self.term_fields = []
+		
+		for field in self.filter_defs:
+			for key in field:
+				if field[key][0] is True and field[key][3] == 'term':
+					self.term_fields.append(key)
+		return
+
+
+	def setDateFields(self):
+		"""
+		all fields with type date that should be used in web interface
+		"""
+		self.date_fields = []
+		
+		for field in self.filter_defs:
+			for key in field:
+				if field[key][0] is True and field[key][3] == 'date':
+					self.date_fields.append(key)
 		return
 
 
 	def setDefaultFilterSections(self):
-		self.default_filter_sections = [
-			'DatabaseAccronym',
-			#'CollectionsTree.CollectionName',
-			'CollectionName',
-			#'CollectionsTree',
-			'Projects.Project',
-			'LastIdentificationCache',
-			'MatchedTaxon',
-			'VernacularTerms',
-			'MatchedSynonyms.Synonym',
-			'MatchedTaxaTree',
-			#'MatchedTaxaTree.Phylum',
-			#'MatchedTaxaTree.Subphylum',
-			#'MatchedTaxaTree.Class',
-			#'MatchedTaxaTree.Subclass',
-			#'MatchedTaxaTree.Order',
-			#'MatchedTaxaTree.Suborder',
-			#'MatchedTaxaTree.Family',
-			#'MatchedTaxaTree.Subfamily',
-			#'MatchedTaxaTree.Genus',
-			#'MatchedTaxaTree.Subgenus',
-			#'TypeStatus',
-			'CountryCache',
-			#'CollectingMethod',
-			#'CollectionAgents.CollectorsName',
-			'LocalityVerbatim',
-			'LocalityDescription',
-			#'HabitatDescription',
-			#'MaterialCategory',
-			#'LifeStage',
-			#'Gender',
-			#'NumberOfUnits',
-			#'Barcodes.Methods.region',
-			'ImagesAvailable'
-		]
+		"""
+		all fields that are in the filter section when no filters are selected
+		"""
+		self.default_filter_sections = []
+		
+		for field in self.filter_defs:
+			for key in field:
+				if field[key][0] is True and field[key][1] is True:
+					self.default_filter_sections.append(key)
 		return
 
 
+	def setStackedTermFields(self):
+		self.stacked_term_fields = []
+		
+		for field in self.filter_defs:
+			for key in field:
+				if key in self.stacked_query_fields and field[key][2] is True:
+					self.stacked_term_fields.append(key)
+		return
+		
+
 	def setStackedQueryFields(self):
+		"""
+		all fields that can be used in stacked queries
+		"""
 		self.stacked_query_fields = [
 			'PartAccessionNumber',
 			'LastIdentificationCache',
+			'SpecimenCreatedWhen',
 			'VernacularTerms',
 			'MatchedSynonyms.Synonym',
 			#'FamilyCache',
@@ -147,6 +211,7 @@ class FieldDefinitions():
 			'HabitatDescription',
 			'CollectingMethod',
 			'CountryCache',
+			'CollectionDate',
 			'CollectionAgents.CollectorsName',
 			'LifeStage',
 			'Gender',
@@ -162,8 +227,11 @@ class FieldDefinitions():
 		return
 
 
-	def setHierarchyQueryFields(self):
-		self.hierarchy_query_fields = [
+	def setHierarchyFilterFields(self):
+		"""
+		all fields used in hierarchy based filters
+		"""
+		self.hierarchy_fields = [
 			'MatchedTaxaHierarchyString',
 			'CollectionHierarchyString'
 		]
@@ -171,6 +239,9 @@ class FieldDefinitions():
 
 
 	def setSuggestionFields(self):
+		"""
+		all fields used for suggestions for filters
+		"""
 		self.suggestion_fields = [
 			#'CollectionsTree.CollectionName',
 			'CollectionName',
@@ -206,34 +277,64 @@ class FieldDefinitions():
 		return
 
 
-	def setRangeFields(self):
-		self.range_fields = [
-			'SpecimenAdded',
-			'NumberOfUnits',
-		]
+	def setFields(self):
+		"""
+		selt the lists of names for the different parts of the web interface
+		"""
+		
+		self.setResultFields()
+		
+		self.setFilterDefs()
+		self.setFilterFields()
+		self.setTermFields()
+		self.setDefaultFilterSections()
+		self.setStackedQueryFields()
+		self.setStackedTermFields()
+		self.setHierarchyFilterFields()
+		self.setSuggestionFields()
+		self.setDateFields()
+		
+		return
+
+
+	# read the definitions for specific fields
+	def getTermFilterNames(self):
+		term_filter_defs = {}
+		for term_field in self.term_fields:
+			if term_field in self.fielddefinitions:
+				term_filter_defs[term_field] = self.fielddefinitions[term_field]['names']
+		return term_filter_defs
+
+
+	def getFilterNames(self):
+		filter_defs = {}
+		for field in self.available_filter_fields:
+			if field in self.fielddefinitions:
+				filter_defs[field] = self.fielddefinitions[field]['names']
+		return filter_defs
+
+
+	def getColNames(self):
+		colnames = {}
+		for fieldname in self.result_fields:
+			if fieldname in self.fielddefinitions:
+				colnames[fieldname] = self.fielddefinitions[fieldname]['names']
+		return colnames
 
 
 	def getHierarchyFilterNames(self):
 		hierarchy_filter_names = {}
-		for hierarchy_filter in self.hierarchy_query_fields:
+		for hierarchy_filter in self.hierarchy_fields:
 			if hierarchy_filter in self.fielddefinitions:
 				hierarchy_filter_names[hierarchy_filter] = self.fielddefinitions[hierarchy_filter]['names']
 		return hierarchy_filter_names
 
 
-	def setFields(self):
-		self.setFieldNames()
-		self.setBucketFields()
-		self.setDefaultFilterSections()
-		self.setStackedQueryFields()
-		self.setHierarchyQueryFields()
-		self.setSuggestionFields()
-		self.setRangeFields()
-		
-		return
-
-
 	def setFieldDefinitions(self):
+		"""
+		definitions of the fields for elastic search requests 
+		and labels in web interface
+		"""
 		self.fielddefinitions = {
 			'PartAccessionNumber': {
 				'names': {'en': 'Accessionnumber', },
@@ -332,6 +433,22 @@ class FieldDefinitions():
 				},
 			},
 			
+			'AccessionDate': {
+				'names': {'en': 'Accession date'},
+				'buckets': {
+					'field_query': 'AccessionDate',
+					'type': 'date'
+				}
+			},
+			
+			'SpecimenCreatedWhen': {
+				'names': {'en': 'Data aquisition date'},
+				'buckets': {
+					'field_query': 'SpecimenCreatedWhen',
+					'type': 'date'
+				}
+			},
+			
 			'LocalityVerbatim': {
 				'names': {'en': 'Sampling locality'},
 				'buckets': {
@@ -370,6 +487,15 @@ class FieldDefinitions():
 					'field_query': 'CountryCache.keyword',
 					'withholdflags': ['EventWithhold'],
 				},
+			},
+			
+			'CollectionDate': {
+				'names': {'en': 'Collection date'},
+				'buckets': {
+					'field_query': 'CollectionDate',
+					'type': 'date',
+					'withholdflags': ['EventWithhold', 'embargo_event_but_country', 'embargo_event_but_country_after_1992', 'embargo_coll_date'],
+				}
 			},
 			
 			'WGS84_Coordinate': {
@@ -532,40 +658,19 @@ class FieldDefinitions():
 	def setFieldTypes(self):
 		for field in self.fielddefinitions:
 			
-			# a field not defined in mapping, generated automatically
-			#if field == 'Barcodes.Methods.region':
-			#	pudb.set_trace()
-			
-			# set a defauld value
-			if 'buckets' in self.fielddefinitions[field]:
-				self.fielddefinitions[field]['buckets']['query_string_field'] = field
-			
 			field_keys = field.split('.')
 			
-			sub_dict = dict(self.es_mappings)
+			mapping = dict(self.es_mappings)
 			for key in field_keys:
-				if key in sub_dict['properties']:
-					sub_dict = sub_dict['properties'][key]
+				if key in mapping['properties']:
+					mapping = mapping['properties'][key]
 			
-					if 'type' in sub_dict:
+					if 'type' in mapping:
 						if 'buckets' in self.fielddefinitions[field]:
-							self.fielddefinitions[field]['buckets']['types'] = [sub_dict['type']]
-							if 'fields' in sub_dict:
-								for typename in sub_dict['fields']:
+							self.fielddefinitions[field]['buckets']['types'] = [mapping['type']]
+							if 'fields' in mapping:
+								for typename in mapping['fields']:
 									self.fielddefinitions[field]['buckets']['types'].append(typename)
-							
-							'''
-							if 'types' in self.fielddefinitions[field]['buckets']:
-								if 'text' in self.fielddefinitions[field]['buckets']['types']:
-									self.fielddefinitions[field]['buckets']['query_string_field'] = '{0}.{1}'.format(field, 'text')
-								elif 'keyword_lc' in self.fielddefinitions[field]['buckets']['types']:
-									self.fielddefinitions[field]['buckets']['query_string_field'] = '{0}.{1}'.format(field, 'keyword_lc')
-								elif 'keyword' in self.fielddefinitions[field]['buckets']['types']:
-									self.fielddefinitions[field]['buckets']['query_string_field'] = '{0}.{1}'.format(field, 'keyword')
-								else:
-									self.fielddefinitions[field]['buckets']['query_string_field'] = field
-							'''
-		
 		return
 
 

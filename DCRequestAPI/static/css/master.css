@@ -46,12 +46,12 @@ main {
 	min-width: 20rem;
 	max-width: 25rem;
 	height: 78vh;
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 
 #filter_selection_field {
 	max-height: 60vh;
-	overflow: scroll;
+	overflow: auto;
 }
 
 /*

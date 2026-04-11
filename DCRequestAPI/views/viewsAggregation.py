@@ -10,7 +10,7 @@ from dwb_authentication.DWB_Servers import DWB_Servers
 
 from DCRequestAPI.views.RequestParams import RequestParams
 
-from ElasticSearch.FieldDefinitions import FieldDefinitions
+from ElasticSearch.FieldConfig import FieldConfig
 
 import pudb
 import json
@@ -18,7 +18,6 @@ import json
 
 class AggregationView():
 	def __init__(self, request):
-		
 		self.request = request
 		self.uid = self.request.authenticated_userid
 		
@@ -50,7 +49,7 @@ class AggregationView():
 		
 		self.messages.extend(self.userlogin.get_messages())
 		
-		self.fielddefinitions = FieldDefinitions().fielddefinitions
+		self.fielddefinitions = FieldConfig().fielddefinitions
 
 
 	@view_config(route_name='aggregation', accept='application/json', renderer="json")

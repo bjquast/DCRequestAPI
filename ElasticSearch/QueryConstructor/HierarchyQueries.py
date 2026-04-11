@@ -6,11 +6,12 @@ logger = logging.getLogger('elastic_queries')
 import pudb
 import re
 
-from ElasticSearch.FieldDefinitions import FieldDefinitions
 from ElasticSearch.QueryConstructor.QueryConstructor import QueryConstructor
 
-class HierarchyQueries():
+class HierarchyQueries(QueryConstructor):
 	def __init__(self, hierarchy_pathes_dict = {}, users_project_ids = None, source_fields = None, size = 1000):
+		QueryConstructor.__init__(self)
+		
 		self.hierarchy_pathes_dict = hierarchy_pathes_dict
 		
 		if users_project_ids is None:
@@ -20,51 +21,15 @@ class HierarchyQueries():
 		if source_fields is None:
 			source_fields = []
 		self.source_fields = source_fields
+		if len(self.source_fields) <= 0:
+			self.source_fields = self.fieldconf.hierarchy_fields
 		
 		self.size = size
-		
-		fielddefs = FieldDefinitions()
-		self.fielddefinitions = fielddefs.fielddefinitions
-		
-		if len(self.source_fields) <= 0:
-			self.source_fields = fielddefs.hierarchy_query_fields
-		
-		QueryConstructor.__init__(self, fielddefs.fielddefinitions, self.source_fields)
 		
 		self.hierarchies_query = {}
 		
 		self.sort_queries_by_definitions()
 		self.setHierarchiesQuery()
-		
-
-
-	def sort_queries_by_definitions(self):
-		# reset the fields, needed when sort_queries_by_definitions is used more than once as with StackedInnerQuery
-		self.nested_restricted_fields = {}
-		self.nested_fields = {}
-		self.simple_restricted_fields = {}
-		self.simple_fields = {}
-		
-		
-		for fieldname in self.source_fields:
-			if fieldname in self.fielddefinitions:
-				if 'buckets' in self.fielddefinitions[fieldname] \
-					and 'path' in self.fielddefinitions[fieldname]['buckets'] \
-					and 'field_query' in self.fielddefinitions[fieldname]['buckets'] \
-					and 'withholdflags' in self.fielddefinitions[fieldname]['buckets']:
-					self.nested_restricted_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
-				elif 'buckets' in self.fielddefinitions[fieldname] \
-					and 'path' in self.fielddefinitions[fieldname]['buckets'] \
-					and 'field_query' in self.fielddefinitions[fieldname]['buckets'] \
-					and 'withholdflags' not in self.fielddefinitions[fieldname]['buckets']:
-					self.nested_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
-				elif 'buckets' in self.fielddefinitions[fieldname] \
-					and 'field_query' in self.fielddefinitions[fieldname]['buckets'] \
-					and 'withholdflags' in self.fielddefinitions[fieldname]['buckets']:
-					self.simple_restricted_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
-				elif 'buckets' in self.fielddefinitions[fieldname]:
-					self.simple_fields[fieldname] = self.fielddefinitions[fieldname]['buckets']
-		return
 
 
 	def setHierarchiesQuery(self):
