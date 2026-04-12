@@ -274,6 +274,9 @@ class DefaultParamsSetter():
 	def set_selected_filter_sections(self):
 		# these are the filters shown as available filters
 		selected_filters = []
+		if len(self.search_params['selected_filter_sections']) < 1:
+			self.search_params['selected_filter_sections'] = list(self.fieldconf.default_filter_sections)
+		
 		for field in self.fieldconf.available_filter_fields:
 			if field in self.search_params['selected_filter_sections']:
 				selected_filters.append(field)
@@ -283,8 +286,6 @@ class DefaultParamsSetter():
 			#	selected_filters.append(field)
 			elif field in self.search_params['hierarchies']:
 				selected_filters.append(field)
-		if len(selected_filters) <= 0:
-			selected_filters = self.fieldconf.default_filter_sections
 		self.search_params['selected_filter_sections'] = selected_filters
 		return
 
