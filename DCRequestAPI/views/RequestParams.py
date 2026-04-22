@@ -10,17 +10,17 @@ class RequestParams():
 		self.request = request
 		self.fieldconf = FieldConfig()
 		
-		self.read_request_params()
-		self.read_search_params()
-		self.read_credentials()
-		self.set_requeststring()
+		self.__read_request_params()
+		self.__read_search_params()
+		self.__read_credentials()
+		self.__set_requeststring()
 		
 		default_params_setter = DefaultParamsSetter(self.search_params)
 		self.search_params = default_params_setter.search_params
 		pass
 
 
-	def read_request_params(self):
+	def __read_request_params(self):
 		self.params_dict = {}
 		try:
 			json_params = self.request.json_body
@@ -36,7 +36,7 @@ class RequestParams():
 		return
 
 
-	def read_stack_queries_params(self):
+	def __read_stack_queries_params(self):
 		query_pattern = re.compile(r'stack_query_((string)|(date_from)|(date_to))_(\d+)_(\d+)$')
 		cache_dicts = {}
 		#pudb.set_trace()
@@ -115,10 +115,10 @@ class RequestParams():
 		return
 
 
-	def read_search_params(self):
+	def __read_search_params(self):
 		self.search_params = {}
 		
-		self.read_stack_queries_params()
+		self.__read_stack_queries_params()
 		
 		exists_params = ['restrict_to_users_projects']
 		boolean_params = ['buckets_sort_alphanum']
@@ -173,6 +173,7 @@ class RequestParams():
 				self.search_params[param_name] = []
 		
 		'''
+		# range params not yet used
 		for param_name in range_params:
 			if param_name in self.params_dict and len(self.params_dict[param_name]) > 0:
 				for searchquery in self.params_dict[param_name]:
@@ -197,7 +198,7 @@ class RequestParams():
 		return
 
 
-	def read_credentials(self):
+	def __read_credentials(self):
 		self.credentials = {}
 		credentials = ['username', 'password', 'token', 'logout']
 		for param_name in credentials: 
@@ -207,7 +208,7 @@ class RequestParams():
 		return
 
 
-	def set_requeststring(self):
+	def __set_requeststring(self):
 		self.requeststring = ''
 		paramslist = []
 		for param in self.params_dict:
@@ -226,22 +227,22 @@ class DefaultParamsSetter():
 	def __init__(self, search_params):
 		self.fieldconf = FieldConfig()
 		self.search_params = search_params
-		self.set_default_params()
+		self.__set_default_params()
 		
-		self.reduce_hierarchical_term_filters()
+		self.__reduce_hierarchical_term_filters()
 
 
-	def set_default_params(self):
-		self.set_term_filters()
-		self.set_hierarchy_filters()
+	def __set_default_params(self):
+		self.__set_term_filters()
+		self.__set_hierarchy_filters()
 		
-		self.set_selected_filter_sections()
-		self.set_open_filter_selectors()
-		#self.set_open_hierarchy_selectors()
-		self.set_result_table_columns()
+		self.__set_selected_filter_sections()
+		self.__set_open_filter_selectors()
+		#self.__set_open_hierarchy_selectors()
+		self.__set_result_table_columns()
 
 
-	def set_term_filters(self):
+	def __set_term_filters(self):
 		# check if term_filters in term_fields or date_fields
 		# if term_filters are in date_fields, check if the values are year[-month-day]
 		term_filters = {}
@@ -263,7 +264,7 @@ class DefaultParamsSetter():
 		return
 
 
-	def set_hierarchy_filters(self):
+	def __set_hierarchy_filters(self):
 		hierarchy_filters = {}
 		for key in self.search_params['hierarchies']:
 			if key in self.fieldconf.hierarchy_fields:
@@ -271,7 +272,7 @@ class DefaultParamsSetter():
 		self.search_params['hierarchies'] = hierarchy_filters
 
 
-	def set_selected_filter_sections(self):
+	def __set_selected_filter_sections(self):
 		# these are the filters shown as available filters
 		selected_filters = []
 		if len(self.search_params['selected_filter_sections']) < 1:
@@ -290,7 +291,7 @@ class DefaultParamsSetter():
 		return
 
 
-	def set_open_filter_selectors(self):
+	def __set_open_filter_selectors(self):
 		# these are the filters that are opend and show a list of buckets
 		open_filters = []
 		for field in self.fieldconf.available_filter_fields:
@@ -307,7 +308,7 @@ class DefaultParamsSetter():
 
 
 	'''
-	def set_open_hierarchy_selectors(self):
+	def __set_open_hierarchy_selectors(self):
 		open_hierarchy_selectors = []
 		for field in self.search_params['open_hierarchy_selectors']:
 			if field in self.fieldconf.hierarchy_fields:
@@ -316,7 +317,7 @@ class DefaultParamsSetter():
 	'''
 
 
-	def set_result_table_columns(self):
+	def __set_result_table_columns(self):
 		table_cols = []
 		for field in self.search_params['result_table_columns']:
 			if field in self.fieldconf.result_fields:
@@ -331,7 +332,7 @@ class DefaultParamsSetter():
 
 
 	# for hierarchy filters all term_filters must be removed that are a parent of any other term filter in the hierarchy
-	def reduce_hierarchical_term_filters(self):
+	def __reduce_hierarchical_term_filters(self):
 		# when term_filters are used with hierarchies
 		# filter out the term_filters that are parents of other term_filters
 		
@@ -346,10 +347,10 @@ class DefaultParamsSetter():
 				
 				for filter_entry in term_filters[key]:
 					element_list = [element.strip() for element in filter_entry.split('>')]
-					self.set_reduced_hierarchy_dict(filter_dict, element_list)
+					self.__set_reduced_hierarchy_dict(filter_dict, element_list)
 				
 				self.reduced_hierarchy_pathes = []
-				self.set_reduced_hierarchy_pathes(filter_dict)
+				self.__set_reduced_hierarchy_pathes(filter_dict)
 				
 				if len(self.reduced_hierarchy_pathes) > 0:
 					new_term_filters[key] = []
@@ -363,25 +364,25 @@ class DefaultParamsSetter():
 		return
 
 
-	def set_reduced_hierarchy_dict(self, subdict, element_list):
+	def __set_reduced_hierarchy_dict(self, subdict, element_list):
 		if len(element_list) <= 0:
 			return
 		element = element_list.pop(0)
 		if element in subdict.keys():
-			self.set_reduced_hierarchy_dict(subdict[element], element_list)
+			self.__set_reduced_hierarchy_dict(subdict[element], element_list)
 		else:
 			subdict[element] = {}
-			self.set_reduced_hierarchy_dict(subdict[element], element_list)
+			self.__set_reduced_hierarchy_dict(subdict[element], element_list)
 		return
 
 
-	def set_reduced_hierarchy_pathes(self, sub_dict, path = None):
+	def __set_reduced_hierarchy_pathes(self, sub_dict, path = None):
 		if path is None:
 			path = []
 		for key in sub_dict:
 			if isinstance(sub_dict[key], dict) and len(sub_dict[key]) > 0:
 				path.append(key)
-				self.set_reduced_hierarchy_pathes(sub_dict[key], path)
+				self.__set_reduced_hierarchy_pathes(sub_dict[key], path)
 			elif isinstance(sub_dict[key], dict) and len(sub_dict[key]) <= 0:
 				path.append(key)
 				self.reduced_hierarchy_pathes.append(path)
