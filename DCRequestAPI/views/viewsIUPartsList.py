@@ -57,7 +57,9 @@ class IUPartsListView():
 
 	@view_config(route_name='iupartslist', accept='application/json', renderer="json")
 	def IUPartsListJSON(self):
-		
+		"""
+		TODO: This is a stub, needs to be implemented
+		"""
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
 		es_searcher.setSourceFields(self.search_params['result_table_columns'])
 		es_searcher.setFilterFields(self.search_params['open_filter_selectors'])
@@ -160,7 +162,8 @@ class IUPartsListView():
 		}
 		return pagecontent
 
-
+	'''
+	# not used
 	def reduce_hierarchical_term_filters(self, term_filters, hierarchy_fields):
 		# when term_filters are used with hierarchies
 		# filter out the term_filters that are parents of other term_filters
@@ -187,8 +190,11 @@ class IUPartsListView():
 				new_term_filters[key] = term_filters[key]
 		
 		return new_term_filters
+	'''
 
 
+	'''
+	# not used
 	def set_reduced_hierarchy_dict(self, subdict, element_list):
 		if len(element_list) <= 0:
 			return
@@ -199,8 +205,11 @@ class IUPartsListView():
 			subdict[element] = {}
 			self.set_reduced_hierarchy_dict(subdict[element], element_list)
 		return
+	'''
 
 
+	'''
+	# not used
 	def set_reduced_hierarchy_pathes(self, sub_dict, path = None):
 		if path is None:
 			path = []
@@ -213,5 +222,6 @@ class IUPartsListView():
 				self.reduced_hierarchy_pathes.append(path)
 				return
 		return
+	'''
 	
 	
