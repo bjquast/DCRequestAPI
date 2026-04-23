@@ -43,21 +43,25 @@ class FieldConfigView():
 		self.messages.extend(self.userlogin.get_messages())
 
 
-	@view_config(route_name='get_field_type', accept='application/json', renderer='json')
-	def get_field_type(self):
-		if 'fieldname' in self.request.matchdict:
-			fieldname = self.request.matchdict['fieldname']
-		else:
-			return HTTPBadRequest(detail = 'Field name missing in request. Add field name to the end of the url: {0}/get_field_type/{fieldname}'.format(self.request.application_url))
+	@view_config(route_name='get_stacked_field_type', accept='application/json', renderer='json')
+	def get_stacked_field_type(self):
+		"""
+		get the type of a field
+		called by  DCRequestAPI/static/js/StackedSearch.js because
+		the stacked search has to differentiate between date and term types
+		"""
+		
+		fieldname = self.request.matchdict['fieldname']
 		
 		response = {
 			'field_type': None
 		}
-		
-		if fieldname in self.fieldconfig.date_fields:
+		if fieldname in self.fieldconfig.stacked_query_fields and fieldname in self.fieldconfig.date_fields:
 			response['field_type'] = 'date'
-		else:
+		elif fieldname in self.fieldconfig.stacked_query_fields and fieldname in self.fieldconfig.term_fields:
 			response['field_type'] = 'term'
+		else:
+			return HTTPBadRequest(detail = 'Field {1} in {0}/get_stacked_field_type/{1} is not a valid field name\n Must be one of: {2}'.format(self.request.application_url, fieldname, ', '.join(self.fieldconfig.stacked_query_fields)))
 		
 		return response
 

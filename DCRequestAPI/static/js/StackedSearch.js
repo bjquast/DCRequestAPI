@@ -63,7 +63,7 @@ class StackedSearch {
 		console.log(field);
 		$.ajax({
 			dataType: "json",
-			url: "./get_field_type/" + field
+			url: "./get_stacked_field_type/" + field
 		})
 		.fail(function (xhr) {
 			let error_response = xhr.responseJSON;

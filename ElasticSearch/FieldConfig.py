@@ -125,7 +125,10 @@ class FieldConfig:
 			{'Gender': [True, False, True, 'term']},
 			{'NumberOfUnits': [True, False, True, 'term']},
 			{'Barcodes.Methods.region': [True, False, True, 'term']},
-			{'ImagesAvailable': [True, True, False, 'term']}
+			{'ImagesAvailable': [True, True, False, 'term']},
+			{'CollectionSpecimenID': [False, False, True, 'term']},
+			{'IdentificationUnitID': [False, False, True, 'term']},
+			{'SpecimenPartID': [False, False, True, 'term']},
 			
 		]
 		return
@@ -180,19 +183,10 @@ class FieldConfig:
 		return
 
 
-	def setStackedTermFields(self):
-		self.stacked_term_fields = []
-		
-		for field in self.filter_defs:
-			for key in field:
-				if key in self.stacked_query_fields and field[key][2] is True:
-					self.stacked_term_fields.append(key)
-		return
-		
-
 	def setStackedQueryFields(self):
 		"""
-		all fields that can be used in stacked queries
+		all fields that can be used in stacked queries 
+		sorted as to be shown in select box
 		"""
 		self.stacked_query_fields = [
 			'PartAccessionNumber',
@@ -289,7 +283,6 @@ class FieldConfig:
 		self.setTermFields()
 		self.setDefaultFilterSections()
 		self.setStackedQueryFields()
-		self.setStackedTermFields()
 		self.setHierarchyFilterFields()
 		self.setSuggestionFields()
 		self.setDateFields()

@@ -1,7 +1,7 @@
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
 from pyramid.view import (view_config, view_defaults)
-from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPSeeOther
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPSeeOther, HTTPBadRequest
 
 from ElasticSearch.ES_Searcher import ES_Searcher
 
@@ -54,6 +54,11 @@ class AggregationView():
 
 	@view_config(route_name='aggregation', accept='application/json', renderer="json")
 	def viewAggregationJSON(self):
+		"""
+		called by:
+		DCRequestAPI/static/js/FilterLists.js
+		DCRequestAPI/static/js/BucketsOverlay.js
+		"""
 		if 'buckets_search_term' in self.search_params:
 			buckets_search_term = self.search_params['buckets_search_term']
 		else:
@@ -62,7 +67,8 @@ class AggregationView():
 		if 'aggregation' in self.search_params:
 			agg_key = self.search_params['aggregation']
 		else:
-			agg_key = None
+			message = 'please provide a parameter aggregation in your request'
+			return HTTPBadRequest(detail = message)
 		
 		if 'buckets_sort_alphanum' in self.search_params:
 			buckets_sort_alphanum = self.search_params['buckets_sort_alphanum']
@@ -80,10 +86,8 @@ class AggregationView():
 			buckets_size = 5000
 		
 		if agg_key not in self.fielddefinitions:
-			return {
-				'message': '{0} is not available as bucket aggregation'.format(agg_key),
-				'buckets': {}
-			}
+			message = '{0} is not available as bucket aggregation'.format(agg_key)
+			return HTTPBadRequest(detail = message)
 		
 		es_searcher = ES_Searcher(search_params = self.search_params, user_id = self.uid, users_project_ids = self.users_project_ids)
 		buckets = es_searcher.singleAggregationSearch(agg_key, buckets_search_term = buckets_search_term, buckets_sort_alphanum = buckets_sort_alphanum, buckets_sort_dir = buckets_sort_dir, size = buckets_size)

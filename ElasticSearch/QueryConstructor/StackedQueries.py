@@ -111,7 +111,7 @@ class StackedInnerQuery(QueryConstructor):
 				if self.request_dict['field'][i] == 'all fields':
 					query_dict = {
 						'term': self.request_dict['string'][i],
-						'fields': self.fieldconf.stacked_term_fields,
+						'fields': self.fieldconf.stacked_query_fields,
 						'inner_connector': self.request_dict['inner_connector']
 					}
 					self.query_list.append(query_dict)
