@@ -78,7 +78,7 @@ class ES_Searcher():
 		if page is not None:
 			if int(page) < 1:
 				page = 1
-			self.start = self.pagesize * int(page)-1
+			self.start = self.pagesize * (int(page)-1)
 		elif 'page' in self.search_params:
 			if int(self.search_params['page']) < 1:
 				self.search_params['page'] = 1
