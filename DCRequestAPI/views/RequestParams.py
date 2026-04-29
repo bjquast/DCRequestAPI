@@ -4,9 +4,13 @@ import re
 
 from ElasticSearch.FieldConfig import FieldConfig
 
+import logging, logging.config
+logging.config.fileConfig('logging.conf')
+logger = logging.getLogger('webapp')
+
 
 class RequestParams():
-	def __init__(self, request):
+	def __init__(self, request, debug=False):
 		self.request = request
 		self.fieldconf = FieldConfig()
 		
@@ -14,6 +18,8 @@ class RequestParams():
 		self.__read_search_params()
 		self.__read_credentials()
 		self.__set_requeststring()
+		if debug is True:
+			self.__log_requestparams()
 		
 		default_params_setter = DefaultParamsSetter(self.search_params)
 		self.search_params = default_params_setter.search_params
@@ -217,6 +223,15 @@ class RequestParams():
 					paramslist.append('{0}={1}'.format(param, value))
 		
 		self.requeststring = '&'.join(paramslist)
+		return
+
+
+	def __log_requestparams(self):
+		params = {}
+		for key in self.params_dict:
+			if self.params_dict[key][0]:
+				params[key] = self.params_dict[key]
+		logger.info(json.dumps(params, indent=2))
 		return
 
 
