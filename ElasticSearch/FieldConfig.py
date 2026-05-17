@@ -72,6 +72,7 @@ class FieldConfig:
 			'IdentificationUnitID',
 			'SpecimenPartID',
 			'Barcodes.Methods.region',
+			'MediaTypes.MediaType',
 			'DatabaseAccronym',
 			'SpecimenCreatedWhen',
 			'AccessionDate',
@@ -125,10 +126,11 @@ class FieldConfig:
 			{'Gender': [True, False, True, 'term']},
 			{'NumberOfUnits': [True, False, True, 'term']},
 			{'Barcodes.Methods.region': [True, False, True, 'term']},
-			{'ImagesAvailable': [True, True, False, 'term']},
+			{'MediaTypes.MediaType': [True, True, False, 'term']},
+			{'ImagesAvailable': [False, True, False, 'term']},
 			{'CollectionSpecimenID': [False, False, True, 'term']},
 			{'IdentificationUnitID': [False, False, True, 'term']},
-			{'SpecimenPartID': [False, False, True, 'term']},
+			{'SpecimenPartID': [True, True, True, 'term']},
 			
 		]
 		return
@@ -216,6 +218,7 @@ class FieldConfig:
 			'IdentificationUnitID',
 			'SpecimenPartID',
 			'Barcodes.Methods.region',
+			'MediaTypes.MediaType',
 			'DatabaseAccronym',
 		]
 		return
@@ -267,6 +270,7 @@ class FieldConfig:
 			'LifeStage',
 			'Gender',
 			'Barcodes.Methods.region',
+			'MediaTypes.MediaType',
 		]
 		return
 
@@ -542,6 +546,15 @@ class FieldConfig:
 					'field_query': 'ImagesAvailable',
 					'withholdflags': ['ImagesWithhold']
 				},
+			},
+			
+			'MediaTypes.MediaType': {
+				'names': {'en': 'Media'},
+				'buckets': {
+					'field_query': 'MediaTypes.MediaType',
+					'withholdflags': ['MediaTypes.MediaTypeWithhold'],
+					'path': 'MediaTypes'
+				}
 			},
 			
 			'CollectionName': {

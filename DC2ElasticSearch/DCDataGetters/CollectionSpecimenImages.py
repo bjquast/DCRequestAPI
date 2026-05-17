@@ -123,6 +123,7 @@ class CollectionSpecimenImages():
 				self.images_dict[row[1]]['NumberOfSpecimenImages'] = 0
 				self.images_dict[row[1]]['ImagesAvailable'] = 'available'
 				self.images_dict[row[1]]['ImagesWithhold'] = 'true'
+				self.images_dict[row[1]]['MediaTypesDict'] = {}
 			
 			image = {
 				'URI': row[2],
@@ -148,6 +149,20 @@ class CollectionSpecimenImages():
 			
 			self.images_dict[row[1]]['Images'].append(image)
 			self.images_dict[row[1]]['NumberOfSpecimenImages'] += 1
+			
+			
+			# set a nested dict for mediatypes and if the according media are withholded
+			if image['ImageType'] not in self.images_dict[row[1]]['MediaTypesDict']:
+				self.images_dict[row[1]]['MediaTypesDict'][image['ImageType']] = image['ImageWithhold']
+			elif image['ImageWithhold'] == 'false':
+				self.images_dict[row[1]]['MediaTypesDict'][image['ImageType']] = image['ImageWithhold']
+		
+		for hash_id in self.images_dict:
+			self.images_dict[hash_id]['MediaTypes'] = []
+			for imagetype in self.images_dict[hash_id]['MediaTypesDict']:
+				self.images_dict[hash_id]['MediaTypes'].append({'MediaType': imagetype, 'MediaTypeWithhold': self.images_dict[hash_id]['MediaTypesDict'][imagetype]})
+			del self.images_dict[hash_id]['MediaTypesDict']
+			
 			
 		return
 

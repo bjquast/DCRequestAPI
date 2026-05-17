@@ -554,6 +554,14 @@ MappingsDict['iuparts'] = {
 			}
 		},
 		
+		'MediaTypes': {
+			'type': 'nested',
+			'properties': {
+				'MediaType': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
+				'MediaTypeWithhold': {'type': 'boolean'}
+			}
+		},
+		
 		'NumberOfBarcodes': {'type': 'integer', 'null_value': 0},
 		
 		'Barcodes': {
