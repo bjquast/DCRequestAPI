@@ -23,17 +23,16 @@ E. g. install system requirements in Ubuntu:
 
  - A running ElasticSearch instance (see [Installing ElasticSearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/install-elasticsearch.html))
 
-
-#### Set up and activate a virtual python environment
-
-    python3 -m venv ./dcrequestapi
-    cd ./dcrequestapi
-    source bin/activate
-
 #### Download sources
 
     git clone https://github.com/bjquast/DCRequestAPI.git
+    cd dcrequestapi
 
+
+#### Set up and activate a virtual python environment
+
+    python3 -m venv .venv
+    source .venv/bin/activate
 
 #### Set up DCRequestAPI in virtual environment
 
