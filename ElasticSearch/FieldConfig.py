@@ -130,7 +130,7 @@ class FieldConfig:
 			{'ImagesAvailable': [False, True, False, 'term']},
 			{'CollectionSpecimenID': [False, False, True, 'term']},
 			{'IdentificationUnitID': [False, False, True, 'term']},
-			{'SpecimenPartID': [True, True, True, 'term']},
+			{'SpecimenPartID': [False, False, True, 'term']},
 			
 		]
 		return
