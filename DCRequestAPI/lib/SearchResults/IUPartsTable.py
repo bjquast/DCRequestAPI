@@ -2,6 +2,11 @@ import pudb
 
 from ElasticSearch.FieldConfig import FieldConfig
 
+from configparser import ConfigParser
+config = ConfigParser(allow_no_value=True)
+config.read('./config.ini')
+
+import re
 
 class IUPartsTable():
 	def __init__(self, selected_sourcefields):
@@ -57,9 +62,15 @@ class IUPartsTable():
 
 
 	def setStableIdentifierURL(self):
-		for source_dict in self.rows:
-			source_dict['PartAccessionNumber'] = ['<a href="{0}">{1}</a>'.format(source_dict['StableIdentifierURL'][0], source_dict['PartAccessionNumber'][0])]
-			source_dict['StableIdentifierURL'] = ['<a href="{0}">{0}</a>'.format(source_dict['StableIdentifierURL'][0])]
+		replace_stable_urls = config.get('dev', 'replace_stable_id_urls', fallback=False)
+		if replace_stable_urls:
+			for source_dict in self.rows:
+				source_dict = self.replace_stable_urls(source_dict)
+		else:
+			for source_dict in self.rows:
+				source_dict['PartAccessionNumber'] = ['<a href="{0}">{1}</a>'.format(source_dict['StableIdentifierURL'][0], source_dict['PartAccessionNumber'][0])]
+				source_dict['StableIdentifierURL'] = ['<a href="{0}">{0}</a>'.format(source_dict['StableIdentifierURL'][0])]
+		return
 
 
 	def getRowContent(self, doc_sources = [], setStableIDURL = True):
@@ -69,4 +80,12 @@ class IUPartsTable():
 		return self.rows
 
 
-
+	def replace_stable_urls(self, source_dict):
+		# set the replacement pattern here
+		pattern1 = re.compile(r'https://id.zfmk.de/collection_ZFMK/')
+		pattern2 = re.compile(r'https://id.zmh-coll.de/collection_ZMH/')
+		source_dict['StableIdentifierURL'][0] = re.sub(pattern1, 'http://localhost:6568/collection_ZFMK', source_dict['StableIdentifierURL'][0])
+		source_dict['StableIdentifierURL'][0] = re.sub(pattern2, 'http://localhost:6569/collection_ZMH', source_dict['StableIdentifierURL'][0])
+		source_dict['PartAccessionNumber'] = ['<a href="{0}">{1}</a>'.format(source_dict['StableIdentifierURL'][0], source_dict['PartAccessionNumber'][0])]
+		source_dict['StableIdentifierURL'] = ['<a href="{0}">{0}</a>'.format(source_dict['StableIdentifierURL'][0])]
+		return source_dict
