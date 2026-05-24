@@ -335,6 +335,7 @@ class FieldConfig:
 		self.fielddefinitions = {
 			'PartAccessionNumber': {
 				'names': {'en': 'Accessionnumber', },
+				'description': 'The accession number of a part of a collected specimen. Such a specimen part may contain individual objects from a collected specimen (e.g. organisms or minerals) or parts from the dissection of such objects (e.g. the leg of a spider). Specimen parts may hold several individuals or parts of them, but they must belong to the same specimen',
 				'buckets': {
 					'field_query': 'PartAccessionNumber.keyword', 
 				},
@@ -343,6 +344,7 @@ class FieldConfig:
 			
 			'StableIdentifierURL': {
 				'names': {'en': 'URL', },
+				'description': 'The URL refering to a specimen part in the collection database. It is composed of a base URL for each database and the ids in the tables CollectionSpecimen, IdentificationUnit, CollectionSpecimenPart',
 				'buckets': {
 					'field_query': 'StableIdentifierURL', 
 				},
@@ -351,6 +353,7 @@ class FieldConfig:
 			
 			'LastIdentificationCache': {
 				'names': {'en': 'Identified Taxon'},
+				'description': 'The newest assignment of a scientific name to an object. Because of scientific progress names of species or other objects might change over the time. The names (identifications) given before are kept in the database. LastIdentificationCache holds the current most identification.',
 				'buckets': {
 					'field_query': 'LastIdentificationCache.keyword', 
 				},
@@ -358,6 +361,7 @@ class FieldConfig:
 			
 			'VernacularTerms': {
 				'names': {'en': 'Vernacular name'},
+				'description': 'Commonly used names of an object (e.g. species, mineral, or fossil) in different languages.',
 				'buckets': {
 					'field_query': 'VernacularTerms.keyword',
 				},
@@ -365,6 +369,7 @@ class FieldConfig:
 			
 			'FamilyCache': {
 				'names': {'en': 'Family'},
+				'description': 'The taxonomic name of an organism at Family rank',
 				'buckets': {
 					'field_query': 'FamilyCache.keyword', 
 				},
@@ -372,6 +377,7 @@ class FieldConfig:
 			
 			'OrderCache': {
 				'names': {'en': 'Order'},
+				'description': 'The taxonomic name of an organism at Order rank',
 				'buckets': {
 					'field_query': 'OrderCache.keyword', 
 				},
@@ -379,6 +385,7 @@ class FieldConfig:
 			
 			'MatchedTaxon': {
 				'names': {'en': 'Accepted Taxon'},
+				'description': 'The accepted scientific name of an object as is supported by curated taxonomies like GBIF backbone taxonomy or Catalog of Life',
 				'buckets': {
 					'field_query': 'MatchedTaxon', 
 				},
@@ -386,6 +393,7 @@ class FieldConfig:
 			
 			'MatchedParentTaxa': {
 				'names': {'en': 'Taxonomy'},
+				'description': 'The accepted taxonomic hierarchy of an object as is supported by curated taxonomies like GBIF backbone taxonomy or Catalog of Life. The field contains a list of taxon names at all ranks including the taxon in the MatchedTaxon field',
 				'buckets': {
 					'field_query': 'MatchedParentTaxa.keyword', 
 				},
@@ -393,6 +401,7 @@ class FieldConfig:
 			
 			'MatchedTaxaTree': {
 				'names': {'en': 'Taxonomy'},
+				'description': 'Names and ids of a taxonomic hierarchy of an object as is supported by curated taxonomies like GBIF backbone taxonomy or Catalog of Life',
 				'buckets': {
 					'field_query': 'MatchedTaxaTree.Taxon',
 					'id_field_for_tree': 'MatchedTaxaTree.TaxonURI',
@@ -403,6 +412,7 @@ class FieldConfig:
 			
 			'MatchedTaxaHierarchyString': {
 				'names': {'en': 'Taxonomic Tree'},
+				'description': 'String representation of the taxonomic hierarchy of an object. Taxonomical names are sorted by their level and separated by ">".',
 				'buckets': {
 					'field_query': 'MatchedTaxaHierarchyString.facet'
 				}
@@ -410,6 +420,7 @@ class FieldConfig:
 			
 			'MatchedSynonyms.Synonym': {
 				'names': {'en': 'Synonym'},
+				'description': 'Known synonyms of the accepted name of an object collected from curated taxonomies like GBIF backbone taxonomy or Catalog of Life',
 				'buckets': {
 					'field_query': 'MatchedSynonyms.Synonym.keyword'
 				},
@@ -417,6 +428,7 @@ class FieldConfig:
 			
 			'TypeStatus': {
 				'names': {'en': 'Type status'},
+				'description': 'When the identified organism is used as reference material for the formal description of a species. There are different kinds of types like Holotype, Syntype, Paratype.',
 				'buckets': {
 					'field_query': 'TypeStatus.keyword'
 				},
@@ -424,6 +436,7 @@ class FieldConfig:
 			
 			'MaterialCategory': {
 				'names': {'en': 'Material category'},
+				'description': 'The matierial type of the object in the collection, for example: microscopic slide, preserved specimen, bones, pelt. An object might only be observed and thus the material category would be "observed"',
 				'buckets': {
 					'field_query': 'MaterialCategory.keyword',
 					'withholdflags': ['PartWithhold'],
@@ -432,6 +445,7 @@ class FieldConfig:
 			
 			'AccessionDate': {
 				'names': {'en': 'Accession date'},
+				'description': 'The date when the specimen has been added to the collection',
 				'buckets': {
 					'field_query': 'AccessionDate',
 					'type': 'date'
@@ -440,6 +454,7 @@ class FieldConfig:
 			
 			'SpecimenCreatedWhen': {
 				'names': {'en': 'Data aquisition date'},
+				'description': 'The date when the data of the specimen have been added to the database.',
 				'buckets': {
 					'field_query': 'SpecimenCreatedWhen',
 					'type': 'date'
@@ -447,7 +462,8 @@ class FieldConfig:
 			},
 			
 			'LocalityVerbatim': {
-				'names': {'en': 'Sampling locality'},
+				'names': {'en': 'Locality name'},
+				'description': 'A common name of the locality where the specimen has been collected, like "Loch Ness", "Badger\'s drift".',
 				'buckets': {
 					'field_query': 'LocalityVerbatim.keyword',
 					'withholdflags': ['EventWithhold', 'embargo_event_but_country', 'embargo_event_but_country_after_1992'],
@@ -456,6 +472,7 @@ class FieldConfig:
 			
 			'LocalityDescription': {
 				'names': {'en': 'Locality description'},
+				'description': 'A more precise description of the locality where the specimen has been collected. For example the locality information given on a label of the collected object',
 				'buckets': {
 					'field_query': 'LocalityDescription.keyword',
 					'withholdflags': ['EventWithhold', 'embargo_event_but_country', 'embargo_event_but_country_after_1992'],
@@ -464,6 +481,7 @@ class FieldConfig:
 			
 			'HabitatDescription': {
 				'names': {'en': 'Habitat'},
+				'description': 'Information about the habitat from which the specimen has been collected.',
 				'buckets': {
 					'field_query': 'HabitatDescription.keyword',
 					'withholdflags': ['EventWithhold', 'embargo_event_but_country', 'embargo_event_but_country_after_1992'],
@@ -472,6 +490,7 @@ class FieldConfig:
 			
 			'CollectingMethod': {
 				'names': {'en': 'Collecting method'},
+				'description': 'Name and short description of the method by which the specimen has been collected.',
 				'buckets': {
 					'field_query': 'CollectingMethod.keyword',
 					'withholdflags': ['EventWithhold', 'embargo_event_but_country', 'embargo_event_but_country_after_1992'],
@@ -480,6 +499,7 @@ class FieldConfig:
 			
 			'CountryCache': {
 				'names': {'en': 'Country'},
+				'description': 'The country of the specimen\'s collection site.',
 				'buckets': {
 					'field_query': 'CountryCache.keyword',
 					'withholdflags': ['EventWithhold'],
@@ -488,6 +508,7 @@ class FieldConfig:
 			
 			'CollectionDate': {
 				'names': {'en': 'Collection date'},
+				'description': 'The date when the specimen has been collected.',
 				'buckets': {
 					'field_query': 'CollectionDate',
 					'type': 'date',
@@ -502,6 +523,7 @@ class FieldConfig:
 			
 			'CollectionAgents.CollectorsName': {
 				'names': {'en': 'Collector(s)'},
+				'description': 'The name(s) of one or more collectors of the specimen',
 				'buckets': {
 					'field_query': 'CollectionAgents.CollectorsName.keyword',
 					'withholdflags': ['CollectionAgents.CollectorsWithhold', 'CollectionAgents.embargo_collector', 'CollectionAgents.embargo_anonymize_collector'],
@@ -512,6 +534,7 @@ class FieldConfig:
 			# IUWithhold is ignored here as it is used for withholding the complete IdentificationUnitPart when it is set
 			'LifeStage': {
 				'names': {'en': 'Life stage'},
+				'description': 'The life stage of the organism in the specimen part, e.g. "juvenil", "adult", "larva".',
 				'buckets': {
 					'field_query': 'LifeStage.keyword',
 				},
@@ -519,6 +542,7 @@ class FieldConfig:
 			
 			'Gender': {
 				'names': {'en': 'Sex'},
+				'description': 'The sex of the organism in the specimen part.',
 				'buckets': {
 					'field_query': 'Gender.keyword',
 				},
@@ -526,6 +550,7 @@ class FieldConfig:
 			
 			'NumberOfUnits': {
 				'names': {'en': 'Number of specimens'},
+				'description': 'The number of individual identified objects in the collected specimen.',
 				'buckets': {
 					'field_query': 'NumberOfUnits',
 				},
@@ -534,6 +559,7 @@ class FieldConfig:
 			'NumberOfSpecimenImages': {
 				# this field is in iuparts object, not in Images
 				'names': {'en': 'Number of images'},
+				'description': 'The number of images in the database depicting the object.',
 				'buckets': {
 					'field_query': 'NumberOfSpecimenImages',
 					'type': 'number'
@@ -542,6 +568,7 @@ class FieldConfig:
 			
 			'ImagesAvailable': {
 				'names': {'en': 'Image(s)'},
+				'description': 'Flag if there is a media file available for the object.',
 				'buckets': {
 					'field_query': 'ImagesAvailable',
 					'withholdflags': ['ImagesWithhold']
@@ -550,6 +577,7 @@ class FieldConfig:
 			
 			'MediaTypes.MediaType': {
 				'names': {'en': 'Media'},
+				'description': 'Types of media files associated with the object in the collection database.',
 				'buckets': {
 					'field_query': 'MediaTypes.MediaType',
 					'withholdflags': ['MediaTypes.MediaTypeWithhold'],
@@ -559,6 +587,7 @@ class FieldConfig:
 			
 			'CollectionName': {
 				'names': {'en': 'Collection'},
+				'description': 'Name of the collection where the object is stored',
 				'buckets': {
 					'field_query': 'CollectionName.keyword',
 				},
@@ -566,6 +595,7 @@ class FieldConfig:
 			
 			'CollectionsTree': {
 				'names': {'en': 'Collection(s)'},
+				'description': 'Names and ids of the collections in the database.',
 				'buckets': {
 					'field_query': 'CollectionsTree.CollectionName',
 					'path': 'CollectionsTree',
@@ -576,6 +606,7 @@ class FieldConfig:
 			
 			'CollectionHierarchyString': {
 				'names': {'en': 'Collections (hierarchical)'},
+				'description': 'String representation of the collection hierarchy of an object. Collections are sorted by their organisational level and separated by ">"',
 				'buckets': {
 					'field_query': 'CollectionHierarchyString.facet'
 				}
@@ -583,6 +614,7 @@ class FieldConfig:
 			
 			'Projects.Project': {
 				'names': {'en': 'Project(s)'},
+				'description': 'Projects in which the objects are used',
 				'buckets': {
 					'field_query': 'Projects.Project.keyword',
 				},
@@ -590,6 +622,7 @@ class FieldConfig:
 			
 			'DatabaseAccronym': {
 				'names': {'en': 'Database'},
+				'description': 'The accronym of the collection database that holds the data on a specimen.',
 				'buckets': {
 					'field_query': 'DatabaseAccronym.keyword',
 				},
@@ -597,6 +630,7 @@ class FieldConfig:
 			
 			'CollectionSpecimenID': {
 				'names': {'en': 'CollectionSpecimenID'},
+				'description': 'The ID of the specimen (= sample) in the collection database.',
 				'buckets': {
 					'field_query': 'CollectionSpecimenID'
 				},
@@ -604,6 +638,7 @@ class FieldConfig:
 			
 			'IdentificationUnitID': {
 				'names': {'en': 'IdentificationUnitID'},
+				'description': 'The ID of an identified individual or object in the collection database.',
 				'buckets': {
 					'field_query': 'IdentificationUnitID'
 				},
@@ -611,6 +646,7 @@ class FieldConfig:
 			
 			'SpecimenPartID': {
 				'names': {'en': 'SpecimenPartID'},
+				'description': 'The ID of a part of a specimen in the collection database',
 				'buckets': {
 					'field_query': 'SpecimenPartID'
 				},
@@ -618,6 +654,7 @@ class FieldConfig:
 			
 			'Barcodes.Methods.region': {
 				'names': {'en': 'Barcode Marker'},
+				'description': 'The region or locus of a gene that has been used to generate a RNA- or DNA-barcode from. Typical regions are: "COI", "ITS", "LSU", "SSU"',
 				'buckets': {
 					'field_query': 'Barcodes.Methods.region.keyword',
 				},
@@ -650,6 +687,7 @@ class FieldConfig:
 		
 			self.fielddefinitions['MatchedTaxaTree.{0}'.format(rank_names[rank]['en'])] = {
 				'names': {'en': rank_names[rank]['en']},
+				'description': 'Taxon assigned to the object at the rank {0}'.format(rank_names[rank]['en']),
 				'buckets': {
 					'field_query': 'MatchedTaxaTree.Taxon',
 					'filter': None,
