@@ -1,0 +1,1819 @@
+{
+  "iuparts": {
+    "mappings": {
+      "properties": {
+        "AccessionDate": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            }
+          },
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
+          "ignore_malformed": true,
+          "type": "date"
+        },
+        "Altitude mNN": {
+          "ignore_malformed": true,
+          "type": "float"
+        },
+        "Altitude_Accuracy m": {
+          "ignore_malformed": true,
+          "type": "float"
+        },
+        "Altitude_Accuracy mNN": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "Barcodes": {
+          "properties": {
+            "AnalysisDate": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                }
+              },
+              "format": "yyyy-MM-dd HH:mm:ss.SSS||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||dd.MM.yyyy||dd.MM.yy||d.MM.yyyy||d.M.yyyy||dd.M.yyyy||d.MM.yy||d.M.yy||dd.M.yy||yyyy",
+              "ignore_malformed": true,
+              "type": "date"
+            },
+            "AnalysisDescription": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                },
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "AnalysisDisplay": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "AnalysisID": {
+              "type": "long"
+            },
+            "AnalysisInstanceNotes": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "AnalysisNumber": {
+              "type": "keyword"
+            },
+            "AnalysisResult": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                },
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "AnalysisTypeNotes": {
+              "type": "keyword"
+            },
+            "ExternalAnalysisURI": {
+              "type": "keyword"
+            },
+            "MeasurementUnit": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "Methods": {
+              "properties": {
+                "MethodDescription": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    },
+                    "keyword_lc": {
+                      "ignore_above": 256,
+                      "normalizer": "use_lowercase",
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "MethodDisplay": {
+                  "fields": {
+                    "keyword_lc": {
+                      "ignore_above": 256,
+                      "normalizer": "use_lowercase",
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "keyword"
+                },
+                "MethodID": {
+                  "type": "long"
+                },
+                "MethodMarker": {
+                  "type": "keyword"
+                },
+                "MethodTypeNotes": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "direction": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "pcr_primer_forward_name": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "pcr_primer_forward_sequence": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "pcr_primer_reverse_name": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "pcr_primer_reverse_sequence": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "region": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "sequence_id": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "sequence_length": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "sequencing_lab": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "sequencing_primer_name": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "sequencing_primer_sequence": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "sequencing_timestamp": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "trace_count": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "trace_file_url": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "trace_filename": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                }
+              }
+            },
+            "ResponsibleName": {
+              "type": "keyword"
+            }
+          }
+        },
+        "CollectingMethod": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "CollectionAcronym": {
+          "fields": {
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "keyword"
+        },
+        "CollectionAgents": {
+          "properties": {
+            "CollectorsAgentURI": {
+              "type": "keyword"
+            },
+            "CollectorsDataWithholding": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "CollectorsName": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                },
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "CollectorsOrder": {
+              "type": "integer"
+            },
+            "CollectorsSpecimenFieldNumber": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "CollectorsWithhold": {
+              "type": "boolean"
+            },
+            "DB_ProjectID": {
+              "type": "keyword"
+            },
+            "ProjectID": {
+              "type": "integer"
+            },
+            "embargo_anonymize_collector": {
+              "type": "boolean"
+            },
+            "embargo_collector": {
+              "type": "boolean"
+            }
+          },
+          "type": "nested"
+        },
+        "CollectionDate": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            }
+          },
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
+          "ignore_malformed": true,
+          "type": "date"
+        },
+        "CollectionEventID": {
+          "type": "long"
+        },
+        "CollectionHierarchyLength": {
+          "type": "integer"
+        },
+        "CollectionHierarchyString": {
+          "fields": {
+            "facet": {
+              "analyzer": "tree_hierarchy",
+              "fielddata": true,
+              "type": "text"
+            }
+          },
+          "type": "text"
+        },
+        "CollectionID": {
+          "type": "integer"
+        },
+        "CollectionName": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "CollectionSpecimenID": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            }
+          },
+          "type": "long"
+        },
+        "CollectionsTree": {
+          "properties": {
+            "CollectionID": {
+              "type": "integer"
+            },
+            "CollectionName": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "HierarchyString": {
+              "fields": {
+                "facet": {
+                  "analyzer": "tree_hierarchy",
+                  "fielddata": true,
+                  "type": "text"
+                }
+              },
+              "type": "text"
+            },
+            "ParentCollectionID": {
+              "type": "integer"
+            },
+            "TreeLevel": {
+              "type": "integer"
+            }
+          },
+          "type": "nested"
+        },
+        "CollectorsEventNumber": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "CountryCache": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "DatabaseAccronym": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "DatabaseID": {
+          "type": "keyword"
+        },
+        "DatabaseURI": {
+          "type": "keyword"
+        },
+        "DepositorsName": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "EventWithhold": {
+          "type": "boolean"
+        },
+        "EventWithholdDate": {
+          "type": "boolean"
+        },
+        "EventWithholdingReason": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "EventWithholdingReasonDate": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "ExternalAttribute_NameID": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "ExternalDatasourceInstitution": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "ExternalDatasourceName": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "ExternalDatasourceURI": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "ExternalIdentifier": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "FOGS": {
+          "properties": {
+            "AnalysisDate": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                }
+              },
+              "format": "yyyy-MM-dd HH:mm:ss.SSS||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||dd.MM.yyyy||dd.MM.yy||d.MM.yyyy||d.M.yyyy||dd.M.yyyy||d.MM.yy||d.M.yy||dd.M.yy||yyyy",
+              "ignore_malformed": true,
+              "type": "date"
+            },
+            "AnalysisDescription": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                },
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "AnalysisDisplay": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "AnalysisID": {
+              "type": "long"
+            },
+            "AnalysisInstanceNotes": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "AnalysisNumber": {
+              "type": "keyword"
+            },
+            "AnalysisResult": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                },
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "AnalysisTypeNotes": {
+              "type": "keyword"
+            },
+            "ExternalAnalysisURI": {
+              "type": "keyword"
+            },
+            "MeasurementUnit": {
+              "type": "keyword"
+            },
+            "Methods": {
+              "properties": {
+                "MethodDescription": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "MethodDisplay": {
+                  "fields": {
+                    "keyword_lc": {
+                      "ignore_above": 256,
+                      "normalizer": "use_lowercase",
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "keyword"
+                },
+                "MethodID": {
+                  "type": "long"
+                },
+                "MethodMarker": {
+                  "type": "keyword"
+                },
+                "MethodTypeNotes": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "allele id (internal)": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "inheritance": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "locus": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "position": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "ref-allele": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "repeat-motif-a": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "repeat-motif-b": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "type": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                },
+                "value": {
+                  "fields": {
+                    "keyword": {
+                      "ignore_above": 256,
+                      "type": "keyword"
+                    }
+                  },
+                  "type": "text"
+                }
+              }
+            },
+            "ResponsibleName": {
+              "type": "keyword"
+            }
+          }
+        },
+        "FamilyCache": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "Gender": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "HabitatDescription": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "HierarchyCache": {
+          "type": "text"
+        },
+        "IUDisplayOrder": {
+          "type": "integer"
+        },
+        "IUWithhold": {
+          "type": "boolean"
+        },
+        "IUWithholdingReason": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "IdentificationUnitCircumstances": {
+          "type": "text"
+        },
+        "IdentificationUnitID": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            }
+          },
+          "type": "long"
+        },
+        "IdentificationUnitNotes": {
+          "type": "text"
+        },
+        "Identifications": {
+          "properties": {
+            "IdentificationDate": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                }
+              },
+              "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
+              "ignore_malformed": true,
+              "type": "date"
+            },
+            "IdentificationSequenceID": {
+              "type": "short"
+            },
+            "ParentTaxa": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "ResponsibleName": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "TaxonNameURI": {
+              "type": "keyword"
+            },
+            "TaxonomicName": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "TypeNotes": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                },
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "TypeStatus": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "VernacularTerm": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "embargo_anonymize_determiner": {
+              "type": "boolean"
+            }
+          },
+          "type": "nested"
+        },
+        "Images": {
+          "properties": {
+            "CopyRightStatement": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                },
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "Description": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                },
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "ImageCreator": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "ImageDisplayOrder": {
+              "type": "integer"
+            },
+            "ImageType": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "ImageWithhold": {
+              "type": "boolean"
+            },
+            "ImageWithholdingReason": {
+              "type": "keyword"
+            },
+            "LicenseHolder": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "LicenseHolderAgentURI": {
+              "type": "keyword"
+            },
+            "LicenseType": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "LicenseURI": {
+              "type": "keyword"
+            },
+            "LicenseYear": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                }
+              },
+              "format": "yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
+              "ignore_malformed": true,
+              "type": "date"
+            },
+            "ResourceURI": {
+              "type": "keyword"
+            },
+            "Title": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                },
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "URI": {
+              "type": "keyword"
+            }
+          },
+          "type": "nested"
+        },
+        "ImagesAvailable": {
+          "ignore_above": 256,
+          "type": "keyword"
+        },
+        "ImagesWithhold": {
+          "ignore_above": 256,
+          "type": "keyword"
+        },
+        "LastIdentificationCache": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "LastUpdated": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            }
+          },
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
+          "ignore_malformed": true,
+          "type": "date"
+        },
+        "LifeStage": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "LocalityDescription": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "LocalityVerbatim": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "MAM_Measurements": {
+          "properties": {
+            "AnalysisDate": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                }
+              },
+              "format": "yyyy-MM-dd HH:mm:ss.SSS||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||dd.MM.yyyy||dd.MM.yy||d.MM.yyyy||d.M.yyyy||dd.M.yyyy||d.MM.yy||d.M.yy||dd.M.yy||yyyy",
+              "ignore_malformed": true,
+              "type": "date"
+            },
+            "AnalysisDescription": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                },
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "AnalysisDisplay": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "AnalysisID": {
+              "type": "long"
+            },
+            "AnalysisInstanceNotes": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "AnalysisNumber": {
+              "type": "keyword"
+            },
+            "AnalysisResult": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                },
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "AnalysisTypeNotes": {
+              "type": "keyword"
+            },
+            "ExternalAnalysisURI": {
+              "type": "keyword"
+            },
+            "MeasurementUnit": {
+              "type": "keyword"
+            },
+            "ResponsibleName": {
+              "type": "keyword"
+            }
+          }
+        },
+        "MatchedParentTaxa": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "MatchedParentTaxaURIs": {
+          "type": "keyword"
+        },
+        "MatchedSynonyms": {
+          "properties": {
+            "Synonym": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                },
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "SynonymAuthor": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "SynonymTaxonURI": {
+              "type": "keyword"
+            }
+          }
+        },
+        "MatchedTaxaHierarchyLength": {
+          "type": "integer"
+        },
+        "MatchedTaxaHierarchyString": {
+          "fields": {
+            "facet": {
+              "analyzer": "tree_hierarchy",
+              "fielddata": true,
+              "type": "text"
+            }
+          },
+          "type": "text"
+        },
+        "MatchedTaxaTree": {
+          "properties": {
+            "HierarchyString": {
+              "fields": {
+                "facet": {
+                  "analyzer": "tree_hierarchy",
+                  "fielddata": true,
+                  "type": "text"
+                }
+              },
+              "type": "text"
+            },
+            "ParentTaxonURI": {
+              "type": "keyword"
+            },
+            "Rank": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "Taxon": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "TaxonURI": {
+              "type": "keyword"
+            },
+            "TaxonURL": {
+              "type": "keyword"
+            },
+            "TreeLevel": {
+              "type": "integer"
+            }
+          },
+          "type": "nested"
+        },
+        "MatchedTaxon": {
+          "fields": {
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "keyword"
+        },
+        "MatchedTaxonAuthor": {
+          "fields": {
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "keyword"
+        },
+        "MatchedTaxonRank": {
+          "fields": {
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "keyword"
+        },
+        "MatchedTaxonURI": {
+          "type": "keyword"
+        },
+        "MatchedTaxonURL": {
+          "type": "keyword"
+        },
+        "MaterialCategory": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "MediaTypes": {
+          "properties": {
+            "MediaType": {
+              "fields": {
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "keyword"
+            },
+            "MediaTypeWithhold": {
+              "type": "boolean"
+            }
+          },
+          "type": "nested"
+        },
+        "NamedArea": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "NamedAreaNotes": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "NamedAreaURL": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "NumberOfBarcodes": {
+          "null_value": 0,
+          "type": "integer"
+        },
+        "NumberOfFOGS": {
+          "null_value": 0,
+          "type": "integer"
+        },
+        "NumberOfMAM_Measurements": {
+          "null_value": 0,
+          "type": "integer"
+        },
+        "NumberOfSpecimenImages": {
+          "null_value": 0,
+          "type": "integer"
+        },
+        "NumberOfUnits": {
+          "fields": {
+            "integer": {
+              "ignore_malformed": true,
+              "type": "integer"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "keyword"
+        },
+        "NumberOfUnitsModifier": {
+          "type": "keyword"
+        },
+        "OnlyObserved": {
+          "type": "boolean"
+        },
+        "OrderCache": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "ParentCollections": {
+          "fields": {
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "keyword"
+        },
+        "PartAccessionNumber": {
+          "analyzer": "whitespace_lc",
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "PartWithhold": {
+          "type": "boolean"
+        },
+        "PartWithholdingReason": {
+          "type": "keyword"
+        },
+        "PreparationDate": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            }
+          },
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
+          "ignore_malformed": true,
+          "type": "date"
+        },
+        "PreparationMethod": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "Projects": {
+          "properties": {
+            "DB_ProjectID": {
+              "type": "keyword"
+            },
+            "Project": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 256,
+                  "type": "keyword"
+                },
+                "keyword_lc": {
+                  "ignore_above": 256,
+                  "normalizer": "use_lowercase",
+                  "type": "keyword"
+                }
+              },
+              "type": "text"
+            },
+            "ProjectID": {
+              "type": "integer"
+            },
+            "ProjectURI": {
+              "type": "keyword"
+            }
+          }
+        },
+        "SpecimenAccessionNumber": {
+          "analyzer": "whitespace_lc",
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "SpecimenCreatedBy": {
+          "type": "keyword"
+        },
+        "SpecimenCreatedWhen": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            }
+          },
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
+          "ignore_malformed": true,
+          "type": "date"
+        },
+        "SpecimenPartID": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            }
+          },
+          "type": "long"
+        },
+        "SpecimenUpdatedBy": {
+          "type": "keyword"
+        },
+        "SpecimenUpdatedWhen": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            }
+          },
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
+          "ignore_malformed": true,
+          "type": "date"
+        },
+        "SpecimenVersion": {
+          "type": "integer"
+        },
+        "SpecimenWithhold": {
+          "type": "boolean"
+        },
+        "SpecimenWithholdingReason": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "StableIdentifierURL": {
+          "type": "keyword"
+        },
+        "StockNumber": {
+          "type": "float"
+        },
+        "StockNumberUnit": {
+          "fields": {
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "keyword"
+        },
+        "StockVerbatim": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "StorageContainer": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "StorageLocation": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "TaxonNameURI": {
+          "ignore_above": 256,
+          "type": "keyword"
+        },
+        "TaxonNameURI_sha": {
+          "ignore_above": 256,
+          "type": "keyword"
+        },
+        "TaxonomicGroup": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "TypeStatus": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "UnitDescription": {
+          "type": "text"
+        },
+        "UnitIdentifier": {
+          "type": "keyword"
+        },
+        "VernacularTerms": {
+          "fields": {
+            "keyword": {
+              "ignore_above": 256,
+              "type": "keyword"
+            },
+            "keyword_lc": {
+              "ignore_above": 256,
+              "normalizer": "use_lowercase",
+              "type": "keyword"
+            }
+          },
+          "type": "text"
+        },
+        "WGS84_Accuracy m": {
+          "ignore_malformed": true,
+          "type": "float"
+        },
+        "WGS84_Coordinate": {
+          "ignore_malformed": true,
+          "type": "geo_point"
+        },
+        "embargo_anonymize_depositor": {
+          "type": "boolean"
+        },
+        "embargo_coll_date": {
+          "type": "boolean"
+        },
+        "embargo_complete": {
+          "type": "boolean"
+        },
+        "embargo_coordinates": {
+          "type": "boolean"
+        },
+        "embargo_event_but_country": {
+          "type": "boolean"
+        },
+        "embargo_event_but_country_after_1992": {
+          "type": "boolean"
+        },
+        "idshash": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}
