@@ -548,6 +548,16 @@ MappingsDict['iuparts'] = {
 					"format": "yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
 					'ignore_malformed': True
 				},
+				'ImageUploadDate': {
+					'type': 'date',
+					"fields": {
+						'keyword': {
+							'type': 'keyword', 'ignore_above': 256
+						}
+					},
+					"format": "yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
+					'ignore_malformed': True
+				}, 
 				'ImageDisplayOrder': {'type': 'integer'},
 				'ImageWithholdingReason': {'type': 'keyword'},
 				'ImageWithhold': {'type': 'boolean'}
@@ -718,7 +728,16 @@ MappingsDict['iuparts'] = {
 		},
 		# Images
 		'NumberOfSpecimenImages': {'type': 'integer', 'null_value': 0},
-		
+		'FirstMediaUploadDate': {
+			'type': 'date',
+			"fields": {
+				'keyword': {
+					'type': 'keyword', 'ignore_above': 256
+				}
+			},
+			"format": "yyyy-MM-dd||yyyy/MM/dd||yyyy||yy",
+			'ignore_malformed': True
+		},
 		'ImagesAvailable': {'type': 'keyword', 'ignore_above': 256},
 		'ImagesWithhold': {'type': 'keyword', 'ignore_above': 256},
 		

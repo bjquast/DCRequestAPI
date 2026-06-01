@@ -33,6 +33,7 @@ class CollectionSpecimenImages():
 		csi.LicenseHolder,
 		csi.LicenseHolderAgentURI,
 		csi.LicenseYear,
+		CONVERT(NVARCHAR, csi.LogCreatedWhen, 23) AS ImageUploadDate,
 		csi.DisplayOrder AS ImageDisplayOrder,
 		csi.DataWithholdingReason AS ImageWithholdingReason,
 		CASE 
@@ -61,6 +62,7 @@ class CollectionSpecimenImages():
 		csi.LicenseHolder,
 		csi.LicenseHolderAgentURI,
 		csi.LicenseYear,
+		CONVERT(NVARCHAR, csi.LogCreatedWhen, 23) AS ImageUploadDate,
 		csi.DisplayOrder AS ImageDisplayOrder,
 		csi.DataWithholdingReason AS ImageWithholdingReason,
 		CASE 
@@ -89,6 +91,7 @@ class CollectionSpecimenImages():
 		csi.LicenseHolder,
 		csi.LicenseHolderAgentURI,
 		csi.LicenseYear,
+		CONVERT(NVARCHAR, csi.LogCreatedWhen, 23) AS ImageUploadDate,
 		csi.DisplayOrder AS ImageDisplayOrder,
 		csi.DataWithholdingReason AS ImageWithholdingReason,
 		CASE 
@@ -101,7 +104,7 @@ class CollectionSpecimenImages():
 		ON csi.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] 
 			AND csi.[IdentificationUnitID] IS NULL
 			AND csi.[SpecimenPartID] IS NULL
-		ORDER BY [rownumber]
+		ORDER BY [rownumber], ImageUploadDate
 		;"""
 		self.cur.execute(query)
 		self.columns = [column[0] for column in self.cur.description]
@@ -124,6 +127,7 @@ class CollectionSpecimenImages():
 				self.images_dict[row[1]]['ImagesAvailable'] = 'available'
 				self.images_dict[row[1]]['ImagesWithhold'] = 'true'
 				self.images_dict[row[1]]['MediaTypesDict'] = {}
+				self.images_dict[row[1]]['FirstMediaUploadDate'] = None
 			
 			image = {
 				'URI': row[2],
@@ -138,9 +142,10 @@ class CollectionSpecimenImages():
 				'LicenseHolder': row[11],
 				'LicenseHolderAgentURI': row[12],
 				'LicenseYear': row[13],
-				'ImageDisplayOrder': row[14],
-				'ImageWithholdingReason': row[15],
-				'ImageWithhold': row[16]
+				'ImageUploadDate': row[14],
+				'ImageDisplayOrder': row[15],
+				'ImageWithholdingReason': row[16],
+				'ImageWithhold': row[17]
 			}
 			
 			# set ImagesWithhold flag to 'false' if there is at least one image without an Withhold flag 
@@ -149,6 +154,11 @@ class CollectionSpecimenImages():
 			
 			self.images_dict[row[1]]['Images'].append(image)
 			self.images_dict[row[1]]['NumberOfSpecimenImages'] += 1
+			
+			# ImageUploadDates are sorted in the query
+			# set the first upload date for the statistics
+			if not self.images_dict[row[1]]['FirstMediaUploadDate'] and image['ImageUploadDate']:
+				self.images_dict[row[1]]['FirstMediaUploadDate'] = image['ImageUploadDate']
 			
 			
 			# set a nested dict for mediatypes and if the according media are withholded
