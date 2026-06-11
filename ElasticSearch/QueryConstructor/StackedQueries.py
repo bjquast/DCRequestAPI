@@ -123,7 +123,7 @@ class StackedInnerQuery(QueryConstructor):
 					}
 					self.query_list.append(query_dict)
 			
-			elif self.request_dict['query_type'][i] == 'date' and (self.request_dict['date_from'][i] or self.request_dict['date_from'][i]):
+			elif self.request_dict['query_type'][i] == 'date' and (self.request_dict['date_from'][i] or self.request_dict['date_to'][i]):
 				query_dict = {
 					'date_from': self.request_dict.get('date_from', [''])[i],
 					'date_to': self.request_dict.get('date_to', [''])[i],

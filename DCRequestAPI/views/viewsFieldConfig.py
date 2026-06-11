@@ -52,13 +52,14 @@ class FieldConfigView():
 		"""
 		
 		fieldname = self.request.matchdict['fieldname']
-		
 		response = {
 			'field_type': None
 		}
 		if fieldname in self.fieldconfig.stacked_query_fields and fieldname in self.fieldconfig.date_fields:
 			response['field_type'] = 'date'
 		elif fieldname in self.fieldconfig.stacked_query_fields and fieldname in self.fieldconfig.term_fields:
+			response['field_type'] = 'term'
+		elif fieldname in self.fieldconfig.stacked_query_fields or fieldname.lower() == 'all fields':
 			response['field_type'] = 'term'
 		else:
 			return HTTPBadRequest(detail = 'Field {1} in {0}/get_stacked_field_type/{1} is not a valid field name\n Must be one of: {2}'.format(self.request.application_url, fieldname, ', '.join(self.fieldconfig.stacked_query_fields)))
