@@ -19,7 +19,7 @@ class Projects():
 		
 		query = """
 		SELECT 
-		[rownumber],
+		idstemp.[rownumber],
 		idstemp.[idshash] AS [_id],
 		CONCAT(idstemp.[DatabaseID], '_', pp.[ProjectID]) AS [DB_ProjectID],
 		pp.[ProjectID],
@@ -32,7 +32,7 @@ class Projects():
 		ON cp.CollectionSpecimenID = cs.CollectionSpecimenID
 		LEFT JOIN [ProjectProxy] pp
 		ON pp.ProjectID = cp.ProjectID
-		ORDER BY [rownumber]
+		ORDER BY idstemp.[rownumber]
 		;"""
 		self.cur.execute(query)
 		self.columns = [column[0] for column in self.cur.description]

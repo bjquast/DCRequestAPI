@@ -19,7 +19,7 @@ class Identifications():
 		
 		query = """
 		SELECT DISTINCT
-		[rownumber],
+		idstemp.[rownumber],
 		idstemp.[idshash] AS [_id],
 		i.IdentificationSequence AS IdentificationSequenceID,
 		CONVERT(NVARCHAR, i.IdentificationDate, 120) AS [IdentificationDate],
@@ -36,7 +36,7 @@ class Identifications():
 		ON iu.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND iu.[IdentificationUnitID] = idstemp.[IdentificationUnitID]
 		INNER JOIN [Identification] i
 		ON i.[CollectionSpecimenID] = iu.[CollectionSpecimenID] AND i.[IdentificationUnitID] = iu.[IdentificationUnitID]
-		ORDER BY [rownumber], i.[IdentificationSequence]
+		ORDER BY idstemp.[rownumber], i.[IdentificationSequence]
 		;"""
 		self.cur.execute(query)
 		#self.columns = [column[0] for column in self.cur.description]

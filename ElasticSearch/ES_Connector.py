@@ -6,8 +6,6 @@ es_logger = logging.getLogger('elastic_queries')
 from elasticsearch import Elasticsearch, BadRequestError
 from elasticsearch.helpers import streaming_bulk, bulk
 
-from .ES_Mappings import MappingsDict
-
 from configparser import ConfigParser
 config = ConfigParser(allow_no_value=True)
 config.read('./config.ini')

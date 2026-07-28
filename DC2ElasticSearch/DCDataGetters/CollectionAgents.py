@@ -1,11 +1,9 @@
-
 import pudb
 
 import logging, logging.config
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('elastic_indexer')
 log_query = logging.getLogger('query')
-
 
 class CollectionAgents():
 	def __init__(self, datagetter):
@@ -19,7 +17,7 @@ class CollectionAgents():
 		
 		query = """
 		SELECT DISTINCT
-		[rownumber],
+		idstemp.[rownumber],
 		idstemp.[idshash] AS [_id],
 		ca.CollectorsName,
 		ca.CollectorsAgentURI,
@@ -50,7 +48,7 @@ class CollectionAgents():
 		# select the ProjectIDs for each Collector of a Specimen
 		query = """
 		SELECT DISTINCT
-		[rownumber],
+		idstemp.[rownumber],
 		idstemp.[idshash] AS [_id],
 		CONCAT(idstemp.[DatabaseID], '_', cp.[ProjectID]) AS [DB_ProjectID],
 		cp.[ProjectID]

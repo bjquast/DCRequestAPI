@@ -447,7 +447,7 @@ MappingsDict['iuparts'] = {
 				'Rank': {'type': 'keyword', 'fields': {'keyword_lc': {'type': 'keyword', 'normalizer': 'use_lowercase', 'ignore_above': 256}}},
 				'TreeLevel': {'type': 'integer'},
 				'ParentTaxonURI': {'type': 'keyword'},
-				'HierarchyString': {'type': 'text', 'fields': {'facet': {'type': 'text', 'analyzer': 'tree_hierarchy', 'fielddata': 'true'}}}
+				'HierarchyString': {'type': 'text', 'fields': {'facet': {'type': 'text', 'analyzer': 'tree_hierarchy', 'fielddata': 'true'}, 'keyword': {'type': 'keyword', 'ignore_above': 512}}}
 			}
 		},
 		

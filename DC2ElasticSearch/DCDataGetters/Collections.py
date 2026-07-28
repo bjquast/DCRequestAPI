@@ -154,7 +154,7 @@ class Collections():
 		INSERT INTO [#temp_collection]
 		([rownumber], [_id], [CollectionID], [CollectionName], [CollectionAcronym])
 		SELECT 
-		[rownumber],
+		idstemp.[rownumber],
 		idstemp.[idshash] AS [_id],
 		COALESCE(c_csp.[CollectionID], c_cs.[CollectionID]) AS [CollectionID],
 		COALESCE(c_csp.[CollectionName], c_cs.[CollectionName]) AS [CollectionName],
@@ -168,7 +168,7 @@ class Collections():
 			ON c_csp.[CollectionID] = csp.[CollectionID]
 		LEFT JOIN [Collection] c_cs
 			ON c_cs.[CollectionID] = csp.[CollectionID]
-		ORDER BY [rownumber]
+		ORDER BY idstemp.[rownumber]
 		"""
 		
 		self.cur.execute(query)

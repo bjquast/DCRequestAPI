@@ -19,7 +19,7 @@ class CollectionSpecimenImages():
 		
 		query = """
 		SELECT 
-		[rownumber],
+		idstemp.[rownumber],
 		idstemp.[idshash] AS [_id],
 		csi.[URI],
 		csi.ResourceURI,
@@ -48,7 +48,7 @@ class CollectionSpecimenImages():
 			AND csi.[SpecimenPartID] = idstemp.[SpecimenPartID]
 		UNION 
 		SELECT 
-		[rownumber],
+		idstemp.[rownumber],
 		idstemp.[idshash] AS [_id],
 		csi.[URI],
 		csi.ResourceURI,
@@ -77,7 +77,7 @@ class CollectionSpecimenImages():
 			AND csi.[SpecimenPartID] IS NULL
 		UNION
 		SELECT 
-		[rownumber],
+		idstemp.[rownumber],
 		idstemp.[idshash] AS [_id],
 		csi.[URI],
 		csi.ResourceURI,
@@ -104,7 +104,7 @@ class CollectionSpecimenImages():
 		ON csi.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] 
 			AND csi.[IdentificationUnitID] IS NULL
 			AND csi.[SpecimenPartID] IS NULL
-		ORDER BY [rownumber], ImageUploadDate
+		ORDER BY idstemp.[rownumber], ImageUploadDate
 		;"""
 		self.cur.execute(query)
 		self.columns = [column[0] for column in self.cur.description]
