@@ -15,7 +15,19 @@ class IdentificationUnitParts():
 		self.con = self.datagetter.con
 
 
+	def __set_created_when_string(self):
+		if self.datagetter.dc_params['lex_ZMH'] is True:
+			self.created_when_string = """		CONVERT(NVARCHAR, 
+			CASE WHEN cs.LogCreatedWhen < '2021-01-01' THEN cs.LogUpdatedWhen
+			ELSE cs.LogCreatedWhen
+			END, 120)
+		AS SpecimenCreatedWhen,"""
+		else:
+			self.created_when_string = """		CONVERT(NVARCHAR, cs.LogCreatedWhen, 120) AS SpecimenCreatedWhen,"""
+		return
+
 	def get_data_page(self):
+		self.__set_created_when_string()
 		
 		query = """
 		SELECT 
@@ -50,7 +62,7 @@ class IdentificationUnitParts():
 			ELSE 'true'
 		END AS SpecimenWithhold,
 		cs.Version AS SpecimenVersion,
-		CONVERT(NVARCHAR, cs.LogCreatedWhen, 120) AS SpecimenCreatedWhen,
+		{0}
 		cs.LogCreatedBy AS SpecimenCreatedBy,
 		CONVERT(NVARCHAR, cs.LogUpdatedWhen, 120) AS SpecimenUpdatedWhen,
 		cs.LogUpdatedBy AS SpecimenUpdatedBy,
@@ -153,7 +165,7 @@ class IdentificationUnitParts():
 		ON (celaltitude.CollectionEventID = ce.CollectionEventID and celaltitude.LocalisationSystemID = 4)
 		LEFT JOIN CollectionEventLocalisation cel_named_area
 		ON (cel_named_area.CollectionEventID = ce.CollectionEventID and cel_named_area.LocalisationSystemID = 7)
-		;"""
+		;""".format(self.created_when_string)
 		self.cur.execute(query)
 		self.columns = [column[0] for column in self.cur.description]
 		

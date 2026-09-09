@@ -51,11 +51,13 @@ class DC_Connections():
 				else:
 					withholded_collections = []
 				
-				
 				if project_section is not None:
 					self.read_projects_connectionparams(project_section)
 				else:
 					self.projects_connectionstring = None
+				
+				# lex_ZMH for replacing LogCreatedWhen values with LogUpdatedWhen for entries before 2021
+				lex_ZMH = self.config.getboolean(section, 'lex_ZMH', fallback = False)
 				
 				mssql_params = MSSQLConnectionParams(server = server, port = port, database = database_name, uid = uid, pwd = password, driver = driver, trust_certificate = trust_certificate, trusted_connection = trusted_connection, encrypt = encrypt)
 				connectionstring = mssql_params.getConnectionString()
@@ -68,7 +70,8 @@ class DC_Connections():
 					'database_id': database_id,
 					'projects_connectionstring': self.projects_connectionstring,
 					'withholded_projects': withholded_projects,
-					'withholded_collections': withholded_collections
+					'withholded_collections': withholded_collections,
+					'lex_ZMH': lex_ZMH,
 				}
 				
 				self.databases.append(database_params)
