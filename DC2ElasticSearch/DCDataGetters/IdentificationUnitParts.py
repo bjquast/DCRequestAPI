@@ -15,19 +15,25 @@ class IdentificationUnitParts():
 		self.con = self.datagetter.con
 
 
-	def __set_created_when_string(self):
+	def __set_created_when_parts(self):
 		if self.datagetter.dc_params['lex_ZMH'] is True:
 			self.created_when_string = """		CONVERT(NVARCHAR, 
-			CASE WHEN cs.LogCreatedWhen < '2021-01-01' THEN cs.LogUpdatedWhen
+			CASE WHEN cs.LogCreatedWhen < '2021-01-01' AND csl.LogDate IS NOT NULL THEN csl.LogDate
+			WHEN cs.LogCreatedWhen < '2021-01-01' AND csl.LogDate IS NULL THEN cs.LogUpdatedWhen
 			ELSE cs.LogCreatedWhen
 			END, 120)
 		AS SpecimenCreatedWhen,"""
+			self.specimen_log_join = """LEFT JOIN (SELECT CollectionSpecimenID, MIN(LogDate) AS LogDate
+			FROM CollectionSpecimen_Log
+			GROUP BY CollectionSpecimenID) AS csl
+			ON csl.CollectionSpecimenID = cs.CollectionSpecimenID"""
 		else:
 			self.created_when_string = """		CONVERT(NVARCHAR, cs.LogCreatedWhen, 120) AS SpecimenCreatedWhen,"""
+			self.specimen_log_join = ''
 		return
 
 	def get_data_page(self):
-		self.__set_created_when_string()
+		self.__set_created_when_parts()
 		
 		query = """
 		SELECT 
@@ -157,6 +163,7 @@ class IdentificationUnitParts():
 		ON csp.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID] AND csp.[SpecimenPartID] = idstemp.[SpecimenPartID]
 		INNER JOIN CollectionSpecimen cs 
 		ON cs.[CollectionSpecimenID] = idstemp.[CollectionSpecimenID]
+		{1}
 		LEFT JOIN CollectionEvent ce
 		ON cs.CollectionEventID = ce.CollectionEventID
 		LEFT JOIN CollectionEventLocalisation celcoord
@@ -165,7 +172,7 @@ class IdentificationUnitParts():
 		ON (celaltitude.CollectionEventID = ce.CollectionEventID and celaltitude.LocalisationSystemID = 4)
 		LEFT JOIN CollectionEventLocalisation cel_named_area
 		ON (cel_named_area.CollectionEventID = ce.CollectionEventID and cel_named_area.LocalisationSystemID = 7)
-		;""".format(self.created_when_string)
+		;""".format(self.created_when_string, self.specimen_log_join)
 		self.cur.execute(query)
 		self.columns = [column[0] for column in self.cur.description]
 		
