@@ -40,7 +40,8 @@ encrypt = @@DS2_ENCRYPT@@
 # project_db_connector references an existing section with SQL SERVER connection parameters
 # can be the same for different data_source sections
 project_db_connector = @@DS2_PROJECT_DB_CONNECTOR@@
-
+# for ZMH database all LogCreatedWhen entries mus be set to LogUpdatedWhen or min(CollectionSpecimen_Log.LogDate) when < 2021-01-01
+lex_ZMH = @@DS2_LEX_ZMH@@
 
 [projects_P1]
 server   = @@P1_SERVER@@
